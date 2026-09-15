@@ -1,0 +1,47 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling thiserror v2.0.20
+   Compiling zmij v1.0.23
+   Compiling xalen-star-anchors v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-star-anchors)
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling vsop87 v3.0.0
+   Compiling itoa v1.0.18
+   Compiling syn v3.0.5
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling xalen-time v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-time)
+   Compiling xalen-stars-hip-data v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-stars-hip-data)
+   Compiling xalen-coords v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-coords)
+   Compiling xalen-ayanamsa v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-ayanamsa)
+   Compiling xalen-houses v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-houses)
+   Compiling xalen-stars v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-stars)
+   Compiling xalen-ephem v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-ephem)
+   Compiling xalen-validation v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/validation)
+    Finished `release` profile [optimized] target(s) in 8.27s
+     Running `target/release/de440_bench --kernel /Users/brijesh/Projects/jyotish-os/kernels/de440s.bsp`
+XALEN ephemeris-precision benchmark — planetary-longitude agreement
+===================================================================
+reference   : JPL DE440 SPK kernel (/Users/brijesh/Projects/jyotish-os/kernels/de440s.bsp)
+candidate   : XALEN analytic VSOP87/ELP series
+metric      : |Δ apparent geocentric ecliptic longitude| (DE440 − VSOP87), arcsec
+span        : JD 2415021.0 .. 2469807.0  (3653 epochs, step 15 days)
+
+body          samples        mean(")         rms(")         max(")         worst@JD
+----------------------------------------------------------------------------------
+Sun              3653         0.0812         0.0983         0.1932        2416386.0
+Moon             3653         2.2027         2.8168        11.5162        2466576.0
+Mercury          3653         0.0849         0.1014         0.2553        2423916.0
+Venus            3653         0.0940         0.1140         0.4033        2416386.0
+Mars             3653         0.0801         0.0914         0.3231        2452896.0
+Jupiter          3653         0.1609         0.1868         0.4550        2469021.0
+Saturn           3653         0.1691         0.1942         0.3862        2468136.0
+Uranus           3653         0.4029         0.5558         1.4096        2464341.0
+Neptune          3653         0.6238         0.8910         2.1540        2469741.0
+Pluto            3653         0.3521         0.4510         1.2924        2469621.0
+----------------------------------------------------------------------------------
+worst body  : Moon at 11.5162" (0.003199°)
+EXIT=0

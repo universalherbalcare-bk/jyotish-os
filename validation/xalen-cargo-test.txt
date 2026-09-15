@@ -1,0 +1,2824 @@
+    Updating crates.io index
+     Locking 183 packages to latest compatible versions
+      Adding criterion v0.5.1 (available: v0.8.2)
+      Adding dirs v5.0.1 (available: v7.0.0)
+      Adding generic-array v0.14.7 (available: v0.14.9)
+      Adding sha2 v0.10.9 (available: v0.11.0)
+      Adding ureq v2.12.1 (available: v3.4.2)
+ Downloading crates ...
+  Downloaded napi-sys v3.3.1
+  Downloaded cast v0.3.0
+  Downloaded same-file v1.0.6
+  Downloaded anes v0.1.6
+  Downloaded ciborium-io v0.2.2
+  Downloaded nohash-hasher v0.2.0
+  Downloaded is-terminal v0.4.17
+  Downloaded plotters-svg v0.3.7
+  Downloaded clap_lex v1.1.1
+  Downloaded ciborium-ll v0.2.2
+  Downloaded criterion-plot v0.5.0
+  Downloaded napi-build v2.4.2
+  Downloaded crossbeam-deque v0.8.8
+  Downloaded oorandom v11.1.5
+  Downloaded pyo3-macros v0.29.2
+  Downloaded target-lexicon v0.13.5
+  Downloaded tinytemplate v1.2.1
+  Downloaded walkdir v2.5.0
+  Downloaded libloading v0.9.0
+  Downloaded plotters-backend v0.3.7
+  Downloaded napi-derive v3.6.6
+  Downloaded crossbeam-epoch v0.9.21
+  Downloaded convert_case v0.12.0
+  Downloaded semver v1.0.28
+  Downloaded pyo3-build-config v0.29.2
+  Downloaded napi-derive-backend v6.1.3
+  Downloaded ciborium v0.2.2
+  Downloaded crossbeam-utils v0.8.23
+  Downloaded ctor v1.0.13
+  Downloaded half v2.7.1
+  Downloaded rayon-core v1.13.0
+  Downloaded clap v4.6.7
+  Downloaded pyo3-macros-backend v0.29.2
+  Downloaded pyo3-ffi v0.29.2
+  Downloaded zerocopy-derive v0.8.57
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded criterion v0.5.1
+  Downloaded itertools v0.10.5
+  Downloaded regex v1.13.1
+  Downloaded plotters v0.3.7
+  Downloaded clap_builder v4.6.7
+  Downloaded rayon v1.12.0
+  Downloaded napi v3.12.5
+  Downloaded pyo3 v0.29.2
+  Downloaded vsop87 v3.0.0
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling thiserror v2.0.20
+   Compiling xalen-star-anchors v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-star-anchors)
+   Compiling vsop87 v3.0.0
+   Compiling memchr v2.8.3
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling itoa v1.0.18
+   Compiling libc v0.2.189
+   Compiling cfg-if v1.0.4
+   Compiling crossbeam-utils v0.8.23
+   Compiling zerocopy v0.8.57
+   Compiling crossbeam-epoch v0.9.21
+   Compiling autocfg v1.5.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling num-traits v0.2.19
+   Compiling either v1.18.0
+   Compiling rayon-core v1.13.0
+   Compiling regex-syntax v0.8.11
+   Compiling once_cell v1.21.4
+   Compiling ciborium-io v0.2.2
+   Compiling anstyle v1.0.14
+   Compiling clap_lex v1.1.1
+   Compiling plotters-backend v0.3.7
+   Compiling clap_builder v4.6.7
+   Compiling plotters-svg v0.3.7
+   Compiling regex-automata v0.4.18
+   Compiling itertools v0.10.5
+   Compiling cast v0.3.0
+   Compiling same-file v1.0.6
+   Compiling walkdir v2.5.0
+   Compiling is-terminal v0.4.17
+   Compiling oorandom v11.1.5
+   Compiling anes v0.1.6
+   Compiling target-lexicon v0.13.5
+   Compiling futures-core v0.3.34
+   Compiling futures-sink v0.3.34
+   Compiling criterion-plot v0.5.0
+   Compiling clap v4.6.7
+   Compiling napi-build v2.4.2
+   Compiling regex v1.13.1
+   Compiling futures-channel v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-io v0.3.34
+   Compiling unicode-segmentation v1.13.3
+   Compiling heck v0.5.0
+   Compiling napi v3.12.5
+   Compiling convert_case v0.12.0
+   Compiling libloading v0.9.0
+   Compiling semver v1.0.28
+   Compiling ctor v1.0.13
+   Compiling napi-sys v3.3.1
+   Compiling xalen-node v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-node)
+   Compiling rustc-hash v2.1.3
+   Compiling bitflags v2.13.2
+   Compiling nohash-hasher v0.2.0
+   Compiling syn v3.0.5
+   Compiling syn v2.0.119
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.20
+   Compiling futures-macro v0.3.34
+   Compiling plotters v0.3.7
+   Compiling pyo3-macros-backend v0.29.2
+   Compiling napi-derive-backend v6.1.3
+   Compiling futures-util v0.3.34
+   Compiling rayon v1.12.0
+   Compiling pyo3-build-config v0.29.2
+   Compiling zerocopy-derive v0.8.57
+   Compiling pyo3-ffi v0.29.2
+   Compiling pyo3 v0.29.2
+   Compiling napi-derive v3.6.6
+   Compiling pyo3-macros v0.29.2
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling xalen-time v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-time)
+   Compiling xalen-stars-hip-data v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-stars-hip-data)
+   Compiling xalen-numerology v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-numerology)
+   Compiling xalen-iching v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-iching)
+   Compiling tinytemplate v1.2.1
+   Compiling xalen-coords v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-coords)
+   Compiling xalen-chinese v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-chinese)
+   Compiling xalen-houses v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-houses)
+   Compiling xalen-ayanamsa v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-ayanamsa)
+   Compiling xalen-western v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-western)
+   Compiling xalen-lalkitab v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-lalkitab)
+   Compiling xalen-stars v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-stars)
+   Compiling xalen-vedic v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-vedic)
+   Compiling xalen-world v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-world)
+   Compiling xalen-chart v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-chart)
+   Compiling xalen-ephem v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-ephem)
+   Compiling xalen-validation v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/validation)
+   Compiling xalen-ephemeris v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen)
+   Compiling half v2.7.1
+   Compiling xalen-cloud v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-cloud)
+   Compiling xalen-ffi v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-ffi)
+   Compiling ciborium-ll v0.2.2
+   Compiling ciborium v0.2.2
+   Compiling criterion v0.5.1
+   Compiling xalen-wasm v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-wasm)
+   Compiling xalen-python v0.6.0 (/Users/brijesh/Projects/jyotish-os/vendor/xalen/crates/xalen-python)
+warning: use of deprecated associated function `xalen_vedic::shadbala::Shadbala::compute`: Use compute_full() for the complete six-fold Shadbala
+   --> examples/vedic_chart.rs:142:28
+    |
+142 |         let sb = Shadbala::compute(name, sid, house, 1.0);
+    |                            ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: `xalen-ephemeris` (example "vedic_chart") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.08s
+     Running unittests src/lib.rs (target/debug/deps/xalen_ayanamsa-0afef2878f338377)
+
+running 31 tests
+test tests::all_47_se_ids_covered ... ok
+test tests::aryabhata_522_between_aryabhata_and_lahiri ... ok
+test tests::at_least_40_named_systems ... ok
+test tests::aryabhata_smaller_than_lahiri ... ok
+test tests::ayanamsa_increases_over_time ... ok
+test tests::b1950_half_of_j1900 ... ok
+test tests::custom_ayanamsa ... ok
+test tests::display_coverage ... ok
+test tests::babylonian_systems_cluster ... ok
+test tests::djwhal_khul_higher_than_fagan_bradley ... ok
+test tests::fagan_bradley_larger_than_lahiri ... ok
+test tests::j1900_matches_swiss_apparent_at_j2000 ... ok
+test tests::j1900_positive_at_j2000 ... ok
+test tests::galactic_systems_match_swiss_relationships ... ok
+test tests::j2000_is_nutation_only_at_j2000 ... ok
+test tests::kp_differs_from_lahiri ... ok
+test tests::lahiri_at_j2000 ... ok
+test tests::lahiri_variants_close ... ok
+test tests::mardyks_around_30_at_j2000 ... ok
+test tests::all_named_ayanamsas_reasonable_at_j2000 ... ok
+test tests::se_id_47_and_above_return_none ... ok
+test tests::surya_siddhanta_variants_close ... ok
+test tests::tropical_sidereal_roundtrip ... ok
+test tests::true_chitra_drifts_with_precession ... ok
+test tests::new_systems_compute_without_panic ... ok
+test tests::true_chitra_is_no_longer_the_23_860_constant ... ok
+test tests::true_chitra_j2000_sanity_band_and_near_lahiri ... ok
+test tests::true_chitra_matches_swiss_within_tolerance ... ok
+test tests::true_chitra_pins_spica_sidereal_longitude_at_180 ... ok
+test tests::se_reference_values_at_j2000 ... ok
+test tests::swiss_ephem_roundtrip ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/swiss_ayanamsa_oracle.rs (target/debug/deps/swiss_ayanamsa_oracle-528b6e1a0de5c51d)
+
+running 4 tests
+test oracle_table_is_complete_and_consistent ... ok
+test true_chitra_matches_swiss_off_grid ... ok
+test true_chitra_matches_swiss_within_1_arcsec ... ok
+test all_ayanamsas_match_swiss_within_1_arcsec ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_chart-a1c065dae7909707)
+
+running 22 tests
+test north_indian::tests::house_centers_within_bounds ... ok
+test south_indian::tests::grid_positions_unique ... ok
+test north_indian::tests::ascendant_marker_present ... ok
+test south_indian::tests::pisces_top_left ... ok
+test south_indian::tests::renders_rashi_chart_label ... ok
+test north_indian::tests::svg_contains_all_12_sign_labels ... ok
+test south_indian::tests::ascendant_line_present ... ok
+test south_indian::tests::grid_positions_within_4x4 ... ok
+test tests::empty_chart_no_panic ... ok
+test tests::planets_in_house_grouping ... ok
+test tests::sign_for_house_wraps ... ok
+test tests::north_indian_produces_valid_svg ... ok
+test western_wheel::tests::ascendant_renders_on_the_left ... ok
+test western_wheel::tests::polar_to_xy_90deg ... ok
+test tests::south_indian_produces_valid_svg ... ok
+test tests::all_houses_populated ... ok
+test western_wheel::tests::polar_to_xy_center_plus_radius ... ok
+test tests::western_wheel_produces_valid_svg ... ok
+test western_wheel::tests::sign_colors_cycle ... ok
+test western_wheel::tests::zodiac_advances_counter_clockwise ... ok
+test western_wheel::tests::renders_all_sign_abbreviations ... ok
+test western_wheel::tests::renders_house_numbers ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/robustness_regression.rs (target/debug/deps/robustness_regression-748f7433ae3bb6c7)
+
+running 1 test
+test nan_inf_and_malformed_house_render_clean_no_panic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_chinese-ec186264d84ce63b)
+
+running 125 tests
+test fengshui::tests::all_8_directions ... ok
+test fengshui::tests::auspicious_combos_symmetric ... ok
+test fengshui::tests::annual_star_known_years ... ok
+test fengshui::tests::ba_zhai_best_worst ... ok
+test fengshui::tests::annual_star_9_year_cycle ... ok
+test fengshui::tests::annual_star_always_1_to_9 ... ok
+test fengshui::tests::ba_zhai_covers_all_8_directions ... ok
+test fengshui::tests::ba_zhai_east_group ... ok
+test fengshui::tests::ba_zhai_auspicious_inauspicious_no_overlap ... ok
+test fengshui::tests::ba_zhai_west_group ... ok
+test fengshui::tests::direction_names ... ok
+test fengshui::tests::double_8_is_auspicious ... ok
+test fengshui::tests::fly_stars_center_5_forward_is_lo_shu ... ok
+test fengshui::tests::fly_stars_center_is_input ... ok
+test fengshui::tests::fly_stars_contains_all_9 ... ok
+test fengshui::tests::fly_stars_forward_vs_reverse_differ ... ok
+test fengshui::tests::flying_star_chart_grids_valid ... ok
+test fengshui::tests::flying_star_chart_period_matches ... ok
+test fengshui::tests::gua_always_valid_range ... ok
+test fengshui::tests::gua_female_5_becomes_8 ... ok
+test fengshui::tests::gua_male_5_becomes_2 ... ok
+test fengshui::tests::gua_never_5 ... ok
+test fengshui::tests::gua_number_known_examples ... ok
+test fengshui::tests::gua_post_2000_male ... ok
+test fengshui::tests::inauspicious_combos ... ok
+test fengshui::tests::monthly_star_feb_matches_group_base ... ok
+test fengshui::tests::monthly_star_always_1_to_9 ... ok
+test fengshui::tests::palace_directions_match_lo_shu ... ok
+test fengshui::tests::period_wraps_after_180_years ... ok
+test fengshui::tests::period_boundaries ... ok
+test fengshui::tests::star_8_is_wealth ... ok
+test fengshui::tests::star_elements_all_defined ... ok
+test fengshui::tests::star_meanings_all_defined ... ok
+test qimen::tests::all_8_deities_present ... ok
+test qimen::tests::all_8_doors_present ... ok
+test qimen::tests::all_9_stars_present ... ok
+test qimen::tests::all_eight_deities_seated_and_zhifu_consistent ... ok
+test qimen::tests::compute_qimen_different_seasons_differ_in_dun ... ok
+test qimen::tests::compute_qimen_is_deterministic ... ok
+test qimen::tests::compute_qimen_produces_9_palaces ... ok
+test qimen::tests::deity_names ... ok
+test qimen::tests::door_auspicious ... ok
+test qimen::tests::door_names ... ok
+test qimen::tests::earth_plate_stems_are_the_nine_distinct_stems ... ok
+test qimen::tests::favorable_palace_check ... ok
+test qimen::tests::jia_palace_yang_dun ... ok
+test qimen::tests::jia_palace_yin_dun ... ok
+test qimen::tests::liu_yi_are_wu_through_gui ... ok
+test qimen::tests::lo_shu_contains_1_to_9 ... ok
+test qimen::tests::lo_shu_is_magic_square ... ok
+test qimen::tests::qimen_ju_known_anchors ... ok
+test qimen::tests::qimen_day_stem_is_continuous_and_anchored ... ok
+test qimen::tests::qimen_ju_summer_terms_are_yin_dun ... ok
+test qimen::tests::qimen_ju_winter_terms_are_yang_dun ... ok
+test qimen::tests::san_qi_are_yi_bing_ding ... ok
+test qimen::tests::star_names ... ok
+test qimen::tests::san_yuan_fu_tou_groups ... ok
+test qimen::tests::zhifu_anchored_to_xun_head_yi ... ok
+test tests::all_12_animals ... ok
+test tests::all_12_months_reachable ... ok
+test tests::bazi_chart_produces_4_pillars ... ok
+test tests::heavenly_stem_elements ... ok
+test tests::hour_branches ... ok
+test tests::known_chart_2000_jun15 ... ok
+test tests::li_chun_2000_around_feb4 ... ok
+test tests::li_chun_2024_around_feb4 ... ok
+test tests::month_branch_wu_for_month5 ... ok
+test tests::month_branch_yin_for_month1 ... ok
+test tests::month_branch_zi_for_month11 ... ok
+test tests::month_stem_all_five_year_groups ... ok
+test tests::month_stem_jia_year_month1_is_bing ... ok
+test tests::month_stem_yi_year_month1_is_wu ... ok
+test tests::sexagenary_60_year_cycle ... ok
+test tests::solar_longitude_at_j2000 ... ok
+test tests::solar_longitude_at_summer_solstice_2024 ... ok
+test tests::solar_longitude_at_vernal_equinox_2024 ... ok
+test tests::solar_month_mid_december_is_month11 ... ok
+test tests::solar_month_mid_january_is_month12 ... ok
+test tests::solar_month_mid_july_is_month6 ... ok
+test tests::solar_month_mid_march_is_month2 ... ok
+test tests::solar_terms_start_at_315 ... ok
+test tests::wu_xing_generating_cycle ... ok
+test tests::wu_xing_overcoming_cycle ... ok
+test tests::year_2000_cycle ... ok
+test tests::year_2024_is_jia_chen ... ok
+test tests::year_pillar_after_li_chun_uses_current_year ... ok
+test tests::year_pillar_before_li_chun_uses_previous_year ... ok
+test tests::year_pillar_derived_from_jd_not_passed_year ... ok
+test ziwei::tests::all_star_palaces_in_range ... ok
+test ziwei::tests::benefic_stars ... ok
+test ziwei::tests::chart_places_all_14_stars ... ok
+test ziwei::tests::compute_chart_has_12_palaces ... ok
+test ziwei::tests::da_xian_12_periods ... ok
+test ziwei::tests::da_xian_age_ranges_consecutive ... ok
+test ziwei::tests::da_xian_starts_at_wu_xing_value ... ok
+test ziwei::tests::da_xian_wraps_around ... ok
+test ziwei::tests::da_xian_yang_clockwise ... ok
+test ziwei::tests::da_xian_yin_counterclockwise ... ok
+test ziwei::tests::di_kong_di_jie_use_birth_hour ... ok
+test ziwei::tests::different_months_different_charts ... ok
+test ziwei::tests::huo_xing_varies_with_birth_hour ... ok
+test ziwei::tests::liu_nian_all_12_branches ... ok
+test ziwei::tests::liu_nian_matches_branch_index ... ok
+test ziwei::tests::lunar_month_out_of_range_clamps_consistently ... ok
+test ziwei::tests::major_star_elements ... ok
+test ziwei::tests::major_star_chinese_names ... ok
+test ziwei::tests::ming_gong_month1_zi_hour ... ok
+test ziwei::tests::ming_gong_varies_with_hour ... ok
+test ziwei::tests::minor_star_chinese_names ... ok
+test ziwei::tests::minor_star_lucky_classification ... ok
+test ziwei::tests::palace_chinese_names ... ok
+test ziwei::tests::place_14_major_stars ... ok
+test ziwei::tests::place_14_minor_stars ... ok
+test ziwei::tests::qing_yang_tuo_luo_flank_lu_cun ... ok
+test ziwei::tests::shen_gong_always_valid_range ... ok
+test ziwei::tests::shen_gong_computed ... ok
+test ziwei::tests::shen_gong_differs_from_ming_for_nonzero_hours ... ok
+test ziwei::tests::shen_gong_specific_values ... ok
+test ziwei::tests::wen_chang_jia_at_si ... ok
+test ziwei::tests::wu_xing_ju_is_2_to_6 ... ok
+test ziwei::tests::zi_wei_palace_canonical_cases ... ok
+test ziwei::tests::zi_wei_palace_day_zero_no_underflow ... ok
+test ziwei::tests::zi_wei_palace_in_range ... ok
+test ziwei::tests::zuo_fu_you_bi_month_only_and_anchored ... ok
+test ziwei::tests::minor_star_palaces_in_range ... ok
+
+test result: ok. 125 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/bazi_fixtures.rs (target/debug/deps/bazi_fixtures-069086520b2017a3)
+
+running 4 tests
+test chart_a_2024_06_15_noon ... ok
+test chart_c_1984_jia_zi_cycle_restart ... ok
+test chart_b_2000_06_15_noon ... ok
+test day_pillar_documented_anchors ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_cloud-dec6f74a7a05fd80)
+
+running 9 tests
+test tests::from_calendar_rejects_invalid_civil_input ... ok
+test tests::offline_interpreter_is_deterministic_and_networkless ... ok
+test tests::convenience_chart_and_interpret ... ok
+test tests::computes_chart_locally ... ok
+test tests::chart_summary_serde_roundtrips ... ok
+test tests::interpretation_serde_roundtrips_with_sections ... ok
+test tests::sidereal_ascendant_equals_tropical_minus_ayanamsa ... ok
+test tests::rejects_invalid_inputs ... ok
+test tests::whole_sign_houses_are_consistent ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_coords-7e6a418ce13cea8b)
+
+running 42 tests
+test aberration::tests::kappa_is_iau1976_value ... ok
+test aberration::tests::aberration_vanishes_at_quadrature ... ok
+test aberration::tests::latitude_amplifies_displacement ... ok
+test nutation::tests::delaunay_args_are_reasonable ... ok
+test aberration::tests::aberration_bounded_by_kappa ... ok
+test nutation::tests::nutation_magnitude_at_j2000 ... ok
+test nutation::tests::nutation_reference_j2000 ... ok
+test nutation::tests::nutation_varies_with_time ... ok
+test obliquity::tests::obliquity_at_j2000 ... ok
+test nutation::tests::out_of_phase_affects_result ... ok
+test obliquity::tests::obliquity_decreases_over_centuries ... ok
+test planet::tests::classical_seven_count ... ok
+test planet::tests::classification_helpers ... ok
+test planet::tests::display_round_trips ... ok
+test planet::tests::from_str_variants ... ok
+test planet::tests::vedic_nine_count ... ok
+test precession::tests::frame_bias_matrix_matches_erfa_golden ... ok
+test precession::tests::general_precession_rate ... ok
+test precession::tests::fw06_angles_match_erfa_golden ... ok
+test precession::tests::p03_nobias_is_orthogonal_and_identity_at_j2000 ... ok
+test precession::tests::p03_nobias_matches_independent_zeta_z_theta_precession ... ok
+test precession::tests::pmat06_is_orthogonal_and_identity_at_j2000 ... ok
+test precession::tests::pmat06_matches_erfa_golden ... ok
+test precession::tests::precess_pipeline_identity_at_j2000 ... ok
+test precession::tests::precess_pipeline_longitude_rate_matches_general_precession ... ok
+test precession::tests::precession_at_j2000_is_zero ... ok
+test precession::tests::precession_matrix_is_identity_at_j2000 ... ok
+test precession::tests::precession_matrix_is_orthogonal ... ok
+test precession::tests::rotate3_and_transpose3_roundtrip ... ok
+test sidereal::tests::gast_deg_in_range ... ok
+test sidereal::tests::gast_is_gmst_plus_equation_of_equinoxes ... ok
+test sidereal::tests::gmst_deg_at_j2000 ... ok
+test sidereal::tests::gmst_hours_about_18h7_at_j2000 ... ok
+test sidereal::tests::gmst_hours_matches_deg_over_15 ... ok
+test transforms::tests::cartesian_ecliptic_roundtrip ... ok
+test transforms::tests::cartesian_to_ecliptic_nan_input_propagates_nan ... ok
+test transforms::tests::cartesian_to_ecliptic_zero_vector_is_finite ... ok
+test transforms::tests::ecliptic_equatorial_roundtrip ... ok
+test transforms::tests::normalize_longitude ... ok
+test transforms::tests::summer_solstice_dec_equals_obliquity ... ok
+test transforms::tests::vernal_equinox_ra_is_zero ... ok
+test nutation::tests::largest_nutation_term ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/sofa_reference_crossval.rs (target/debug/deps/sofa_reference_crossval-537d5b04ecbb6412)
+
+running 5 tests
+test mean_obliquity_matches_sofa_obl06 ... ok
+test mean_obliquity_matches_swiss_grid ... ok
+test nutation_2000b_matches_sofa ... ok
+test nutation_longitude_matches_swiss_within_2000b_truncation ... ok
+test nutation_obliquity_matches_swiss_grid ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_ephem-fd5a7d7c1d1c54d8)
+
+running 293 tests
+test almanac::tests::almanac_is_send_sync ... ok
+test almanac::tests::genuine_errors_are_not_swallowed_by_fall_through ... ok
+test almanac::tests::epoch_out_of_range_surfaced_when_no_provider_covers ... ok
+test almanac::tests::sidereal_is_tropical_minus_ayanamsa ... ok
+test almanac::tests::geocentric_speed_matches_known_daily_motion ... ok
+test almanac::tests::topocentric_lunar_parallax_dominates_solar ... ok
+test asteroids::tests::all_asteroid_positions_returns_four ... ok
+test asteroids::tests::asteroid_numbers_correct ... ok
+test asteroids::tests::category_assignment_correct ... ok
+test asteroids::tests::centaur_periods_correct ... ok
+test asteroids::tests::all_asteroids_reasonable_speed ... ok
+test asteroids::tests::ceres_at_j2000_reasonable ... ok
+test asteroids::tests::eros_period_correct ... ok
+test asteroids::tests::asteroid_display ... ok
+test asteroids::tests::centaurs_at_j2000_reasonable ... ok
+test asteroids::tests::ceres_epoch_2020 ... ok
+test asteroids::tests::all_extended_returns_fifteen ... ok
+test asteroids::tests::extended_asteroid_display ... ok
+test asteroids::tests::eros_at_j2000_near_earth ... ok
+test asteroids::tests::external_asteroid_empty_file ... ok
+test asteroids::tests::external_asteroid_header_only ... ok
+test asteroids::tests::all_extended_distance_across_epochs ... ok
+test asteroids::tests::external_orbital_period ... ok
+test asteroids::tests::kepler_circular_asteroid ... ok
+test asteroids::tests::kepler_convergence_pallas ... ok
+test asteroids::tests::load_asteroid_auto_mean_motion ... ok
+test asteroids::tests::load_asteroid_elements_basic ... ok
+test asteroids::tests::external_asteroid_reasonable_position ... ok
+test asteroids::tests::kepler_convergence_high_eccentricity ... ok
+test asteroids::tests::juno_at_j2000_reasonable ... ok
+test asteroids::tests::load_asteroid_elements_values ... ok
+test asteroids::tests::external_asteroid_position_ceres ... ok
+test asteroids::tests::load_asteroid_error_bad_eccentricity ... ok
+test asteroids::tests::load_asteroid_error_too_few_fields ... ok
+test asteroids::tests::load_asteroid_error_negative_a ... ok
+test asteroids::tests::load_asteroid_explicit_mean_motion ... ok
+test asteroids::tests::load_asteroid_no_n_column ... ok
+test asteroids::tests::load_asteroid_with_comments ... ok
+test asteroids::tests::mean_motion_kepler_third_law ... ok
+test asteroids::tests::orbital_periods_correct ... ok
+test asteroids::tests::pallas_at_j2000_reasonable ... ok
+test asteroids::tests::tno_periods_correct ... ok
+test almanac::tests::concurrent_access ... ok
+test asteroids::tests::new_main_belt_at_j2000_reasonable ... ok
+test asteroids::tests::vesta_at_j2000_reasonable ... ok
+test asteroids::tests::tnos_at_j2000_reasonable ... ok
+test asteroids::tests::positions_by_category_works ... ok
+test besselian::tests::cone_angles_2017_match_nasa ... ok
+test chiron::tests::chiron_at_j2000_reasonable ... ok
+test asteroids::tests::retrograde_detection_works ... ok
+test asteroids::tests::tno_slow_motion ... ok
+test chiron::tests::chiron_epoch_2020 ... ok
+test chiron::tests::chiron_moves_at_reasonable_speed ... ok
+test chiron::tests::chiron_distance_reasonable_range ... ok
+test asteroids::tests::distance_reasonable_range_across_epochs ... ok
+test chiron::tests::interpolation_at_epoch_boundary ... ok
+test chiron::tests::is_chiron_epoch_valid_boundaries ... ok
+test chiron::tests::kepler_circular_orbit ... ok
+test chiron::tests::lerp_angle_wraparound ... ok
+test chiron::tests::kepler_known_case ... ok
+test compat::tests::ayanamsa_ex_invalid ... ok
+test compat::tests::ayanamsa_lahiri_at_j2000 ... ok
+test compat::tests::ayanamsa_ex_all_47_systems ... ok
+test compat::tests::calc_ut_invalid_planet ... ok
+test compat::tests::calc_ut_moon_at_j2000 ... ok
+test compat::tests::calc_ut_osculating_apogee_matches_pyswisseph ... ok
+test almanac::tests::epoch_out_of_range_falls_through_to_next_provider ... ok
+test chiron::tests::chiron_multi_epoch_accuracy ... ok
+test almanac::tests::almanac_computes_all_vedic_grahas ... ok
+test compat::tests::calc_ut_rejects_unsupported_flags ... ok
+test compat::tests::calc_ut_sidereal_honors_active_sid_mode ... ok
+test compat::tests::calc_ut_sidereal_subtracts_ayanamsa ... ok
+test compat::tests::close_is_noop ... ok
+test compat::tests::deltat_positive_at_j2000 ... ok
+test chiron::tests::continuity_across_epoch_boundaries ... ok
+test compat::tests::calc_ut_sun_at_j2000 ... ok
+test compat::tests::house_codes_z_and_b_refused ... ok
+test compat::tests::houses_all_systems ... ok
+test compat::tests::houses_armc_is_real ... ok
+test compat::tests::houses_armc_uses_gast_not_gmst ... ok
+test compat::tests::houses_ex_sidereal_subtracts_ayanamsa ... ok
+test compat::tests::calc_ut_sidereal_speed_subtracts_ayanamsa_rate ... ok
+test compat::tests::houses_invalid_system ... ok
+test compat::tests::houses_match_true_obliquity_apparent_sidereal ... ok
+test compat::tests::houses_placidus ... ok
+test compat::tests::houses_rejects_bad_coordinates ... ok
+test compat::tests::houses_populates_auxiliary_ascmc ... ok
+test compat::tests::julday_j2000 ... ok
+test compat::tests::revjul_roundtrip ... ok
+test compat::tests::se_house_system_mapping_complete ... ok
+test compat::tests::se_planet_mapping_complete ... ok
+test compat::tests::set_ephe_path_is_noop ... ok
+test de440::tests::accuracy_arcsec_not_better_than_worst_body ... ok
+test de440::tests::accuracy_tier_analytical_fallback_when_no_kernel ... ok
+test compat::tests::calc_ut_speed_flag_populates_motion ... ok
+test asteroids::tests::retrograde_detection_extended ... ok
+test de440::tests::almanac_with_de440_nonexistent_file_is_noop ... ok
+test de440::tests::almanac_with_de440_strict_errors_on_nonexistent ... ok
+test de440::tests::chebyshev_constant ... ok
+test de440::tests::chebyshev_cos_identity ... ok
+test de440::tests::chebyshev_cubic ... ok
+test de440::tests::chebyshev_empty ... ok
+test de440::tests::chebyshev_linear ... ok
+test de440::tests::accuracy_tier_kernel_for_confirmed_de440 ... ok
+test de440::tests::accuracy_tier_unconfirmed_for_spk_without_de_label ... ok
+test de440::tests::chebyshev_many_terms ... ok
+test de440::tests::chebyshev_mixed_polynomial ... ok
+test de440::tests::chebyshev_quadratic ... ok
+test de440::tests::de440_header_defaults_valid ... ok
+test de440::tests::de440_provenance_detected_from_comment ... ok
+test de440::tests::de440_serves_pluto_pre1885_and_post2099_if_kernel ... ok
+test de440::tests::de440_target_mapping ... ok
+test de440::tests::de440_vs_vsop87_geocentric_at_j2000 ... ok
+test de440::tests::derivative_constant_is_zero ... ok
+test de440::tests::derivative_linear ... ok
+test de440::tests::derivative_quadratic ... ok
+test de440::tests::earth_geocentric_is_origin ... ok
+test compat::tests::fixstar_not_found ... ok
+test de440::tests::empty_reader_has_no_data ... ok
+test compat::tests::fixstar_spica ... ok
+test de440::tests::find_record_binary_search ... ok
+test de440::tests::from_file_real_de440_if_available ... ok
+test de440::tests::from_file_rejects_nonexistent ... ok
+test de440::tests::fallback_provider_uses_vsop87 ... ok
+test de440::tests::chebyshev_orthogonality_numerical ... ok
+test de440::tests::from_file_rejects_garbage_denum ... ok
+test de440::tests::from_file_returns_err_on_bad_epoch_range ... ok
+test de440::tests::ipt_words_per_record ... ok
+test de440::tests::from_file_synthetic_valid_header ... ok
+test de440::tests::from_file_rejects_truncated_file ... ok
+test de440::tests::naif_id_body_mapping ... ok
+test de440::tests::negative_word_address_is_rejected ... ok
+test de440::tests::non_finite_next_pointer_is_rejected ... ok
+test de440::tests::non_finite_rsize_is_rejected ... ok
+test de440::tests::position_km_rejects_epoch_past_directory_coverage ... ok
+test de440::tests::non_integral_rsize_is_rejected ... ok
+test de440::tests::provider_falls_back_for_unsupported_body ... ok
+test de440::tests::provider_is_send_sync ... ok
+test de440::tests::provider_with_records_does_not_claim_de440_metadata ... ok
+test de440::tests::record_body_coeffs_extraction ... ok
+test de440::tests::parse_synthetic_spk_file ... ok
+test compat::tests::calc_ut_all_se_planets ... ok
+test de440::tests::segment_priority_last_in_file_wins ... ok
+test de440::tests::rsize_not_multiple_of_three_form_is_rejected ... ok
+test de440::tests::spk_epoch_out_of_range ... ok
+test de440::tests::de440_label_detection_edge_cases ... ok
+test de440::tests::segment_span_mismatch_is_rejected ... ok
+test de440::tests::geocentric_gap_falls_back_to_vsop ... ok
+test de440::tests::almanac_integration_with_de440_provider ... ok
+test de440::tests::spk_without_de_label_is_not_advertised_as_de440 ... ok
+test de440::tests::spk_heliocentric_is_not_ssb ... ok
+test de440::tests::summary_chain_cycle_is_rejected ... ok
+test de440::tests::spk_geocentric_moon ... ok
+test de440::tests::spk_position_at_j2000 ... ok
+test de440::tests::synthetic_mercury_position ... ok
+test de440::tests::synthetic_linear_mercury_position ... ok
+test de440::tests::spk_heliocentric_subtracts_sun_ssb ... ok
+test de440::tests::try_from_file_strict_errors_on_nonexistent ... ok
+test de440::tests::try_from_file_lenient_is_silent_fallback_but_not_de440 ... ok
+test de440::tests::summary_next_beyond_eof_is_rejected ... ok
+test eclipse::tests::lunar_eclipse_empty_for_reversed_range ... ok
+test de440::tests::summary_nsum_overrun_is_rejected ... ok
+test chiron::tests::full_century_sweep ... ok
+test almanac::tests::sun_rise_transit_set_at_delhi ... ok
+test eclipse::tests::nasa_2024_mar25_penumbral_lunar ... ok
+test eclipse::tests::find_lunar_eclipses_year_2024 ... ok
+test eclipse::tests::full_moons_in_one_year ... ok
+test besselian::tests::solar_eclipse_2023_apr_20_is_hybrid ... ok
+test eclipse::tests::nasa_2024_sep18_partial_lunar ... ok
+test besselian::tests::solar_eclipse_2017_aug_21_matches_nasa ... ok
+test eclipse::tests::nasa_2025_mar14_total_lunar ... ok
+test besselian::tests::solar_eclipse_2024_apr_08_matches_nasa ... ok
+test eclipse::tests::solar_eclipse_empty_for_reversed_range ... ok
+test eclipse::tests::nasa_2024_apr08_total_solar ... ok
+test eclipse::tests::nasa_2024_oct02_annular_solar ... ok
+test event_search::tests::crossing_exactly_on_step_boundary ... ok
+test event_search::tests::crossing_past_jd_end_is_not_emitted ... ok
+test event_search::tests::find_linear_crossing ... ok
+test event_search::tests::find_sign_ingress_linear ... ok
+test event_search::tests::find_sign_ingress_wrap_360_to_0 ... ok
+test event_search::tests::find_sine_crossings ... ok
+test event_search::tests::find_station_cosine ... ok
+test event_search::tests::no_crossing_when_none_exists ... ok
+test event_search::tests::precision_of_bisection ... ok
+test event_search::tests::sign_ingress_past_jd_end_is_not_emitted ... ok
+test lilith::tests::lilith_at_known_epoch_2020 ... ok
+test lilith::tests::lilith_continuous_over_decade ... ok
+test lilith::tests::lilith_full_cycle_about_8_85_years ... ok
+test lilith::tests::lilith_prograde_motion ... ok
+test lilith::tests::lilith_valid_range ... ok
+test lilith::tests::mean_lilith_at_j2000 ... ok
+test lilith::tests::mean_perigee_at_j2000 ... ok
+test lilith::tests::priapus_equals_perigee ... ok
+test lilith::tests::priapus_opposite_lilith ... ok
+test lilith::tests::priapus_valid_range ... ok
+test lilith::tests::true_lilith_at_1992_matches_pyswisseph ... ok
+test lilith::tests::true_lilith_at_j2000_matches_pyswisseph ... ok
+test lilith::tests::true_lilith_oscillates_about_mean ... ok
+test lilith::tests::true_lilith_valid_range ... ok
+test eclipse::tests::new_moons_in_one_year ... ok
+test eclipse::tests::nasa_2025_mar29_partial_solar ... ok
+test moon::tests::meeus_example_47a ... ok
+test moon::tests::moon_at_j2000_reasonable ... ok
+test moon::tests::moon_longitude_stability_across_epochs ... ok
+test moon::tests::moon_moves_about_13_degrees_per_day ... ok
+test moon::tests::table_sizes_correct ... ok
+test output::tests::equatorial_is_rotation_of_ecliptic ... ok
+test output::tests::geocentric_rectangular_equatorial_round_trips ... ok
+test output::tests::geocentric_rectangular_is_consistent_with_spherical ... ok
+test output::tests::helio_light_time_applied_when_resolvable ... ok
+test output::tests::helio_light_time_fault_is_propagated_not_silently_degraded ... ok
+test output::tests::heliocentric_distance_differs_from_geocentric ... ok
+test output::tests::heliocentric_mars_matches_pyswisseph ... ok
+test output::tests::heliocentric_rectangular_sun_is_origin ... ok
+test output::tests::heliocentric_unavailable_for_geometric_points ... ok
+test output::tests::ra_dec_matches_pyswisseph_at_j2000 ... ok
+test pluto::tests::pluto_accepts_all_of_2099_rejects_2100 ... ok
+test pluto::tests::pluto_at_j2000_reasonable ... ok
+test pluto::tests::pluto_epoch_2020 ... ok
+test pluto::tests::pluto_meeus_example_37a ... ok
+test pluto::tests::pluto_moves_slowly ... ok
+test pluto::tests::pluto_out_of_range_rejected ... ok
+test pluto::tests::table_37a_has_43_terms ... ok
+test eclipse::tests::find_solar_eclipses_year_2024 ... ok
+test returns::tests::all_returns_land_on_natal_longitude ... ok
+test returns::tests::lunar_return_is_exact_not_mean ... ok
+test returns::tests::mars_return_lands_exactly ... ok
+test returns::tests::return_body_maps_to_expected_body ... ok
+test returns::tests::saturn_return_instant_matches_pyswisseph ... ok
+test returns::tests::solar_return_about_one_year ... ok
+test returns::tests::solar_return_zero_crossing_natal ... ok
+test returns::tests::every_return_meets_tight_convergence_tolerance ... ok
+test returns::tests::tt_and_ut1_finders_consistent ... ok
+test returns::tests::wrap_deg_boundaries ... ok
+test local_eclipse::tests::off_path_location_is_not_total ... ok
+test returns::tests::successive_jupiter_returns_increase ... ok
+test rise_set::tests::civil_twilight_brackets_sunrise ... ok
+test local_eclipse::tests::local_2017_madras_oregon_matches_swiss_oracle ... ok
+test rise_set::tests::polar_summer_sun_never_sets ... ok
+test true_node::tests::mean_node_at_j2000 ... ok
+test true_node::tests::mean_node_retrograde ... ok
+test true_node::tests::mean_node_valid_range ... ok
+test true_node::tests::mean_vs_true_bounded_across_18_year_cycle ... ok
+test true_node::tests::south_node_from_true_node ... ok
+test true_node::tests::south_node_opposite_north ... ok
+test true_node::tests::south_node_valid_range ... ok
+test true_node::tests::true_node_always_valid_range ... ok
+test true_node::tests::true_node_at_j2000_near_mean_node ... ok
+test true_node::tests::true_node_differs_from_mean_node ... ok
+test true_node::tests::true_node_epoch_2020 ... ok
+test true_node::tests::true_node_retrograde_over_year ... ok
+test vsop::tests::aberration_correction_function_at_known_angle ... ok
+test vsop::tests::aberration_magnitude_bounded_for_planets ... ok
+test vsop::tests::aberration_not_applied_to_nodes ... ok
+test vsop::tests::aberration_shifts_sun_longitude ... ok
+test vsop::tests::all_vsop87_planets_computable ... ok
+test vsop::tests::chiron_computable ... ok
+test vsop::tests::chiron_light_time_applied ... ok
+test vsop::tests::jupiter_light_time_plausible ... ok
+test vsop::tests::ketu_opposite_rahu ... ok
+test vsop::tests::light_time_all_vsop_planets_still_valid ... ok
+test vsop::tests::light_time_shifts_nonzero_for_planets ... ok
+test vsop::tests::mars_geocentric_reasonable ... ok
+test vsop::tests::mean_apogee_computable ... ok
+test vsop::tests::mean_apogee_distance_zero ... ok
+test vsop::tests::mean_apogee_latitude_zero ... ok
+test vsop::tests::mean_apogee_no_aberration ... ok
+test vsop::tests::mean_node_at_j2000 ... ok
+test vsop::tests::mercury_light_time_smallest ... ok
+test vsop::tests::moon_position_unaffected_by_light_time ... ok
+test vsop::tests::node_positions_unaffected_by_light_time ... ok
+test vsop::tests::pluto_computable_via_meeus ... ok
+test vsop::tests::pluto_geocentric_at_2020 ... ok
+test vsop::tests::pluto_geocentric_differs_from_heliocentric ... ok
+test vsop::tests::pluto_geocentric_distance_differs_from_heliocentric ... ok
+test vsop::tests::pluto_light_time_applied ... ok
+test vsop::tests::provider_is_send_sync ... ok
+test vsop::tests::saturn_light_time_nonzero ... ok
+test vsop::tests::sun_geocentric_at_j2000 ... ok
+test vsop::tests::sun_position_unaffected_by_light_time ... ok
+test vsop::tests::true_node_computable ... ok
+test vsop::tests::true_node_near_mean_node ... ok
+test rise_set::tests::transit_is_meridian_crossing ... ok
+test eclipse::tests::lunar_eclipses_sorted_chronologically ... ok
+test eclipse::tests::lunar_eclipse_type_coverage ... ok
+test eclipse::tests::lunar_eclipse_shadow_depth_proxy_range ... ok
+test rise_set::tests::twilight_ordering_civil_nautical_astronomical ... ok
+test eclipse::tests::nasa_all_six_eclipses_found_within_one_day ... ok
+test rise_set::tests::next_events_matches_swiss_all_cases ... ok
+test eclipse::tests::solar_eclipse_type_coverage ... ok
+test eclipse::tests::solar_eclipse_coverage_proxy_positive ... ok
+test eclipse::tests::solar_eclipses_sorted_chronologically ... ok
+test eclipse::tests::eclipse_frequency_per_decade ... ok
+
+test result: ok. 293 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.78s
+
+     Running tests/accuracy_tightening.rs (target/debug/deps/accuracy_tightening-e25c26e9c8142aec)
+
+running 22 tests
+test moon_average_speed_near_13 ... ok
+test moon_phase_angle_cycles ... ok
+test moon_phase_full_moon_near_180 ... ok
+test multiepoch_moon_valid ... ok
+test moon_speed_about_13_deg_per_day ... ok
+test multiepoch_sun_longitude_monotonic_near_jan1 ... ok
+test moon_phase_new_moon_near_0 ... ok
+test multiepoch_sun_positions_valid ... ok
+test multiepoch_sun_near_280_at_jan1 ... ok
+test sun_completes_full_circle_in_year ... ok
+test multiepoch_jupiter_traverses_zodiac ... ok
+test sun_speed_aphelion_slower ... ok
+test moon_no_large_discontinuities ... ok
+test moon_completes_13_circles_per_year ... ok
+test multiepoch_mars_jupiter_saturn_computable ... ok
+test sun_speed_about_1_deg_per_day ... ok
+test multiepoch_all_planets_computable ... ok
+test mercury_speed_variable ... ok
+test sun_no_discontinuities ... ok
+test jupiter_speed_about_0_08_deg_per_day ... ok
+test saturn_slower_than_jupiter ... ok
+test planet_speed_ordering ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.25s
+
+     Running tests/accuracy_vs_de440.rs (target/debug/deps/accuracy_vs_de440-3bad76940e905376)
+
+running 3 tests
+test analytical_vs_de440_inner_planets_agree_at_j2000 ... ok
+test analytical_vs_de440_per_body_statistics ... ok
+test analytical_vs_de440_pluto_in_window ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cross_validation_extended.rs (target/debug/deps/cross_validation_extended-1fe7ee2f0dd9dd96)
+
+running 29 tests
+test ayanamsa_lahiri_at_1900 ... ok
+test ayanamsa_lahiri_at_2024 ... ok
+test ayanamsa_lahiri_at_2000 ... ok
+test ayanamsa_lahiri_at_1950 ... ok
+test delta_t_at_1900 ... ok
+test ayanamsa_lahiri_at_2050 ... ok
+test ayanamsa_lahiri_monotonically_increasing ... ok
+test ayanamsa_lahiri_rate_about_50_arcsec_per_year ... ok
+test delta_t_at_2000 ... ok
+test delta_t_at_2020 ... ok
+test delta_t_extrapolation_2050 ... ok
+test delta_t_espenak_meeus_comparison ... ok
+test delta_t_increases_1900_to_2020 ... ok
+test house_cusps_asc_differs_by_latitude ... ok
+test house_cusps_cusp_2_and_11_in_valid_ranges ... ok
+test house_cusps_mc_differs_by_longitude ... ok
+test house_cusps_placidus_london_j2000 ... ok
+test house_cusps_placidus_newyork_j2000 ... ok
+test house_cusps_placidus_pune_j2000 ... ok
+test nakshatra_from_moon_j2000 ... ok
+test multiepoch_moon_positions ... ok
+test nakshatra_pada_from_moon_j2000 ... ok
+test nakshatra_changes_with_moon_motion ... ok
+test multiepoch_sun_always_near_280_on_jan1 ... ok
+test multiepoch_sun_positions ... ok
+test multiepoch_jupiter_positions ... ok
+test multiepoch_mars_positions ... ok
+test multiepoch_saturn_positions ... ok
+test multiepoch_all_five_bodies_computable ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/de440_real_crossval.rs (target/debug/deps/de440_real_crossval-d3993f3e39b954ab)
+
+running 17 tests
+test de440_earth_ssb_distance_is_about_one_au ... ok
+test almanac_with_de440_loads_and_computes ... ok
+test de440_almanac_tropical_longitudes_at_j2000 ... ok
+test de440_geocentric_moon_distance_at_j2000 ... ok
+test de440_moon_at_j2000_matches_jpl_apparent_longitude ... ok
+test de440_geocentric_sun_distance_at_j2000 ... ok
+test de440_provider_reports_correct_metadata ... ok
+test de440_raw_positions_self_consistency_regression ... ok
+test de440_spk_all_expected_body_pairs_present ... ok
+test de440_positions_stable_across_multiple_epochs ... ok
+test de440_provider_geocentric_ecliptic_sun ... ok
+test de440_spk_coverage_spans_1550_to_2650 ... ok
+test de440_spk_file_loads_and_has_correct_segment_count ... ok
+test de440_sun_at_2024_jan_01 ... ok
+test de440_sun_longitude_matches_swiss_eph_tight ... ok
+test de440_sun_ssb_matches_independent_jpl_horizons ... ok
+test de440_vs_vsop87_comparison_at_j2000 ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/online_calculator_crossval.rs (target/debug/deps/online_calculator_crossval-60b94e0382ecf1e2)
+
+running 27 tests
+test online_compatibility_max_score_36 ... ok
+test online_compatibility_enemy_yoni_pair ... ok
+test online_compatibility_gana_scores ... ok
+test online_compatibility_nadi_dosha_detection ... ok
+test online_ayanamsa_lahiri_j2000_matches_reference ... ok
+test online_compatibility_ashwini_rohini ... ok
+test online_compatibility_same_nakshatra_ashwini ... ok
+test online_dasha_balance_ashwini_midpoint ... ok
+test online_dasha_period_durations_match_standard ... ok
+test online_dasha_balance_jyeshtha_example ... ok
+test online_dasha_antardasha_subdivisions ... ok
+test online_dasha_sequence_from_rohini ... ok
+test online_house_cusps_london_j2000_structural ... ok
+test online_house_cusps_multiple_systems_agree_on_angles ... ok
+test online_house_cusps_pune_j2000_mc_range ... ok
+test online_house_cusps_pune_j2000_asc_range ... ok
+test online_house_cusps_pune_j2000_structural ... ok
+test online_nakshatra_boundaries_standard_table ... ok
+test online_ketu_opposite_rahu ... ok
+test online_nakshatra_lords_standard_cycle ... ok
+test online_nakshatra_pada_computation ... ok
+test online_nakshatra_moon_j2000_swati_or_adjacent ... ok
+test online_compatibility_total_never_exceeds_36 ... ok
+test sun_sidereal_lahiri_proves_accuracy ... ok
+test online_sidereal_sun_in_sagittarius_j2000 ... ok
+test online_rashi_placements_j2000 ... ok
+test online_sidereal_positions_lahiri_j2000 ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/readme_example.rs (target/debug/deps/readme_example-5cdf61f5b0908d66)
+
+running 1 test
+test readme_headline_example_compiles_and_prints_swati ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/swiss_eph_crossval.rs (target/debug/deps/swiss_eph_crossval-6ef8ea682570c740)
+
+running 23 tests
+test delta_t_j2000 ... ok
+test ayanamsa_kp_j2000 ... ok
+test ayanamsa_lahiri_j2000 ... ok
+test ayanamsa_kp_less_than_lahiri ... ok
+test house_cusps_pune_j2000 ... ok
+test jpl_moon_j2000 ... ok
+test jpl_sun_j2000 ... ok
+test jpl_neptune_j2000 ... ok
+test nutation_j2000 ... ok
+test obliquity_j2000 ... ok
+test jpl_jupiter_j2000 ... ok
+test jpl_venus_j2000 ... ok
+test true_obliquity_j2000 ... ok
+test jpl_mercury_j2000 ... ok
+test jpl_uranus_j2000 ... ok
+test jpl_mars_j2000 ... ok
+test jpl_saturn_j2000 ... ok
+test provider_tt_vs_almanac_ut1 ... ok
+test jpl_planetary_longitudes_1950 ... ok
+test jpl_planetary_longitudes_2024 ... ok
+test jpl_planetary_longitudes_2050 ... ok
+test all_vsop87_bodies_compute ... ok
+test jpl_planetary_longitudes_j2000 ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/vsop87_official_crossval.rs (target/debug/deps/vsop87_official_crossval-206f84aa5f7422cc)
+
+running 1 test
+test xalen_matches_official_vsop87_check_file ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_ephemeris-718b20563d5d1740)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/star_catalog_swiss_crossval.rs (target/debug/deps/star_catalog_swiss_crossval-0db1b2d2f6577cf5)
+
+running 3 tests
+test breadth_target_met ... ok
+test generated_catalog_count_is_real_hipparcos_8870 ... ok
+test named_stars_match_swiss_subarcsecond ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/swiss_eph_crossval.rs (target/debug/deps/swiss_eph_crossval-ae8749dc2fd52ab7)
+
+running 24 tests
+test ayanamsa_lahiri_bounds ... ok
+test ayanamsa_kp_less_than_lahiri ... ok
+test houses_pune_placidus ... ok
+test jpl_moon_1950 ... ok
+test jpl_moon_2024 ... ok
+test jpl_moon_2050 ... ok
+test jpl_moon_j2000 ... ok
+test jpl_sun_2050 ... ok
+test jpl_sun_2024 ... ok
+test jpl_sun_1950 ... ok
+test jpl_jupiter_j2000 ... ok
+test jpl_jupiter_1950 ... ok
+test jpl_neptune_j2000 ... ok
+test jpl_jupiter_2024 ... ok
+test rahu_ketu_opposite ... ok
+test jpl_mercury_j2000 ... ok
+test jpl_sun_j2000 ... ok
+test jpl_jupiter_2050 ... ok
+test sidereal_sun_j2000_lahiri ... ok
+test jpl_venus_j2000 ... ok
+test jpl_mars_2024 ... ok
+test jpl_saturn_j2000 ... ok
+test jpl_mars_j2000 ... ok
+test jpl_uranus_j2000 ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/validation.rs (target/debug/deps/validation-a096d3ecb29fef40)
+
+running 31 tests
+test chinese_bazi_year_cycle_60 ... ok
+test ayanamsa_increases_over_time ... ok
+test fixed_stars_catalog_integrity ... ok
+test delta_t_j2000_value ... ok
+test divisional_vargottama ... ok
+test lahiri_ayanamsa_at_j2000 ... ok
+test moon_position_is_reasonable ... ok
+test historical_date_computation ... ok
+test future_date_computation ... ok
+test house_cusps_cover_360 ... ok
+test moon_moves_correctly ... ok
+test multiple_ayanamsa_at_j2000 ... ok
+test jupiter_slow_motion ... ok
+test nakshatra_at_known_position ... ok
+test numerology_pythagorean_vs_chaldean ... ok
+test rahu_ketu_opposite ... ok
+test concurrent_chart_computation ... ok
+test vara_j2000_is_saturday ... ok
+test vedic_dignities_consistent ... ok
+test panchang_at_j2000 ... ok
+test sun_at_j2000_sidereal_in_sagittarius ... ok
+test western_aspect_detection ... ok
+test sun_at_j2000_tropical ... ok
+test sun_annual_motion ... ok
+test saturn_very_slow ... ok
+test mars_position_range ... ok
+test all_vedic_grahas_computable ... ok
+test all_planets_different ... ok
+test panchang_tithi_end_vs_pyswisseph_ref ... ok
+test mercury_fastest_inner ... ok
+test venus_faster_than_mars ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_ffi-3cfd1133b642299c)
+
+running 26 tests
+test tests::ayanamsa_invalid_id_returns_error ... ok
+test tests::ayanamsa_at_j2000 ... ok
+test tests::ayanamsa_non_finite_jd_returns_error ... ok
+test tests::houses_invalid_system_returns_error ... ok
+test tests::houses_compute ... ok
+test tests::houses_reject_non_finite_and_out_of_range_lat ... ok
+test tests::houses_all_system_ids_valid ... ok
+test tests::init_succeeds ... ok
+test tests::ayanamsa_all_ids_valid ... ok
+test tests::invalid_body_returns_error ... ok
+test tests::ketu_body_id_13 ... ok
+test tests::null_pointer_returns_error ... ok
+test tests::panic_sentinels_are_distinct_from_normal_errors ... ok
+test tests::planet_position_full_node_retrograde_and_ketu ... ok
+test tests::planet_position_full_rejects_bad_input ... ok
+test tests::planet_position_rejects_non_finite_jd ... ok
+test tests::catch_unwind_wrappers_preserve_normal_returns ... ok
+test tests::version_string ... ok
+test tests::sidereal_longitude_rejects_non_finite_jd ... ok
+test tests::sidereal_invalid_ayanamsa_returns_error ... ok
+test tests::sidereal_ketu_body_13 ... ok
+test tests::planet_position_full_six_tuple_and_speed ... ok
+test tests::planet_position_sun ... ok
+test tests::sidereal_longitude_reasonable ... ok
+test tests::sidereal_all_ayanamsa_ids_valid ... ok
+test tests::all_body_ids_valid ... ok
+
+test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_houses-0093b39b83096217)
+
+running 111 tests
+test angles::tests::geolocation_try_new_rejects_bad_input ... ok
+test angles::tests::gmst_at_j2000 ... ok
+test angles::tests::geo_location ... ok
+test angles::tests::ic_opposite_mc ... ok
+test angles::tests::lst_pune ... ok
+test angles::tests::mc_at_ramc_zero ... ok
+test angles::tests::ascendant_at_equator_vernal_equinox ... ok
+test cusps::tests::alcabitius_classic_differs_from_standard ... ok
+test cusps::tests::alcabitius_classic_cusp_1_asc_cusp_10_mc ... ok
+test cusps::tests::alcabitius_classic_polar_falls_back ... ok
+test cusps::tests::alcabitius_classic_opposite_cusps ... ok
+test cusps::tests::alcabitius_classic_valid_cusps ... ok
+test cusps::tests::alcabitius_cusps_valid_range_at_pune ... ok
+test cusps::tests::alcabitius_opposite_cusps_differ_by_180 ... ok
+test cusps::tests::alcabitius_cusp_1_equals_asc_cusp_10_equals_mc ... ok
+test cusps::tests::alcabitius_polar_falls_back_to_porphyry ... ok
+test cusps::tests::all_swiss_ephem_codes_unique ... ok
+test cusps::tests::apc_intermediate_cusps_are_not_exact_oppositions ... ok
+test cusps::tests::all_systems_produce_valid_cusps ... ok
+test cusps::tests::apc_polar_falls_back ... ok
+test cusps::tests::apc_valid_cusps ... ok
+test cusps::tests::apc_valid_at_multiple_latitudes ... ok
+test cusps::tests::auxiliary_ascendants_match_swiss_oracle ... ok
+test cusps::tests::auxiliary_ascendants_are_house_system_independent ... ok
+test cusps::tests::campanus_angles_at_greenwich ... ok
+test cusps::tests::campanus_cusp_1_equals_asc_cusp_10_equals_mc ... ok
+test cusps::tests::campanus_cusp_4_equals_ic_cusp_7_equals_dsc ... ok
+test cusps::tests::campanus_differs_from_morinus ... ok
+test cusps::tests::campanus_houses_all_valid ... ok
+test cusps::tests::campanus_opposite_cusps_differ_by_180 ... ok
+test cusps::tests::campanus_no_nan_at_multiple_latitudes ... ok
+test cusps::tests::campanus_southern_hemisphere_valid ... ok
+test cusps::tests::carter_cusp_1_equals_ascendant ... ok
+test cusps::tests::carter_differs_from_east_point_off_equator ... ok
+test cusps::tests::carter_houses_span_full_circle ... ok
+test cusps::tests::carter_opposite_cusps ... ok
+test cusps::tests::carter_polar_swaps_anchor_like_swiss ... ok
+test cusps::tests::carter_tracks_ascendant_across_latitudes ... ok
+test cusps::tests::carter_valid_cusps ... ok
+test cusps::tests::equal_cusps_start_from_asc ... ok
+test cusps::tests::equatorial_ascendant_is_latitude_independent ... ok
+test cusps::tests::fallback_honest_for_all_systems_at_pole ... ok
+test cusps::tests::gauquelin_angles_on_sector_boundaries ... ok
+test cusps::tests::auxiliary_ascendants_valid_for_all_systems ... ok
+test cusps::tests::gauquelin_polar_fallback_is_well_formed ... ok
+test cusps::tests::gauquelin_polar_falls_back ... ok
+test cusps::tests::gauquelin_position_matches_swisseph_oracle ... ok
+test cusps::tests::gauquelin_valid_cusps_at_pune ... ok
+test cusps::tests::koch_cusp_1_equals_asc_cusp_10_equals_mc ... ok
+test cusps::tests::koch_cusps_valid_range_at_pune ... ok
+test cusps::tests::koch_opposite_cusps_differ_by_180 ... ok
+test cusps::tests::gauquelin_every_third_boundary_equals_placidus_cusp ... ok
+test cusps::tests::koch_polar_falls_back_to_porphyry ... ok
+test cusps::tests::krusinski_angular_cusps_match_chart_angles ... ok
+test cusps::tests::krusinski_matches_swiss_oracle_inline ... ok
+test cusps::tests::meridian_cusp_10_near_mc ... ok
+test cusps::tests::meridian_cusps_valid_range ... ok
+test cusps::tests::meridian_houses_span_full_circle ... ok
+test cusps::tests::meridian_no_latitude_dependency ... ok
+test cusps::tests::meridian_opposite_cusps_differ_by_180 ... ok
+test cusps::tests::morinus_obliquity_projection_is_multiplicative ... ok
+test cusps::tests::gauquelin_36_monotone_boundaries_span_circle ... ok
+test cusps::tests::meridian_works_at_polar_latitudes ... ok
+test cusps::tests::gauquelin_boundary_position_roundtrip ... ok
+test cusps::tests::placidus_at_pune ... ok
+test cusps::tests::placidus_polar_falls_back_to_porphyry ... ok
+test cusps::tests::planet_in_house ... ok
+test cusps::tests::polar_and_koch_ascendants_are_opposite ... ok
+test cusps::tests::porphyry_has_mc_at_cusp_10 ... ok
+test cusps::tests::pullen_sd_cusp_1_asc_cusp_10_mc ... ok
+test cusps::tests::new_systems_valid_at_multiple_locations ... ok
+test cusps::tests::pullen_sd_differs_from_porphyry ... ok
+test cusps::tests::pullen_sd_houses_span_full_circle ... ok
+test cusps::tests::pullen_sd_valid_cusps ... ok
+test cusps::tests::pullen_sr_cusp_1_asc_cusp_10_mc ... ok
+test cusps::tests::pullen_sr_differs_from_sd ... ok
+test cusps::tests::pullen_sr_houses_span_full_circle ... ok
+test cusps::tests::pullen_sr_valid_cusps ... ok
+test cusps::tests::sidereal_ascendant_matches_swiss_lahiri ... ok
+test cusps::tests::sidereal_subtracts_ayanamsa_from_every_cusp_and_angle ... ok
+test cusps::tests::sunshine_makransky_cusp_1_asc_cusp_10_mc ... ok
+test cusps::tests::sunshine_makransky_opposite_cusps ... ok
+test cusps::tests::sunshine_makransky_polar_falls_back ... ok
+test cusps::tests::sunshine_makransky_valid_cusps ... ok
+test cusps::tests::sunshine_treindl_cusp_1_asc_cusp_10_mc ... ok
+test cusps::tests::sunshine_treindl_opposite_cusps ... ok
+test cusps::tests::sunshine_treindl_valid_cusps ... ok
+test cusps::tests::topocentric_cusp_1_equals_asc_cusp_10_equals_mc ... ok
+test cusps::tests::topocentric_cusps_valid_range_at_pune ... ok
+test cusps::tests::topocentric_cusps_valid ... ok
+test cusps::tests::topocentric_close_to_placidus ... ok
+test cusps::tests::topocentric_opposite_cusps_differ_by_180 ... ok
+test cusps::tests::topocentric_polar_falls_back_to_porphyry ... ok
+test cusps::tests::total_house_system_count_at_least_20 ... ok
+test cusps::tests::vertex_computed ... ok
+test cusps::tests::whole_sign_cusps_are_30_degrees_apart ... ok
+test cusps::tests::zariel_latitude_independent ... ok
+test cusps::tests::zariel_matches_meridian ... ok
+test cusps::tests::zariel_valid_cusps ... ok
+test geocoding::tests::alias_cities_same_coords ... ok
+test geocoding::tests::all_major_indian_cities ... ok
+test geocoding::tests::case_insensitive ... ok
+test geocoding::tests::global_capitals ... ok
+test geocoding::tests::mumbai_coordinates ... ok
+test geocoding::tests::at_least_100_cities ... ok
+test geocoding::tests::new_york_coordinates ... ok
+test geocoding::tests::pune_coordinates ... ok
+test geocoding::tests::southern_hemisphere ... ok
+test geocoding::tests::ujjain_astrology_center ... ok
+test geocoding::tests::unknown_city_returns_none ... ok
+test geocoding::tests::western_hemisphere ... ok
+
+test result: ok. 111 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/swiss_houses_oracle.rs (target/debug/deps/swiss_houses_oracle-56b39392e9ee995d)
+
+running 2 tests
+test placidus_framing_is_pinned_to_swiss ... ok
+test cusps_match_swiss_oracle ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/vertex_swiss_regression.rs (target/debug/deps/vertex_swiss_regression-50f88fa2ef016792)
+
+running 1 test
+test vertex_matches_swiss_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_iching-346174e630ff5803)
+
+running 41 tests
+test tests::all_64_hexagrams_present ... ok
+test tests::all_8_trigrams_have_names ... ok
+test tests::corrected_ocr_lines_read_correctly ... ok
+test tests::date_reading_changing_line_text_is_consistent ... ok
+test tests::hexagram_65_returns_none ... ok
+test tests::all_384_lines_present_and_nonempty ... ok
+test tests::hexagram_from_date_changing_line_zero_remainder_is_top_line ... ok
+test tests::hexagram_from_date_deterministic ... ok
+test tests::hexagram_from_date_different_hours_differ ... ok
+test tests::hexagram_from_date_produces_valid_reading ... ok
+test tests::hexagram_from_date_uses_pre_heaven_trigrams ... ok
+test tests::hexagram_from_trigrams_all_64_covered ... ok
+test tests::hexagram_from_trigrams_creative ... ok
+test tests::hexagram_from_trigrams_receptive ... ok
+test tests::hexagram_lines_match_trigrams ... ok
+test tests::hexagram_lookup_by_number ... ok
+test tests::hexagram_method_line_text_matches_free_function ... ok
+test tests::hexagram_zero_returns_none ... ok
+test tests::king_wen_table_consistency ... ok
+test tests::line_flip ... ok
+test tests::line_text_known_values ... ok
+test tests::line_text_out_of_range ... ok
+test tests::line_texts_table_has_64_rows ... ok
+test tests::nuclear_hexagram_creative ... ok
+test tests::nuclear_hexagram_hex3 ... ok
+test tests::nuclear_hexagram_receptive ... ok
+test tests::opposite_hexagram_creative_is_receptive ... ok
+test tests::opposite_hexagram_involutory ... ok
+test tests::opposite_hexagram_receptive_is_creative ... ok
+test tests::line_texts_preserve_legge_diacritics_somewhere ... ok
+test tests::pre_heaven_sequence_matches_mei_hua ... ok
+test tests::relating_hexagram_flip_line_0 ... ok
+test tests::relating_hexagram_flip_line_5 ... ok
+test tests::trigram_from_index_wraps ... ok
+test tests::trigram_from_lines_roundtrip ... ok
+test tests::trigram_symbols ... ok
+test tests::use_line_not_appended_to_line_six ... ok
+test tests::use_line_texts_only_for_hex_1_and_2 ... ok
+test tests::parentheses_balanced_except_legges_one_intentional_imbalance ... ok
+test tests::no_source_ocr_artifacts_in_any_text ... ok
+test tests::each_line_opens_with_its_ordinal ... ok
+
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_lalkitab-2f08a6bea03f1e65)
+
+running 43 tests
+test debts::tests::ancestral_debt_sun_in_1_no_debt ... ok
+test debts::tests::maternal_debt_moon_in_8_with_malefic ... ok
+test debts::tests::duty_debt_saturn_in_1 ... ok
+test debts::tests::ancestral_debt_sun_in_6 ... ok
+test debts::tests::multiple_debts ... ok
+test debts::tests::no_debts_clean_chart ... ok
+test debts::tests::spousal_debt_venus_7_with_mars ... ok
+test debts::tests::self_debt_jupiter_in_6 ... ok
+test debts::tests::spousal_no_debt_venus_7_alone ... ok
+test dormant::tests::enemy_table_symmetry_not_required ... ok
+test dormant::tests::jupiter_dormant_in_venus_house ... ok
+test dormant::tests::mars_dormant_conjunct_mercury ... ok
+test dormant::tests::mars_not_dormant_in_own_house_alone ... ok
+test dormant::tests::moon_dormant_conjunct_rahu ... ok
+test dormant::tests::moon_not_dormant_alone_in_own_house ... ok
+test dormant::tests::saturn_dormant_in_sun_house ... ok
+test dormant::tests::sun_dormant_conjunct_saturn ... ok
+test dormant::tests::sun_dormant_in_saturn_house ... ok
+test dormant::tests::sun_not_dormant_in_own_house ... ok
+test effects::tests::jupiter_good_includes_12 ... ok
+test effects::tests::all_planets_cover_all_houses ... ok
+test effects::tests::rahu_troubled_majority ... ok
+test effects::tests::sun_good_houses ... ok
+test effects::tests::sun_neutral_houses ... ok
+test effects::tests::sun_troubled_houses ... ok
+test houses::tests::house_out_of_range_clamps ... ok
+test houses::tests::natural_rulers_check ... ok
+test houses::tests::place_and_find ... ok
+test houses::tests::planets_in_house ... ok
+test remedies::tests::all_108_entries_exist ... ok
+test remedies::tests::ketu_in_6_keyed_correctly ... ok
+test remedies::tests::every_entry_has_planet_and_house ... ok
+test remedies::tests::empty_entries_report_none_not_some_empty ... ok
+test remedies::tests::lookup_does_not_panic_for_all_combos ... ok
+test remedies::tests::saturn_in_10_keyed_correctly ... ok
+test remedies::tests::sun_in_1_keyed_correctly ... ok
+test varshphal::tests::annual_summary_has_all_planets ... ok
+test varshphal::tests::annual_summary_year_1_no_change ... ok
+test varshphal::tests::annual_summary_year_2_all_changed ... ok
+test varshphal::tests::year_12_wraps_around ... ok
+test varshphal::tests::year_13_same_as_natal ... ok
+test varshphal::tests::year_1_same_as_natal ... ok
+test varshphal::tests::year_2_shifts_by_one ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_node-227b03ba8a8b4922)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_numerology-e61c8ff23eb6ee72)
+
+running 35 tests
+test tests::birthday_number_simple ... ok
+test tests::birth_date_digits_correct ... ok
+test tests::chaldean_no_nine ... ok
+test tests::chaldean_has_no_letter_nine ... ok
+test tests::chaldean_q_is_1 ... ok
+test tests::expression_chaldean ... ok
+test tests::expression_pythagorean ... ok
+test tests::challenge_numbers_computed ... ok
+test tests::full_profile_computes ... ok
+test tests::karmic_debt_numbers ... ok
+test tests::life_path_known ... ok
+test tests::life_path_master_11 ... ok
+test tests::lo_shu_grid_basic ... ok
+test tests::lo_shu_is_magic_square ... ok
+test tests::master_number_detection ... ok
+test tests::name_value_ignores_spaces ... ok
+test tests::number_meaning_returns_none_for_absent_entries ... ok
+test tests::number_meanings_all_single ... ok
+test tests::personal_day_computed ... ok
+test tests::personal_year_cycle ... ok
+test tests::personality_consonants_only ... ok
+test tests::personality_smart_excludes_y_vowels ... ok
+test tests::pinnacle_numbers_computed ... ok
+test tests::pythagorean_a_is_1 ... ok
+test tests::reduce_basic ... ok
+test tests::reduce_master_22 ... ok
+test tests::smart_and_standard_agree_without_y ... ok
+test tests::soul_urge_smart_includes_y_vowels ... ok
+test tests::soul_urge_vowels_only ... ok
+test tests::vowel_plus_consonant_smart_equals_total ... ok
+test tests::y_adjacent_to_vowel_is_consonant ... ok
+test tests::y_at_word_end_is_vowel ... ok
+test tests::y_at_word_start_is_consonant ... ok
+test tests::y_in_kyle_is_vowel ... ok
+test tests::y_only_vowel_sound_is_vowel ... ok
+
+test result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen-c6c3cfaea5fbc3f6)
+
+running 30 tests
+test tests::test_body_from_id_canonical_order ... ok
+test tests::test_ayanamsa_from_id_all_valid ... ok
+test tests::test_body_from_id_valid ... ok
+test tests::test_delta_t_positive ... ok
+test tests::test_check_jd_rejects_non_finite ... ok
+test tests::test_compute_ayanamsa_deg_lahiri_j2000 ... ok
+test tests::test_body_from_id_invalid ... ok
+test tests::test_ayanamsa_from_id_errors_on_invalid ... ok
+test tests::test_check_geo_bounds ... ok
+test tests::test_expression_number_basic ... ok
+test tests::test_expression_number_invalid_system ... ok
+test tests::test_house_system_from_id_all_valid ... ok
+test tests::test_house_system_from_id_canonical_order ... ok
+test tests::test_house_system_from_id_errors_on_invalid ... ok
+test tests::test_all_ayanamsa_ids_finite ... ok
+test tests::test_julian_day_j2000 ... ok
+test tests::test_life_path_basic ... ok
+test tests::test_parse_ayanamsa_string ... ok
+test tests::test_parse_body_string ... ok
+test tests::test_parse_house_system_string ... ok
+test tests::test_rashi_aries ... ok
+test tests::test_rashi_pisces ... ok
+test tests::test_position_full_six_tuple_and_retrograde ... ok
+test tests::test_position_full_sidereal_subtracts_ayanamsa ... ok
+test tests::test_position_full_speed_matches_pyswisseph ... ok
+test tests::test_all_body_ids_computable ... ok
+test tests::test_all_planets_includes_ketu_opposite_rahu ... ok
+test tests::test_planet_position_rejects_non_finite_and_bad_id ... ok
+test tests::test_full_chart_structure_and_ketu ... ok
+test tests::test_planet_position_dict_keys_and_ketu ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_star_anchors-1283f58016d241b1)
+
+running 1 test
+test tests::spica_anchor_is_bit_exact ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_stars-bbdebddcf44d643d)
+
+running 49 tests
+test catalog::tests::empty_catalog ... ok
+test catalog::tests::find_in_catalog_case_insensitive ... ok
+test catalog::tests::jd_based_longitude ... ok
+test catalog::tests::header_only_catalog ... ok
+test catalog::tests::load_catalog_ecliptic_coords ... ok
+test catalog::tests::load_catalog_no_header ... ok
+test catalog::tests::load_catalog_with_comments ... ok
+test catalog::tests::load_catalog_magnitudes ... ok
+test catalog::tests::load_catalog_basic ... ok
+test catalog::tests::find_conjunctions_in_loaded_catalog ... ok
+test catalog::tests::load_catalog_error_too_few_fields ... ok
+test catalog::tests::precession_applied ... ok
+test tests::catalog_has_108_stars ... ok
+test catalog::tests::load_catalog_error_bad_number ... ok
+test catalog::tests::merge_catalogs_basic ... ok
+test catalog::tests::merge_catalogs_adds_new ... ok
+test catalog::tests::merge_catalogs_external_overrides ... ok
+test tests::expanded_star_count_is_sum ... ok
+test tests::generated_catalog_count_matches_constant ... ok
+test tests::generated_catalog_all_within_vmag_limit ... ok
+test tests::generated_catalog_sorted_by_hip_no_dupes ... ok
+test tests::generated_named_bright_stars_present_by_hip ... ok
+test tests::nakshatra_yogatara_invalid_index_returns_none ... ok
+test tests::generated_find_by_name_case_insensitive ... ok
+test tests::generated_positions_are_finite_and_in_range ... ok
+test tests::bharani_41_resolves_to_validated_longitude_not_curated ... ok
+test tests::nakshatra_yogatara_boundary_nakshatras ... ok
+test tests::find_by_name_case_insensitive ... ok
+test tests::nakshatra_yogatara_spot_checks ... ok
+test tests::hyades_stars_present ... ok
+test tests::nakshatra_yogatara_all_27_mapped ... ok
+test tests::navigator_stars_present ... ok
+test tests::latitude_changes_with_precession_and_proper_motion ... ok
+test tests::formerly_fallback_names_resolve_to_generated_catalog ... ok
+test tests::precession_moves_stars ... ok
+test tests::no_duplicate_names ... ok
+test tests::no_conjunction_when_far ... ok
+test tests::find_conjunction_with_aldebaran ... ok
+test tests::precession_rate_is_iau2006_not_newcomb ... ok
+test tests::precession_multi_epoch_matches_pyswisseph ... ok
+test tests::proper_motion_arcturus_significant_over_1000yr ... ok
+test tests::proper_motion_sirius_significant_over_1000yr ... ok
+test tests::proper_motion_zero_stars_track_pure_rotation_precession ... ok
+test tests::rotation_beats_planar_model_for_high_latitude_vega ... ok
+test tests::royal_stars_present ... ok
+test tests::southern_cross_complete ... ok
+test tests::spica_at_j2000 ... ok
+test tests::only_clusters_remain_unreconciled ... ok
+test tests::expanded_conjunction_finds_more_than_curated ... ok
+
+test result: ok. 49 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/swiss_star_oracle.rs (target/debug/deps/swiss_star_oracle-cd256d4d1e6824a2)
+
+running 2 tests
+test oracle_generated_catalog_matches_swiss ... ok
+test oracle_find_by_name_matches_swiss ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_stars_hip_data-66069a5f51befc2f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_time-bc12f96d7aad005c)
+
+running 63 tests
+test calendar::tests::gregorian_roundtrip ... ok
+test calendar::tests::j2000_epoch ... ok
+test calendar::tests::jd_to_calendar_guards_nonfinite_and_huge ... ok
+test calendar::tests::julian_cutover_rejects_reform_gap_dates ... ok
+test calendar::tests::julian_gregorian_differ ... ok
+test calendar::tests::lmt_pune ... ok
+test calendar::tests::proleptic_gregorian_roundtrip_at_jd_2299161_boundary ... ok
+test calendar::tests::proleptic_gregorian_roundtrip_year_1500 ... ok
+test delta_t::tests::delta_t_continuous_across_domain ... ok
+test delta_t::tests::delta_t_j2000_is_about_64_seconds ... ok
+test delta_t::tests::delta_t_ancient_is_large ... ok
+test delta_t::tests::delta_t_with_uncertainty_grows_for_ancient ... ok
+test delta_t::tests::future_uncertainty_grows_beyond_observed ... ok
+test delta_t::tests::lod_tail_is_continuous_with_spline ... ok
+test delta_t::tests::sigma_reproduces_published_step_envelope ... ok
+test delta_t::tests::smh_spline_matches_published_values ... ok
+test delta_t::tests::smh_spline_tracks_iers_modern_era ... ok
+test delta_t::tests::uncertainty_is_model_specific_not_borrowed_from_smh ... ok
+test delta_t::tests::zero_model_returns_zero ... ok
+test epoch::tests::epoch_pune_ist ... ok
+test epoch::tests::epoch_year ... ok
+test epoch::tests::from_utc_dut1_only_moves_ut1 ... ok
+test epoch::tests::from_utc_tt_uses_leap_seconds ... ok
+test epoch::tests::legacy_constructors_keep_delta_t_path ... ok
+test julian::tests::j2000_roundtrip ... ok
+test julian::tests::tdb_tt_difference_bounded ... ok
+test julian::tests::to_tt_with_sigma_matches_to_tt_and_uncertainty ... ok
+test julian::tests::tt_tdb_roundtrip ... ok
+test julian::tests::ut1_tt_conversion ... ok
+test leap_seconds::tests::boundary_takes_new_value ... ok
+test leap_seconds::tests::date_form_matches_jd_form_at_midnight ... ok
+test leap_seconds::tests::day_length_handles_leap_day ... ok
+test leap_seconds::tests::known_offsets_by_jd ... ok
+test leap_seconds::tests::leap_second_months_detected ... ok
+test leap_seconds::tests::leap_step_jds_are_consistent ... ok
+test leap_seconds::tests::nan_jd_degrades_to_floor ... ok
+test leap_seconds::tests::offsets_increase_by_one ... ok
+test timescale::tests::convert_is_antisymmetric ... ok
+test timescale::tests::same_scale_is_zero ... ok
+test timescale::tests::tt_to_tai_offset_is_constant ... ok
+test timescale::tests::ut1_offset_includes_dut1 ... ok
+test timescale::tests::utc_to_tai_offset_is_leap_seconds ... ok
+test timescale::tests::utc_to_tt_via_convert_matches_known_value ... ok
+test timezone::tests::at_least_100_entries ... ok
+test timezone::tests::global_cities ... ok
+test timezone::tests::kathmandu_nepal_offset ... ok
+test timezone::tests::local_to_ut_city_convenience ... ok
+test timezone::tests::local_to_ut_city_unknown ... ok
+test timezone::tests::local_to_ut_new_york ... ok
+test timezone::tests::at_least_50_cities ... ok
+test timezone::tests::local_to_ut_pune_birth ... ok
+test timezone::tests::major_indian_cities ... ok
+test timezone::tests::midnight_crossing ... ok
+test timezone::tests::pune_offset ... ok
+test timezone::tests::tehran_offset ... ok
+test timezone::tests::unknown_city_returns_none ... ok
+test utc::tests::leap_second_label_is_handled ... ok
+test utc::tests::plain_seconds_path ... ok
+test utc::tests::sixty_seconds_on_non_last_day_of_leap_month_not_flagged ... ok
+test utc::tests::sixty_seconds_outside_leap_month_not_flagged ... ok
+test utc::tests::tai_utc_roundtrip ... ok
+test utc::tests::utc_to_tai_to_tt_chain ... ok
+test utc::tests::utc_to_ut1_uses_dut1 ... ok
+
+test result: ok. 63 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/delta_t_occultation_crossval.rs (target/debug/deps/delta_t_occultation_crossval-3c9ae71bcd6e10a6)
+
+running 2 tests
+test smh_spline_tracks_modern_occultations_tightly ... ok
+test smh_spline_is_unbiased_fit_to_occultation_record ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/delta_t_polynomial_crossval.rs (target/debug/deps/delta_t_polynomial_crossval-1e11b87a7ec5f237)
+
+running 5 tests
+test espenak_meeus_matches_published_nasa_polynomials ... ok
+test espenak_meeus_tail_equals_morrison_stephenson_parabola ... ok
+test morrison_stephenson_2004_matches_published_parabola ... ok
+test tdb_minus_tt_matches_published_two_term_amplitude ... ok
+test tt_ut1_tt_roundtrip_closes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/utc_crossval.rs (target/debug/deps/utc_crossval-bd67d5a30884cb64)
+
+running 5 tests
+test epoch_from_utc_tt_matches_swiss ... ok
+test jd_utc_to_tt_matches_swiss ... ok
+test leap_second_boundary_is_continuous ... ok
+test ut1_matches_swiss_with_supplied_dut1 ... ok
+test tai_offset_is_table_value ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/de440_bench.rs (target/debug/deps/de440_bench-a8e7233bb994d290)
+
+running 4 tests
+test tests::angle_sep_handles_wrap ... ok
+test tests::deviation_accumulates_arcseconds ... ok
+test tests::baseline_computes_real_positions ... ok
+test tests::self_baseline_longitudes_are_identical ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/main.rs (target/debug/deps/xalen_validation-46b5871605fd520a)
+
+running 8 tests
+test stats::tests::angle_sep_wraps ... ok
+test stats::tests::over_legacy_counts_tenth_degree ... ok
+test stats::tests::stats_accumulate ... ok
+test tests::body_name_mapping_is_complete ... ok
+test tests::ayanamsa_name_mapping_resolves ... ok
+test tests::mean_obliquity_matches_coords_crate ... ok
+test tests::report_acc_gating_and_info ... ok
+test tests::process_record_populates_and_is_sane ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_vedic-e354608632c9b483)
+
+running 602 tests
+test ashtakavarga::tests::known_chart_sun_bav_aries_sign ... ok
+test ashtakavarga::tests::all_seven_planets_have_distinct_tables ... ok
+test ashtakavarga::tests::bhinna_per_planet_bounded ... ok
+test ashtakavarga::tests::bhinna_row_totals_plausible ... ok
+test ashtakavarga::tests::mercury_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::moon_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::jupiter_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::mars_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::per_sign_sav_in_classical_range ... ok
+test ashtakavarga::tests::ashtakavarga_total_reasonable ... ok
+test ashtakavarga::tests::prashtarashtakavarga_rahu_returns_zeros ... ok
+test ashtakavarga::tests::prashtarashtakavarga_sun_matches_bhinna ... ok
+test ashtakavarga::tests::sarva_sums_correctly ... ok
+test ashtakavarga::tests::sarvashtakavarga_returns_7_rows ... ok
+test ashtakavarga::tests::saturn_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::sun_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::transit_favorable_check ... ok
+test ashtakavarga::tests::venus_bav_total_matches_table_count ... ok
+test ashtakavarga::tests::sav_seven_planet_total_337 ... ok
+test ashtottari::tests::all_lord_years_sum_108 ... ok
+test ashtottari::tests::moon_in_ardra_starts_sun ... ok
+test ashtottari::tests::moon_in_ashwini_starts_rahu ... ok
+test ashtottari::tests::ashtottari_8_periods ... ok
+test ashtottari::tests::ashtottari_total_108_from_boundary ... ok
+test ashtottari::tests::ashtottari_balance ... ok
+test ashtottari::tests::moon_in_krittika_starts_venus ... ok
+test ashtottari::tests::moon_in_shravana_starts_saturn_not_jupiter ... ok
+test chara_dasha::tests::dual_lordship_aquarius_rahu_stronger ... ok
+test ashtottari::tests::starting_lord_table_block_widths ... ok
+test chara_dasha::tests::chara_dasha_has_sub_periods ... ok
+test chara_dasha::tests::dual_lordship_non_dual_signs_unchanged ... ok
+test chara_dasha::tests::chara_dasha_12_periods ... ok
+test chara_dasha::tests::dual_lordship_scorpio_ketu_stronger ... ok
+test chara_dasha::tests::chara_dasha_periods_contiguous ... ok
+test chara_dasha::tests::dual_lordship_scorpio_mars_default ... ok
+test chara_dasha::tests::even_sign_backward_count ... ok
+test chara_dasha::tests::lord_in_same_sign_gives_12 ... ok
+test chara_dasha::tests::narayana_dasha_even_lagna_anticlockwise ... ok
+test chara_dasha::tests::narayana_dasha_odd_lagna_clockwise ... ok
+test chara_dasha::tests::narayana_dasha_periods_contiguous ... ok
+test chara_dasha::tests::narayana_even_sign_backward_count ... ok
+test chara_dasha::tests::narayana_lord_in_own_sign_12_years ... ok
+test chara_dasha::tests::narayana_odd_sign_forward_count ... ok
+test chara_dasha::tests::narayana_period_years_range ... ok
+test chara_dasha::tests::narayana_total_years_reasonable ... ok
+test chara_dasha::tests::narayana_with_nodes_can_use_ketu_lord ... ok
+test chara_dasha::tests::narayana_with_nodes_produces_12_periods ... ok
+test chara_dasha::tests::odd_signs_correct ... ok
+test chara_dasha::tests::odd_sign_forward_count ... ok
+test chara_dasha::tests::sequence_even_lagna_backward ... ok
+test chara_dasha::tests::period_years_valid_range ... ok
+test chara_dasha::tests::sequence_odd_lagna_forward ... ok
+test chara_dasha::tests::sthira_dasha_dual_9_years ... ok
+test chara_dasha::tests::sthira_dasha_12_periods ... ok
+test chara_dasha::tests::sthira_dasha_fixed_8_years ... ok
+test chara_dasha::tests::sthira_dasha_movable_7_years ... ok
+test chara_dasha::tests::sthira_dasha_has_sub_periods ... ok
+test chara_dasha::tests::sthira_periods_contiguous ... ok
+test chara_dasha::tests::sthira_sub_periods_contiguous ... ok
+test compatibility::tests::graha_maitri_enemies ... ok
+test compatibility::tests::graha_maitri_friends ... ok
+test chara_dasha::tests::sthira_total_years_96 ... ok
+test compatibility::tests::graha_maitri_same_lord ... ok
+test compatibility::tests::graha_maitri_mixed ... ok
+test compatibility::tests::nadi_classical_adi ... ok
+test compatibility::tests::nadi_classical_antya ... ok
+test compatibility::tests::nadi_classical_madhya ... ok
+test compatibility::tests::nadi_different ... ok
+test compatibility::tests::nadi_dosha_ashwini_magha ... ok
+test compatibility::tests::nadi_dosha_same ... ok
+test compatibility::tests::same_nakshatra_scores_well ... ok
+test compatibility::tests::varna_brahmin_lookup ... ok
+test compatibility::tests::varna_groom_higher_scores_1 ... ok
+test compatibility::tests::varna_groom_lower_scores_0 ... ok
+test compatibility::tests::varna_kshatriya_lookup ... ok
+test compatibility::tests::varna_shudra_lookup ... ok
+test compatibility::tests::varna_vaishya_lookup ... ok
+test compatibility::tests::vashya_dwipad_compatible_with_all ... ok
+test compatibility::tests::vashya_incompatible ... ok
+test compatibility::tests::vashya_same_category ... ok
+test compatibility::tests::yoni_enemy_pair ... ok
+test compatibility::tests::yoni_neutral ... ok
+test compatibility::tests::yoni_same_animal ... ok
+test dasha::tests::first_dasha_is_balance ... ok
+test compatibility::tests::max_components_correct ... ok
+test dasha::tests::find_current ... ok
+test dasha::tests::full_cycle_starts_with_given_lord ... ok
+test dasha::tests::lords_follow_sequence ... ok
+test dasha::tests::full_cycle_always_120_years ... ok
+test compatibility::tests::total_never_exceeds_36 ... ok
+test dasha::tests::vimshottari_covers_120_years_from_boundary ... ok
+test dasha::tests::vimshottari_with_balance_less_than_120 ... ok
+test dasha::tests::with_antardasha ... ok
+test dignity::tests::compound_adhi_mitra ... ok
+test dignity::tests::compound_adhi_shatru ... ok
+test dasha::tests::three_level_deep_dasha ... ok
+test dignity::tests::mars_own_signs ... ok
+test dignity::tests::moolatrikona_ranges_exist ... ok
+test dignity::tests::moon_moolatrikona_in_taurus ... ok
+test dignity::tests::natural_enmity_sun_saturn ... ok
+test dignity::tests::natural_friendship_sun_moon ... ok
+test dignity::tests::natural_neutral_moon_mars ... ok
+test dignity::tests::saturn_neutral_in_gemini ... ok
+test dignity::tests::sign_lord_table ... ok
+test dignity::tests::sun_debilitated_in_libra ... ok
+test dignity::tests::sun_exalted_in_aries ... ok
+test dignity::tests::sun_moolatrikona_in_leo_0_20 ... ok
+test dignity::tests::temporal_enemies_5_to_8 ... ok
+test dignity::tests::temporal_friends_adjacent ... ok
+test divisional::tests::d16_dual_sign_starts_sagittarius ... ok
+test divisional::tests::d16_fixed_sign_starts_leo ... ok
+test divisional::tests::d16_last_part_movable ... ok
+test divisional::tests::d16_movable_sign_starts_aries ... ok
+test divisional::tests::d16_sequential_check ... ok
+test divisional::tests::all_vargas_produce_valid_rashi ... ok
+test divisional::tests::d1_identity ... ok
+test divisional::tests::d20_dual_sign_starts_leo ... ok
+test divisional::tests::d20_fixed_sign_starts_sagittarius ... ok
+test divisional::tests::d20_last_part_movable ... ok
+test divisional::tests::d20_movable_sign_starts_aries ... ok
+test divisional::tests::d20_sequential_check ... ok
+test divisional::tests::d24_even_sign_backward_sequence ... ok
+test divisional::tests::d24_even_sign_starts_cancer_backward ... ok
+test divisional::tests::d24_last_part_odd_sign ... ok
+test divisional::tests::d24_odd_sign_forward_sequence ... ok
+test divisional::tests::d24_odd_sign_starts_leo ... ok
+test divisional::tests::d27_air_sign_starts_libra ... ok
+test divisional::tests::d27_earth_sign_starts_cancer ... ok
+test divisional::tests::d27_fire_sign_starts_aries ... ok
+test divisional::tests::d27_last_part_fire ... ok
+test divisional::tests::d27_sequential_in_fire ... ok
+test divisional::tests::d27_water_sign_starts_capricorn ... ok
+test divisional::tests::d40_even_sign_starts_libra ... ok
+test divisional::tests::d40_last_part_even ... ok
+test divisional::tests::d40_last_part_odd ... ok
+test divisional::tests::d40_odd_sign_starts_aries ... ok
+test divisional::tests::d40_sequential_odd ... ok
+test divisional::tests::d45_dual_sign_starts_sagittarius ... ok
+test divisional::tests::d45_fixed_sign_starts_leo ... ok
+test divisional::tests::d45_last_part_movable ... ok
+test divisional::tests::d45_movable_sign_starts_aries ... ok
+test divisional::tests::d45_sequential_check ... ok
+test divisional::tests::d4_chaturthamsa_kendra_mapping ... ok
+test divisional::tests::d60_counts_from_own_sign ... ok
+test divisional::tests::drekkana ... ok
+test divisional::tests::dwadasamsa ... ok
+test divisional::tests::find_vargottama_planets_basic ... ok
+test divisional::tests::find_vargottama_planets_empty_input ... ok
+test divisional::tests::find_vargottama_planets_multiple_match ... ok
+test divisional::tests::find_vargottama_planets_none_match ... ok
+test divisional::tests::hora_odd_sign ... ok
+test divisional::tests::longitude_over_360_normalized ... ok
+test divisional::tests::navamsa_aries_0_deg ... ok
+test divisional::tests::navamsa_aries_end ... ok
+test divisional::tests::navamsa_leo_starts_from_aries ... ok
+test divisional::tests::negative_longitude_normalized ... ok
+test divisional::tests::trimsamsa_even_sign ... ok
+test divisional::tests::trimsamsa_odd_sign ... ok
+test divisional::tests::vargottama_by_longitude_0_aries ... ok
+test divisional::tests::all_new_vargas_produce_valid_rashi_fine_grained ... ok
+test divisional::tests::vargottama_by_longitude_mid_aries_not ... ok
+test divisional::tests::vargottama_detection ... ok
+test dosha::tests::combustion_status_levels ... ok
+test dosha::tests::combustion_wraps_around_360 ... ok
+test dosha::tests::is_combust_default_is_direct ... ok
+test dosha::tests::jupiter_combust_within_11_deg ... ok
+test dosha::tests::kaal_sarpa_absent ... ok
+test dosha::tests::kaal_sarpa_present ... ok
+test dosha::tests::mangal_cancellation_uses_exact_nakshatra_not_rashi ... ok
+test dosha::tests::mangal_dosha_cancelled_by_own_sign ... ok
+test dosha::tests::mangal_dosha_from_7th ... ok
+test dosha::tests::mars_combust_within_17_deg ... ok
+test dosha::tests::mercury_combust_14_direct_12_retrograde ... ok
+test dosha::tests::moon_combust_within_12_deg ... ok
+test dosha::tests::no_mangal_dosha ... ok
+test dosha::tests::no_pitra_dosha ... ok
+test dosha::tests::pitra_dosha_rahu_in_9th ... ok
+test dosha::tests::rahu_ketu_never_combust ... ok
+test dosha::tests::saturn_combust_within_15_deg ... ok
+test dosha::tests::severe_mangal_dosha ... ok
+test dosha::tests::sun_never_combust ... ok
+test dosha::tests::venus_combust_10_direct_8_retrograde ... ok
+test gandanta::tests::aries_taurus_boundary_not_gandanta ... ok
+test gandanta::tests::cancer_side_of_120 ... ok
+test gandanta::tests::edge_of_gandanta_120 ... ok
+test gandanta::tests::exactly_at_0_degrees ... ok
+test gandanta::tests::exactly_at_120 ... ok
+test gandanta::tests::exactly_at_240 ... ok
+test gandanta::tests::gandanta_info_in_zone ... ok
+test gandanta::tests::gandanta_info_outside_zone ... ok
+test gandanta::tests::gemini_cancer_boundary_not_gandanta ... ok
+test gandanta::tests::just_inside_aries_side ... ok
+test gandanta::tests::just_inside_pisces_side ... ok
+test gandanta::tests::leo_side_of_120 ... ok
+test gandanta::tests::leo_virgo_boundary_not_gandanta ... ok
+test gandanta::tests::middle_of_each_sign_not_gandanta ... ok
+test gandanta::tests::mild_gandanta_pisces ... ok
+test gandanta::tests::negative_longitude ... ok
+test gandanta::tests::outside_cancer_leo_boundary ... ok
+test gandanta::tests::outside_gandanta_aries ... ok
+test gandanta::tests::outside_gandanta_pisces ... ok
+test gandanta::tests::over_360_longitude ... ok
+test gandanta::tests::sagittarius_side_of_240 ... ok
+test gandanta::tests::scorpio_side_of_240 ... ok
+test gandanta::tests::taurus_gemini_boundary_not_gandanta ... ok
+test i18n::tests::deity_names_english_match_existing ... ok
+test i18n::tests::deity_names_all_languages_non_empty ... ok
+test i18n::tests::karana_english_matches_existing ... ok
+test i18n::tests::language_all_count ... ok
+test i18n::tests::deity_names_hindi_samples ... ok
+test i18n::tests::language_display_all_non_empty ... ok
+test i18n::tests::karana_names_hindi_all_11 ... ok
+test i18n::tests::nakshatra_names_all_languages_non_empty ... ok
+test i18n::tests::nakshatra_names_hindi_all_27 ... ok
+test i18n::tests::nakshatra_names_kannada_all_27 ... ok
+test i18n::tests::nakshatra_names_tamil_all_27 ... ok
+test i18n::tests::paksha_names_all_languages ... ok
+test i18n::tests::paksha_names_all_languages_non_empty ... ok
+test i18n::tests::planet_names_all_languages_non_empty ... ok
+test i18n::tests::planet_names_bengali ... ok
+test i18n::tests::planet_names_english_match_existing ... ok
+test i18n::tests::planet_names_gujarati ... ok
+test i18n::tests::planet_names_hindi_navagraha ... ok
+test i18n::tests::nakshatra_names_unique_per_language ... ok
+test i18n::tests::planet_names_japanese ... ok
+test i18n::tests::planet_names_kannada ... ok
+test i18n::tests::planet_names_malayalam ... ok
+test i18n::tests::localized_tithi_yoga_karana_never_panic_on_invalid_number ... ok
+test i18n::tests::planet_names_marathi ... ok
+test i18n::tests::planet_names_sanskrit ... ok
+test i18n::tests::planet_names_spanish ... ok
+test i18n::tests::planet_names_tamil ... ok
+test i18n::tests::planet_names_telugu ... ok
+test i18n::tests::planet_names_thai ... ok
+test i18n::tests::rashi_names_all_languages_non_empty ... ok
+test i18n::tests::rashi_names_english_match_western ... ok
+test i18n::tests::rashi_names_french_all_twelve ... ok
+test i18n::tests::rashi_names_german_all_twelve ... ok
+test i18n::tests::rashi_names_hindi_all_twelve ... ok
+test i18n::tests::rashi_names_japanese_all_twelve ... ok
+test i18n::tests::rashi_names_kannada_all_twelve ... ok
+test i18n::tests::rashi_names_sanskrit_all_twelve ... ok
+test i18n::tests::rashi_names_tamil_all_twelve ... ok
+test i18n::tests::tithi_english_matches_existing ... ok
+test i18n::tests::tithi_names_hindi_all_30 ... ok
+test i18n::tests::tithi_purnima_amavasya_hindi ... ok
+test i18n::tests::rashi_names_unique_per_language ... ok
+test i18n::tests::vara_english_matches_existing ... ok
+test i18n::tests::vara_names_all_languages_non_empty ... ok
+test i18n::tests::vara_names_bengali ... ok
+test i18n::tests::vara_names_hindi ... ok
+test i18n::tests::vara_names_indonesian ... ok
+test i18n::tests::vara_names_japanese ... ok
+test i18n::tests::vara_names_kannada ... ok
+test i18n::tests::vara_names_malayalam ... ok
+test i18n::tests::vara_names_spanish ... ok
+test i18n::tests::vara_names_tamil ... ok
+test i18n::tests::vara_names_telugu ... ok
+test i18n::tests::vara_names_thai ... ok
+test i18n::tests::western_node_aliases_match_vedic_in_indic ... ok
+test i18n::tests::yoga_english_matches_existing ... ok
+test i18n::tests::yoga_names_hindi_all_27 ... ok
+test jaimini::tests::ak_has_highest_degree_in_sign ... ok
+test jaimini::tests::arudha_pada_general ... ok
+test jaimini::tests::arudha_pada_lord_in_lagna_takes_10th ... ok
+test jaimini::tests::arudha_pada_never_lands_in_1st_or_7th ... ok
+test jaimini::tests::arudha_pada_provisional_in_7th_takes_10th_from_it ... ok
+test jaimini::tests::arudha_pada_provisional_in_bhava_takes_10th_from_it ... ok
+test jaimini::tests::chara_karakas_7_assigned ... ok
+test jaimini::tests::jaimini_dual_aspects_dual ... ok
+test jaimini::tests::jaimini_movable_aspects_fixed ... ok
+test jaimini::tests::nodes_excluded ... ok
+test kp::tests::compute_significators_returns_all_9_planets ... ok
+test kp::tests::kp_chart_house_of_degree_equal_houses ... ok
+test kp::tests::kp_at_zero_degrees ... ok
+test kp::tests::kp_249_max ... ok
+test kp::tests::is_event_promised_basic ... ok
+test kp::tests::kp_chart_planet_house ... ok
+test kp::tests::cuspal_sub_lord_fields_populated ... ok
+test kp::tests::kp_chart_wrapping_cusps ... ok
+test kp::tests::cuspal_analysis_returns_12_houses ... ok
+test kp::tests::kp_event_favorable_houses ... ok
+test kp::tests::check_event_in_chart_runs ... ok
+test kp::tests::kp_number_to_sign_boundaries ... ok
+test kp::tests::kp_number_to_sign_guard ... ok
+test kp::tests::kp_number_to_sign_pins_drift_corrected_values ... ok
+test kp::tests::kp_number_to_sign_range ... ok
+test kp::tests::outer_planets_have_no_dasha_lord ... ok
+test kp::tests::planet_to_from_dasha_lord_roundtrip ... ok
+test kp::tests::ruling_planets_agents_rahu ... ok
+test kp::tests::ruling_planets_dedup ... ok
+test kp::tests::ruling_planets_strength_scoring ... ok
+test kp::tests::sign_lords_correct ... ok
+test kp::tests::kp_number_range ... ok
+test kp::tests::significator_aspecting_present ... ok
+test kp::tests::significator_occupant_present ... ok
+test kp::tests::sub_lord_differs_within_nakshatra ... ok
+test kp::tests::significator_owner_present ... ok
+test mrityu_bhaga::tests::all_seven_planets_have_all_12_entries ... ok
+test mrityu_bhaga::tests::info_struct_hit ... ok
+test kp::tests::significators_of_house_returns_ordered ... ok
+test mrityu_bhaga::tests::info_struct_miss ... ok
+test mrityu_bhaga::tests::info_unknown_planet ... ok
+test mrityu_bhaga::tests::jupiter_mb_cancer_27 ... ok
+test mrityu_bhaga::tests::jupiter_mb_leo_6 ... ok
+test mrityu_bhaga::tests::ketu_has_no_mb ... ok
+test mrityu_bhaga::tests::lagna_mb_aries_1 ... ok
+test mrityu_bhaga::tests::mars_mb_aries_19 ... ok
+test mrityu_bhaga::tests::mars_mb_sagittarius_2 ... ok
+test mrityu_bhaga::tests::mercury_mb_aries_15 ... ok
+test mrityu_bhaga::tests::mercury_mb_pisces_5 ... ok
+test mrityu_bhaga::tests::moon_mb_aries_8 ... ok
+test mrityu_bhaga::tests::moon_mb_taurus_25 ... ok
+test mrityu_bhaga::tests::moon_mb_virgo_1 ... ok
+test mrityu_bhaga::tests::mrityu_bhaga_degree_lookup ... ok
+test mrityu_bhaga::tests::negative_longitude ... ok
+test mrityu_bhaga::tests::over_360 ... ok
+test mrityu_bhaga::tests::rahu_has_no_mb ... ok
+test mrityu_bhaga::tests::saturn_mb_aries_10 ... ok
+test mrityu_bhaga::tests::saturn_mb_cancer_9 ... ok
+test mrityu_bhaga::tests::sun_mb_aries_20 ... ok
+test mrityu_bhaga::tests::sun_mb_capricorn_2 ... ok
+test mrityu_bhaga::tests::unknown_planet ... ok
+test mrityu_bhaga::tests::venus_jupiter_mirror_symmetry ... ok
+test mrityu_bhaga::tests::venus_mb_aquarius_29 ... ok
+test mrityu_bhaga::tests::venus_mb_aries_28 ... ok
+test muhurta::tests::abhijit_near_noon ... ok
+test muhurta::tests::activity_marriage_needs_fixed_or_tender ... ok
+test muhurta::tests::activity_surgery_needs_sharp ... ok
+test muhurta::tests::activity_travel_needs_movable ... ok
+test muhurta::tests::auspicious_choghadiya ... ok
+test muhurta::tests::brahma_muhurta_before_sunrise ... ok
+test muhurta::tests::choghadiya_16_periods ... ok
+test muhurta::tests::choghadiya_covers_full_day ... ok
+test muhurta::tests::choghadiya_weekday_7_no_panic ... ok
+test muhurta::tests::disha_shool_values ... ok
+test muhurta::tests::hora_24_total ... ok
+test muhurta::tests::hora_monday_first_is_moon ... ok
+test muhurta::tests::hora_night_not_day ... ok
+test muhurta::tests::hora_saturday_first_is_saturn ... ok
+test muhurta::tests::hora_sunday_first_is_sun ... ok
+test muhurta::tests::nakshatra_fixed_quality ... ok
+test muhurta::tests::nakshatra_movable_quality ... ok
+test muhurta::tests::nakshatra_sharp_quality ... ok
+test muhurta::tests::nakshatra_tender_quality ... ok
+test muhurta::tests::panchaka_agni ... ok
+test muhurta::tests::panchaka_chora ... ok
+test muhurta::tests::panchaka_mrityu ... ok
+test muhurta::tests::panchaka_none ... ok
+test kp::tests::kp_number_to_sign_is_inverse_of_compute_kp_number ... ok
+test muhurta::tests::panchaka_raja ... ok
+test muhurta::tests::panchaka_roga ... ok
+test muhurta::tests::planetary_hour_always_valid_planet ... ok
+test muhurta::tests::planetary_hour_clamps_out_of_range ... ok
+test muhurta::tests::planetary_hour_monday_hour0_is_moon ... ok
+test muhurta::tests::planetary_hour_saturday_hour0_is_saturn ... ok
+test muhurta::tests::planetary_hour_sunday_hour0_is_sun ... ok
+test muhurta::tests::rahu_kalam_sunday ... ok
+test muhurta::tests::rahu_kalam_within_day ... ok
+test muhurta::tests::tarabala_cycle_repeats ... ok
+test muhurta::tests::tarabala_favorable_set ... ok
+test muhurta::tests::tarabala_same_nakshatra_is_janma ... ok
+test muhurta::tests::tarabala_second_is_sampat ... ok
+test muhurta::tests::tarabala_third_is_vipat ... ok
+test muhurta::tests::tarabala_unfavorable_set ... ok
+test muhurta::tests::tarabala_wrap_around ... ok
+test nadi::tests::all_rules_count ... ok
+test nadi::tests::all_rules_have_valid_structure ... ok
+test nadi::tests::domain_display ... ok
+test nadi::tests::each_sign_covered_for_supported_planets ... ok
+test nadi::tests::indication_text_maps_empty_to_none ... ok
+test nadi::tests::jupiter_cancer_exalted ... ok
+test nadi::tests::moon_taurus_exalted ... ok
+test nadi::tests::saturn_libra_exalted ... ok
+test nadi::tests::sign_wraps_around ... ok
+test nadi::tests::sun_aries_is_career ... ok
+test nadi::tests::unbundled_indication_is_none_not_empty_string ... ok
+test nadi::tests::unsupported_planet_returns_empty ... ok
+test nakshatra::tests::all_27_nakshatras ... ok
+test nakshatra::tests::nakshatra_boundaries ... ok
+test nakshatra::tests::nakshatra_lords_cycle ... ok
+test nakshatra::tests::pada_computation ... ok
+test nakshatra::tests::vimshottari_total_120 ... ok
+test panchang::tests::full_moon_is_purnima ... ok
+test panchang::tests::full_panchang ... ok
+test panchang::tests::karana_names ... ok
+test panchang::tests::new_moon_is_amavasya ... ok
+test panchang::tests::tithi_yoga_name_never_panics_on_invalid_deserialized_number ... ok
+test panchang::tests::vara_j2000_is_saturday ... ok
+test panchang::tests::yoga_from_positions ... ok
+test panchang_transitions::tests::interval_paksha_reports_value_paksha ... ok
+test panchang_transitions::tests::all_transitions_consistent_with_instant_panchang ... ok
+test panchang_transitions::tests::karana_span_is_six_degrees ... ok
+test panchang_transitions::tests::nakshatra_end_matches_closed_form ... ok
+test panchang_transitions::tests::next_boundary_basic_and_wrap ... ok
+test panchang_transitions::tests::signed_delta_wraps_correctly ... ok
+test panchang_transitions::tests::tithi_end_handles_360_to_0_wrap ... ok
+test panchang_transitions::tests::tithi_end_matches_closed_form ... ok
+test panchang_transitions::tests::tithi_solver_lands_on_120_degree_boundary ... ok
+test panchang_transitions::tests::yoga_end_matches_closed_form ... ok
+test prashna::tests::ashtamangala_all_items ... ok
+test prashna::tests::arudha_clamped_to_range ... ok
+test prashna::tests::ashtamangala_gold_is_sun ... ok
+test prashna::tests::ashtamangala_mirror_is_moon ... ok
+test prashna::tests::ashtamangala_turmeric_is_jupiter ... ok
+test prashna::tests::favorable_moon_houses ... ok
+test prashna::tests::mook_number_in_range ... ok
+test prashna::tests::moon_nakshatra_computed ... ok
+test prashna::tests::planet_display ... ok
+test prashna::tests::prashna_lagna_lord_all_signs ... ok
+test prashna::tests::prashna_lagna_lord_aries ... ok
+test prashna::tests::prashna_lagna_lord_cancer ... ok
+test prashna::tests::timing_all_modalities_cycle ... ok
+test prashna::tests::timing_dual_sign ... ok
+test prashna::tests::timing_fixed_sign ... ok
+test prashna::tests::timing_movable_sign ... ok
+test prashna::tests::unfavorable_moon_house ... ok
+test pushkara::tests::air_sign_gemini_navamsa_6 ... ok
+test pushkara::tests::air_sign_libra_navamsa_8 ... ok
+test pushkara::tests::earth_sign_taurus_navamsa_3 ... ok
+test pushkara::tests::earth_sign_taurus_navamsa_5 ... ok
+test pushkara::tests::earth_sign_virgo_navamsa_3 ... ok
+test pushkara::tests::fire_sign_aries_navamsa_1_not_pushkara ... ok
+test pushkara::tests::fire_sign_aries_navamsa_7 ... ok
+test pushkara::tests::fire_sign_aries_navamsa_9 ... ok
+test pushkara::tests::fire_sign_leo_navamsa_7 ... ok
+test pushkara::tests::fire_sign_middle_navamsas_not_pushkara ... ok
+test pushkara::tests::fire_sign_sagittarius_navamsa_9 ... ok
+test pushkara::tests::negative_longitude ... ok
+test pushkara::tests::over_360 ... ok
+test pushkara::tests::pushkara_bhaga_all_signs_have_one ... ok
+test pushkara::tests::pushkara_bhaga_aries_21 ... ok
+test pushkara::tests::pushkara_bhaga_cancer_8 ... ok
+test pushkara::tests::pushkara_bhaga_libra_24 ... ok
+test pushkara::tests::pushkara_bhaga_pisces_9 ... ok
+test pushkara::tests::pushkara_bhaga_taurus_14 ... ok
+test pushkara::tests::pushkara_info_both_hits ... ok
+test pushkara::tests::pushkara_info_navamsa_only ... ok
+test pushkara::tests::pushkara_info_neither ... ok
+test pushkara::tests::total_pushkara_navamsas_is_24 ... ok
+test pushkara::tests::water_sign_cancer_navamsa_1 ... ok
+test pushkara::tests::water_sign_cancer_navamsa_3 ... ok
+test pushkara::tests::water_sign_pisces_navamsa_1 ... ok
+test pushkara::tests::water_sign_scorpio_navamsa_1 ... ok
+test rashi::tests::elements_and_modalities ... ok
+test rashi::tests::lords ... ok
+test rashi::tests::rashi_from_longitude ... ok
+test retrograde::tests::direct_motion ... ok
+test retrograde::tests::planet_name_variant ... ok
+test retrograde::tests::retrograde_motion ... ok
+test retrograde::tests::stationary_direct ... ok
+test retrograde::tests::stationary_retrograde ... ok
+test retrograde::tests::threshold_boundary ... ok
+test retrograde::tests::typical_planet_speeds ... ok
+test retrograde::tests::zero_speed_is_stationary_direct ... ok
+test shadbala::tests::abda_bala_nonzero_for_some_planet ... ok
+test shadbala::tests::backwards_compat_simplified_compute ... ok
+test shadbala::tests::compute_full_kala_bala_is_broken_down ... ok
+test shadbala::tests::compute_full_produces_valid_shadbala ... ok
+test shadbala::tests::dig_bala_sun_in_10th ... ok
+test shadbala::tests::compute_full_all_seven_planets ... ok
+test shadbala::tests::drik_bala_benefic_opposition ... ok
+test shadbala::tests::drik_bala_can_be_negative ... ok
+test shadbala::tests::drik_bala_malefic_opposition ... ok
+test shadbala::tests::drik_bala_mars_special_aspect ... ok
+test shadbala::tests::drik_bala_mixed_aspects ... ok
+test shadbala::tests::drik_bala_no_aspects ... ok
+test shadbala::tests::drik_bala_within_bphs_virupa_scale ... ok
+test shadbala::tests::full_shadbala_computation ... ok
+test shadbala::tests::hora_bala_first_hora_saturday ... ok
+test shadbala::tests::is_natural_benefic_checks ... ok
+test shadbala::tests::kala_bala_has_subcomponents ... ok
+test shadbala::tests::kendra_bala_values ... ok
+test shadbala::tests::masa_bala_nonzero_for_some_planet ... ok
+test shadbala::tests::naisargika_order_bphs ... ok
+test shadbala::tests::nathonnatha_mars_nocturnal ... ok
+test shadbala::tests::nathonnatha_mercury_always_60 ... ok
+test shadbala::tests::nathonnatha_moon_max_at_midnight ... ok
+test shadbala::tests::nathonnatha_moon_zero_at_noon ... ok
+test shadbala::tests::nathonnatha_sun_max_at_noon ... ok
+test shadbala::tests::nathonnatha_sun_zero_at_midnight ... ok
+test shadbala::tests::paksha_bala_benefic_at_full_moon ... ok
+test shadbala::tests::paksha_bala_benefic_at_new_moon ... ok
+test shadbala::tests::paksha_bala_malefic_at_new_moon ... ok
+test shadbala::tests::paksha_bala_range ... ok
+test shadbala::tests::retrograde_cheshta ... ok
+test shadbala::tests::saptavargaja_sun_in_aries ... ok
+test shadbala::tests::saptavargaja_produces_nonzero_for_all_planets ... ok
+test shadbala::tests::saptavargaja_unit_enemy ... ok
+test shadbala::tests::saptavargaja_unit_exaltation ... ok
+test shadbala::tests::saptavargaja_unit_friend ... ok
+test shadbala::tests::saptavargaja_unit_neutral ... ok
+test shadbala::tests::saptavargaja_unit_own_sign ... ok
+test shadbala::tests::shadbala_ratio_interpretation ... ok
+test shadbala::tests::sthana_bala_full_includes_saptavargaja ... ok
+test shadbala::tests::sun_debilitated_in_libra ... ok
+test shadbala::tests::sun_exalted_in_aries_10deg ... ok
+test shadbala::tests::tribhaga_jupiter_always_60 ... ok
+test shadbala::tests::tribhaga_mars_third_third_night ... ok
+test shadbala::tests::tribhaga_mercury_first_third_day ... ok
+test shadbala::tests::tribhaga_moon_first_third_night ... ok
+test shadbala::tests::tribhaga_saturn_third_third_day ... ok
+test shadbala::tests::tribhaga_sun_second_third_day ... ok
+test shadbala::tests::tribhaga_venus_second_third_night ... ok
+test shadbala::tests::vara_bala_saturday_saturn ... ok
+test shadbala::tests::vedic_aspect_all_planets_7th_house ... ok
+test shadbala::tests::vedic_aspect_jupiter_special ... ok
+test shadbala::tests::vedic_aspect_mars_special ... ok
+test shadbala::tests::vedic_aspect_saturn_special ... ok
+test sudarshana::tests::age_one_advances_to_house_two ... ok
+test sudarshana::tests::birth_year_returns_house_one ... ok
+test sudarshana::tests::double_overlap_two_same_anchor ... ok
+test sudarshana::tests::large_age_wraps ... ok
+test sudarshana::tests::no_overlap_distinct_anchors ... ok
+test sudarshana::tests::range_computation ... ok
+test sudarshana::tests::sign_wraps_past_pisces ... ok
+test sudarshana::tests::triple_overlap_same_anchor ... ok
+test sudarshana::tests::twelve_year_cycle ... ok
+test sudarshana::tests::wheel_labels ... ok
+test tajaka::tests::angular_dist_symmetric ... ok
+test tajaka::tests::check_ithasala_conjunction ... ok
+test tajaka::tests::check_ithasala_none_when_out_of_orb ... ok
+test tajaka::tests::check_ithasala_none_when_slower ... ok
+test tajaka::tests::check_ithasala_trine ... ok
+test tajaka::tests::detect_tajaka_yogas_finds_ikkabal ... ok
+test tajaka::tests::detect_tajaka_yogas_finds_ithasala ... ok
+test tajaka::tests::duhphali_hemmed_by_malefics ... ok
+test tajaka::tests::ikkabal_jupiter_in_cancer ... ok
+test tajaka::tests::gaurav_uses_jupiter_moon_sun ... ok
+test tajaka::tests::ikkabal_sun_in_leo ... ok
+test tajaka::tests::induvara_all_in_kendras ... ok
+test tajaka::tests::ithasala_applying ... ok
+test tajaka::tests::ithasala_not_when_separating ... ok
+test tajaka::tests::kamboola_ithasala_with_retrograde ... ok
+test tajaka::tests::mahatmya_present ... ok
+test tajaka::tests::mitra_uses_punya_jupiter_venus ... ok
+test tajaka::tests::muntha_aspects_conjunction ... ok
+test tajaka::tests::muntha_aspects_trine_and_square ... ok
+test tajaka::tests::muntha_at_age_0 ... ok
+test tajaka::tests::muntha_cycles_12 ... ok
+test tajaka::tests::muntha_lord_correct ... ok
+test tajaka::tests::punya_day_formula ... ok
+test tajaka::tests::punya_night_formula ... ok
+test tajaka::tests::sahams_count ... ok
+test tajaka::tests::sahams_in_range ... ok
+test tajaka::tests::sahams_use_real_positions_not_zero ... ok
+test tajaka::tests::yamaya_mutual_reception ... ok
+test tajaka::tests::vidya_day_is_inverse_of_punya ... ok
+test tajaka::tests::yashas_uses_punya_and_jupiter ... ok
+test transit::tests::chandrashtama_detection ... ok
+test transit::tests::sade_sati_all_signs_consistent ... ok
+test transit::tests::sade_sati_not_active ... ok
+test transit::tests::sade_sati_peak ... ok
+test transit::tests::sade_sati_rising ... ok
+test transit::tests::sade_sati_setting ... ok
+test transit::tests::transit_jupiter_favorable_2nd ... ok
+test transit::tests::transit_jupiter_unfavorable_3rd ... ok
+test transit::tests::transit_mars_matches_saturn_pattern ... ok
+test transit::tests::transit_rahu_ketu_match_mars ... ok
+test transit::tests::transit_saturn_favorable_houses ... ok
+test transit::tests::transit_sun_favorable_houses ... ok
+test transit::tests::transit_venus_generous_favorable ... ok
+test upagraha::tests::dhuma_formula ... ok
+test upagraha::tests::gulika_uses_correct_slot ... ok
+test upagraha::tests::upagraha_from_sun ... ok
+test upagraha::tests::upaketu_formula ... ok
+test upagraha::tests::vyatipata_plus_dhuma_equals_360 ... ok
+test varshaphal::tests::full_tripataki ... ok
+test varshaphal::tests::muntha_lord_is_sign_lord ... ok
+test varshaphal::tests::muntha_sign_cycles ... ok
+test varshaphal::tests::no_tripataki ... ok
+test varshaphal::tests::partial_tripataki_one ... ok
+test varshaphal::tests::solar_return_advances_one_year ... ok
+test varshaphal::tests::solar_return_year_zero ... ok
+test varshaphal::tests::varshaphal_with_transits ... ok
+test varshaphal::tests::varshaphal_without_transits ... ok
+test varshaphal::tests::weekday_j2000_is_saturday ... ok
+test varshaphal::tests::weekday_rotates_seven_days ... ok
+test varshaphal::tests::year_lord_j2000 ... ok
+test yoga::tests::budhaditya ... ok
+test yoga::tests::gajakesari_conjunction ... ok
+test yoga::tests::gajakesari_trine ... ok
+test yoga::tests::graha_yuddha_mars_mercury_within_1_deg ... ok
+test yoga::tests::graha_yuddha_none_beyond_1_deg ... ok
+test yoga::tests::graha_yuddha_none_for_moon ... ok
+test yoga::tests::graha_yuddha_none_for_sun ... ok
+test yoga::tests::graha_yuddha_none_same_planet ... ok
+test yoga::tests::graha_yuddha_venus_wins_over_jupiter ... ok
+test yoga::tests::graha_yuddha_wrap_around_360 ... ok
+test yoga::tests::hamsa_yoga_in_kendra ... ok
+test yoga::tests::kemadruma_no_support ... ok
+test yoga::tests::no_gajakesari ... ok
+test yoga::tests::no_kemadruma_with_support ... ok
+test yoga::tests::no_yoga_not_kendra ... ok
+test yoga::tests::no_yoga_wrong_sign ... ok
+test yoga::tests::ruchaka_yoga ... ok
+test yoga::tests::vipreeta_raja ... ok
+test yogini::tests::yogini_8_periods ... ok
+test yogini::tests::yogini_balance ... ok
+test yogini::tests::yogini_total_36_from_boundary ... ok
+test yogini::tests::yogini_years_sum ... ok
+test kp::tests::kp_number_covers_full_249_and_matches_published_boundaries ... ok
+
+test result: ok. 602 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_wasm-c59bea9c73764b8c)
+
+running 39 tests
+test tests::wasm_ayanamsa ... ok
+test tests::wasm_delta_t ... ok
+test tests::wasm_body_name ... ok
+test tests::wasm_all_ayanamsas ... ok
+test tests::wasm_compatibility_invalid_nakshatra ... ok
+test tests::wasm_delta_t_historical ... ok
+test tests::wasm_divisional_chart_all_valid_vargas ... ok
+test tests::wasm_compatibility_different_nakshatras ... ok
+test tests::wasm_compatibility_same_nakshatra ... ok
+test tests::wasm_divisional_chart_d1 ... ok
+test tests::wasm_divisional_chart_d9 ... ok
+test tests::compatibility_resolves_boundary_nakshatra_by_longitude ... ok
+test tests::wasm_divisional_chart_invalid_varga ... ok
+test tests::wasm_divisional_chart_normalized ... ok
+test tests::wasm_invalid_ayanamsa ... ok
+test tests::wasm_invalid_body ... ok
+test tests::wasm_houses ... ok
+test tests::wasm_invalid_house_system ... ok
+test tests::wasm_julian_day ... ok
+test tests::wasm_ketu_body_id_13 ... ok
+test tests::wasm_ketu_sidereal ... ok
+test tests::wasm_nakshatra ... ok
+test tests::wasm_nakshatra_info_unified_shape ... ok
+test tests::wasm_planet_position_rejects_bad_input ... ok
+test tests::wasm_planet_position_node_retrograde_and_ketu ... ok
+test tests::wasm_rejects_non_finite_jd ... ok
+test tests::wasm_all_house_systems ... ok
+test tests::wasm_rejects_bad_geo ... ok
+test tests::wasm_panchang ... ok
+test tests::wasm_tropical_sun ... ok
+test tests::wasm_sidereal_sun ... ok
+test tests::wasm_vimshottari_dasha ... ok
+test tests::wasm_planet_position_full_tuple_and_speed ... ok
+test tests::wasm_planet_position_sidereal_subtracts_ayanamsa ... ok
+test tests::wasm_vimshottari_dasha_covers_120_years ... ok
+test tests::wasm_full_chart ... ok
+test tests::wasm_all_body_ids ... ok
+test tests::wasm_all_vedic_grahas ... ok
+test tests::wasm_compatibility_all_pairs_valid_range ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_western-275bae18a38a6505)
+
+running 317 tests
+test antiscia::tests::antiscion_solstice_points_fixed ... ok
+test antiscia::tests::antiscion_canonical_sign_pairs ... ok
+test antiscia::tests::contra_antiscion_equinox_points_fixed ... ok
+test aspects::tests::angular_distance_basic ... ok
+test antiscia::tests::antiscion_is_involution ... ok
+test aspects::tests::applying_vs_separating ... ok
+test antiscia::tests::contra_antiscion_is_opposite_of_antiscion ... ok
+test antiscia::tests::no_contact_when_out_of_orb ... ok
+test antiscia::tests::contact_is_symmetric ... ok
+test antiscia::tests::detect_antiscion_contact ... ok
+test antiscia::tests::detect_sorted_by_orb ... ok
+test antiscia::tests::detect_contra_antiscion_contact ... ok
+test aspects::tests::conjunction_detected ... ok
+test aspects::tests::find_all_aspects_multi ... ok
+test aspects::tests::minor_aspects ... ok
+test aspects::tests::no_aspect_when_out_of_orb ... ok
+test aspects::tests::opposition_detected ... ok
+test aspects::tests::transit_conjunction_linear ... ok
+test aspects::tests::transit_no_results_empty_window ... ok
+test aspects::tests::transit_opposition_linear ... ok
+test aspects::tests::transit_trine_linear ... ok
+test aspects::tests::transit_wrapping_conjunction ... ok
+test aspects::tests::trine_detected ... ok
+test cosmobiology::tests::ebertin_keys_has_at_least_20 ... ok
+test cosmobiology::tests::format_picture_output ... ok
+test cosmobiology::tests::lookup_none_is_symmetric_for_stripped_entries ... ok
+test cosmobiology::tests::chart_has_all_positions ... ok
+test cosmobiology::tests::lookup_nonempty_entry_returns_some ... ok
+test cosmobiology::tests::lookup_returns_none_for_stripped_interpretation ... ok
+test cosmobiology::tests::chart_midpoints_count ... ok
+test cosmobiology::tests::lookup_unknown_pair_is_none ... ok
+test cosmobiology::tests::chart_positions_are_mod_90 ... ok
+test cosmobiology::tests::chart_pictures_have_no_stripped_interpretations ... ok
+test cosmobiology::tests::planetary_picture_exact_hit ... ok
+test cosmobiology::tests::no_self_reference_in_pictures ... ok
+test cosmobiology::tests::pictures_sorted_by_orb ... ok
+test cosmobiology::tests::planetary_picture_via_square ... ok
+test declination::tests::contraparallel_opposite_sign_in_orb ... ok
+test declination::tests::declination_at_solstices_equals_obliquity ... ok
+test declination::tests::declination_matches_meeus_spherical_formula ... ok
+test declination::tests::declination_zero_on_equator_points ... ok
+test declination::tests::detect_finds_both_kinds ... ok
+test declination::tests::detect_sorted_by_orb ... ok
+test declination::tests::from_ecliptic_antiscia_share_declination ... ok
+test declination::tests::from_ecliptic_solstice_pair_is_parallel ... ok
+test declination::tests::opposite_sign_large_magnitude_is_not_contraparallel ... ok
+test declination::tests::parallel_out_of_orb ... ok
+test declination::tests::parallel_same_sign_in_orb ... ok
+test dignity::tests::accidental_dignity_angular ... ok
+test dignity::tests::almuten_figuris_positive_only ... ok
+test dignity::tests::almuten_figuris_sorted_descending ... ok
+test dignity::tests::almuten_of_degree_returns_strongest ... ok
+test dignity::tests::almuten_returns_sorted ... ok
+test dignity::tests::mutual_reception_venus_mars ... ok
+test dignity::tests::peregrine_negative ... ok
+test dignity::tests::egyptian_terms_all_signs ... ok
+test dignity::tests::sun_detriment_in_aquarius ... ok
+test dignity::tests::sun_domicile_in_leo ... ok
+test dignity::tests::sun_exalted_in_aries ... ok
+test electional::tests::benefic_hour_check ... ok
+test electional::tests::election_rating_thresholds ... ok
+test electional::tests::election_score_all_benefic_angular ... ok
+test electional::tests::election_score_malefic_angular_penalty ... ok
+test electional::tests::house_of_normalizes_out_of_range_longitudes ... ok
+test electional::tests::house_of_wrapping ... ok
+test dignity::tests::almuten_figuris_every_degree_has_result ... ok
+test electional::tests::moon_quality_applying_benefic ... ok
+test electional::tests::moon_quality_motionless_moon_is_voc ... ok
+test electional::tests::moon_quality_voc_via_future_perfection_rule ... ok
+test electional::tests::moon_quality_void_of_course ... ok
+test electional::tests::planetary_hour_day_vs_night_differ ... ok
+test electional::tests::planetary_hour_returns_valid_planet ... ok
+test harmonics::tests::age_harmonic_at_30 ... ok
+test harmonics::tests::chart_has_all_bodies ... ok
+test harmonics::tests::common_harmonics_count ... ok
+test harmonics::tests::harmonic_1_is_natal ... ok
+test harmonics::tests::harmonic_2_doubles ... ok
+test harmonics::tests::harmonic_aspect_conjunction ... ok
+test harmonics::tests::harmonic_wraps ... ok
+test harmonics::tests::midpoint_basic ... ok
+test harmonics::tests::midpoint_tree_n_choose_2 ... ok
+test harmonics::tests::midpoint_wrapping ... ok
+test heliacal::tests::all_heliacal_bodies ... ok
+test heliacal::tests::arcus_visionis_known_values ... ok
+test heliacal::tests::arcus_visionis_star_by_magnitude ... ok
+test heliacal::tests::bisect_transition_precision ... ok
+test heliacal::tests::body_altitude_positive_at_meridian ... ok
+test heliacal::tests::elongation_basic ... ok
+test heliacal::tests::elongation_wraps_correctly ... ok
+test heliacal::tests::compute_heliacal_rise_returns_detail ... ok
+test heliacal::tests::heliacal_event_type_display ... ok
+test heliacal::tests::heliacal_body_display ... ok
+test heliacal::tests::heliacal_rise_finds_event_with_mock ... ok
+test heliacal::tests::star_heliacal_rise_annual ... ok
+test hellenistic::tests::decennial_contiguous_periods ... ok
+test hellenistic::tests::decennial_covers_requested_span ... ok
+test hellenistic::tests::decennial_day_starts_with_sun ... ok
+test hellenistic::tests::decennial_has_7_sub_periods_per_major ... ok
+test heliacal::tests::heliacal_set_finds_event_with_mock ... ok
+test hellenistic::tests::decennial_major_years_match ... ok
+test hellenistic::tests::decennial_night_starts_with_moon ... ok
+test hellenistic::tests::decennial_sub_periods_sum_to_129_months ... ok
+test hellenistic::tests::firdaria_contiguous ... ok
+test hellenistic::tests::firdaria_day_starts_with_sun ... ok
+test hellenistic::tests::firdaria_first_sub_ruler_is_major_ruler ... ok
+test hellenistic::tests::firdaria_night_starts_with_moon ... ok
+test hellenistic::tests::firdaria_nodes_have_no_subs ... ok
+test hellenistic::tests::firdaria_has_9_major_periods ... ok
+test hellenistic::tests::firdaria_planetary_major_has_7_subs ... ok
+test hellenistic::tests::firdaria_sub_periods_equal_length ... ok
+test hellenistic::tests::firdaria_total_75_years ... ok
+test hellenistic::tests::profection_at_age_0 ... ok
+test hellenistic::tests::profection_cycles_12 ... ok
+test hellenistic::tests::sect_determination ... ok
+test hellenistic::tests::zr_12_l1_periods ... ok
+test hellenistic::tests::zr_total_years ... ok
+test horary::tests::accidental_angular_houses ... ok
+test hellenistic::tests::zr_with_l2_has_sub_periods ... ok
+test hellenistic::tests::zr_l2_subperiods_sum_to_l1_duration ... ok
+test horary::tests::accidental_cadent_penalty ... ok
+test horary::tests::accidental_oriental_superior_occidental_inferior ... ok
+test horary::tests::accidental_retrograde_penalty ... ok
+test horary::tests::asc_too_early_detected ... ok
+test horary::tests::check_perfection_normalizes_longitudes ... ok
+test horary::tests::asc_too_late_detected ... ok
+test horary::tests::combustion_within_8_5_deg ... ok
+test horary::tests::house_for_topic_mapping ... ok
+test horary::tests::considerations_radical_chart ... ok
+test horary::tests::lilly_moon_in_scorpio_fall ... ok
+test horary::tests::lilly_peregrine_no_dignity ... ok
+test horary::tests::lilly_sun_in_aquarius_detriment ... ok
+test horary::tests::lilly_sun_in_aries_exaltation ... ok
+test horary::tests::lilly_sun_in_leo_domicile ... ok
+test horary::tests::lilly_term_and_face_contribute ... ok
+test horary::tests::lilly_total_calculation ... ok
+test horary::tests::lilly_triplicity_day_vs_night ... ok
+test horary::tests::moon_last_next_aspects ... ok
+test horary::tests::perfection_conjunction_applying ... ok
+test horary::tests::perfection_denied_when_sign_changes_first ... ok
+test horary::tests::perfection_future_before_sign_change ... ok
+test horary::tests::perfection_no_aspect ... ok
+test horary::tests::perfection_no_aspect_orb_is_none_not_nan ... ok
+test horary::tests::perfection_square_with_difficulty ... ok
+test horary::tests::sign_ruler_traditional ... ok
+test horary::tests::saturn_in_7th_detected ... ok
+test horary::tests::under_sunbeams_between_8_5_and_17 ... ok
+test lots::tests::all_lots_in_range ... ok
+test lots::tests::catalogue_has_97_lots ... ok
+test lots::tests::compute_all_returns_97 ... ok
+test lots::tests::day_chart_detection ... ok
+test lots::tests::every_lot_has_a_name ... ok
+test lots::tests::every_lot_has_a_source ... ok
+test lots::tests::exaltation_uses_fixed_degree ... ok
+test lots::tests::fortune_day_chart ... ok
+test lots::tests::fortune_formula_matches_legacy ... ok
+test lots::tests::fortune_night_reverses ... ok
+test lots::tests::lot_always_0_to_360 ... ok
+test lots::tests::lot_of_basis_uses_fortune_and_spirit ... ok
+test lots::tests::no_night_formula_means_same_as_day ... ok
+test lots::tests::sect_reversal_changes_result ... ok
+test lots::tests::spirit_formula_matches_legacy ... ok
+test lots::tests::spirit_is_fortune_reversed ... ok
+test lunar::tests::cazimi_detection ... ok
+test lunar::tests::combustion_mars ... ok
+test lunar::tests::full_moon_phase ... ok
+test lunar::tests::illumination_full_moon ... ok
+test lunar::tests::illumination_new_moon ... ok
+test lunar::tests::new_moon_phase ... ok
+test midpoints::tests::all_midpoints_count ... ok
+test midpoints::tests::find_activations_basic ... ok
+test midpoints::tests::format_halfsums_notation ... ok
+test midpoints::tests::midpoint_opposite_is_180_away ... ok
+test midpoints::tests::midpoint_opposition_case ... ok
+test midpoints::tests::midpoint_shorter_arc_wrapping ... ok
+test midpoints::tests::midpoint_simple_average ... ok
+test midpoints::tests::midpoint_symmetric ... ok
+test midpoints::tests::midpoint_tree_activation ... ok
+test midpoints::tests::midpoint_tree_square_activation ... ok
+test midpoints::tests::no_self_activation ... ok
+test midpoints::tests::sort_wheel_90_ordering ... ok
+test midpoints::tests::to_90_degree_values ... ok
+test patterns::tests::grand_cross_not_from_grand_trine ... ok
+test patterns::tests::grand_cross_not_mystic_rectangle ... ok
+test patterns::tests::grand_cross_with_orb ... ok
+test patterns::tests::grand_cross_detected ... ok
+test patterns::tests::grand_trine_detected ... ok
+test patterns::tests::kite_detected ... ok
+test patterns::tests::kite_requires_grand_trine ... ok
+test patterns::tests::mystic_rectangle_detected ... ok
+test patterns::tests::mystic_rectangle_not_grand_cross ... ok
+test patterns::tests::no_patterns_when_scattered ... ok
+test patterns::tests::scattered_four_no_complex_patterns ... ok
+test patterns::tests::stellium_detected ... ok
+test patterns::tests::t_square_detected ... ok
+test patterns::tests::yod_detected ... ok
+test progressions::tests::age_computation ... ok
+test progressions::tests::apply_arc_wraps ... ok
+test progressions::tests::ascensional_difference_equator ... ok
+test progressions::tests::converse_goes_backward ... ok
+test progressions::tests::diurnal_semi_arc_at_equator ... ok
+test progressions::tests::full_profection_age_0_aries_asc ... ok
+test progressions::tests::full_profection_angular_detection ... ok
+test progressions::tests::full_profection_non_aries_asc ... ok
+test progressions::tests::monthly_profection_advances ... ok
+test progressions::tests::monthly_profection_month_0_equals_annual ... ok
+test progressions::tests::monthly_profection_wraps_around ... ok
+test progressions::tests::primary_arc_simple_conjunction ... ok
+test progressions::tests::primary_arc_simple_opposition ... ok
+test progressions::tests::primary_directions_no_self_pairing ... ok
+test progressions::tests::primary_directions_produces_sorted_output ... ok
+test progressions::tests::primary_directions_respects_max_years ... ok
+test progressions::tests::profection_cycle ... ok
+test progressions::tests::profection_lord_at_age_0 ... ok
+test progressions::tests::secondary_progression_at_age_30 ... ok
+test progressions::tests::semi_arcs_complement ... ok
+test progressions::tests::solar_arc_computation ... ok
+test progressions::tests::solar_arc_directions_basic ... ok
+test progressions::tests::solar_arc_directions_wraps ... ok
+test progressions::tests::time_lords_basic ... ok
+test progressions::tests::time_lords_covers_full_range ... ok
+test progressions::tests::time_lords_empty_for_zero ... ok
+test returns::tests::consecutive_solar_returns_are_about_one_year_apart ... ok
+test returns::tests::demi_return_is_half_period ... ok
+test returns::tests::lunar_returns_monthly ... ok
+test returns::tests::multiple_solar_returns ... ok
+test returns::tests::saturn_return_is_29_years ... ok
+test returns::tests::solar_return_differs_from_approximate ... ok
+test returns::tests::solar_return_handles_zero_crossing ... ok
+test returns::tests::solar_return_is_annual ... ok
+test returns::tests::solar_return_is_in_the_future_of_birth ... ok
+test returns::tests::solar_return_longitude_matches_for_various_natal_positions ... ok
+test returns::tests::solar_return_longitude_matches_natal ... ok
+test returns::tests::solar_return_multiple_years_all_accurate ... ok
+test returns::tests::sun_longitude_at_j2000 ... ok
+test returns::tests::sun_longitude_increases_over_time ... ok
+test sabian::tests::anaretic_degree ... ok
+test sabian::tests::critical_degrees_cardinal ... ok
+test sabian::tests::critical_degrees_fixed ... ok
+test sabian::tests::critical_degrees_mutable ... ok
+test sabian::tests::aries_1_degree ... ok
+test sabian::tests::all_360_symbols_present ... ok
+test sabian::tests::aries_30_degree ... ok
+test sabian::tests::decanate_first ... ok
+test sabian::tests::decanate_second ... ok
+test sabian::tests::decanate_third ... ok
+test sabian::tests::decanate_water_sign ... ok
+test sabian::tests::invalid_degree_returns_none ... ok
+test sabian::tests::invalid_sign_index_returns_none ... ok
+test sabian::tests::opposite_degree ... ok
+test sabian::tests::pisces_30_degree_wrap ... ok
+test sabian::tests::sign_boundaries ... ok
+test sabian::tests::sign_degree_lookup ... ok
+test sabian::tests::taurus_1_degree ... ok
+test sabian::tests::wrap_around_360 ... ok
+test sidereal::tests::fagan_bradley_at_j2000 ... ok
+test sidereal::tests::fagan_bradley_increases_over_time ... ok
+test sidereal::tests::fagan_svp_close_to_fagan_bradley ... ok
+test sidereal::tests::identify_ayanamsa_names ... ok
+test sidereal::tests::lahiri_differs_from_fagan_bradley ... ok
+test sidereal::tests::sidereal_chart_construction ... ok
+test sidereal::tests::sidereal_chart_with_lahiri ... ok
+test sidereal::tests::sidereal_chart_with_svp ... ok
+test sidereal::tests::sidereal_chart_wrap_around_pisces_aries ... ok
+test sidereal::tests::sidereal_sign_extraction ... ok
+test sidereal::tests::tropical_to_sidereal_basic ... ok
+test sidereal::tests::tropical_to_sidereal_wrap_around ... ok
+test stars::tests::aldebaran_ecliptic_near_taurus ... ok
+test stars::tests::all_dec_in_range ... ok
+test stars::tests::all_ra_in_range ... ok
+test stars::tests::brighter_than_3_has_many_stars ... ok
+test stars::tests::brighter_than_returns_first_mag ... ok
+test stars::tests::catalog_raw_count ... ok
+test stars::tests::behenian_stars_all_15_present ... ok
+test stars::tests::ecliptic_latitude_in_range ... ok
+test stars::tests::ecliptic_longitude_in_range ... ok
+test stars::tests::ecliptic_conversion_matches_stored_all ... ok
+test stars::tests::all_27_nakshatra_yogataras_present ... ok
+test stars::tests::find_by_name_case_insensitive ... ok
+test stars::tests::cassiopeia_w_complete ... ok
+test stars::tests::polaris_declination_near_90 ... ok
+test stars::tests::lupus_bright_stars_present ... ok
+test stars::tests::precessed_ecliptic_shifts_forward ... ok
+test stars::tests::herculis_stars_present ... ok
+test stars::tests::expansion_stars_ecliptic_tight ... ok
+test stars::tests::regulus_near_ecliptic ... ok
+test stars::tests::precessed_ecliptic_multi_epoch_matches_pyswisseph ... ok
+test stars::tests::royal_stars_all_4_present ... ok
+test stars::tests::nakshatra_yogataras_have_valid_stars ... ok
+test stars::tests::pleiades_cluster_present ... ok
+test stars::tests::sirius_is_brightest ... ok
+test stars::tests::scorpius_chain_complete ... ok
+test stars::tests::spica_near_virgo ... ok
+test uranian::tests::all_array_has_eight_entries ... ok
+test stars::tests::catalog_has_at_least_500_stars ... ok
+test uranian::tests::all_tnp_longitudes_returns_eight ... ok
+test uranian::tests::dial_360_normalizes ... ok
+test uranian::tests::dial_90_collapses_cardinal ... ok
+test stars::tests::simbad_verified_top50_ra_dec ... ok
+test uranian::tests::direct_midpoint_simple ... ok
+test uranian::tests::indirect_is_180_from_direct ... ok
+test uranian::tests::is_planetary_picture_90_collapses_square ... ok
+test uranian::tests::is_planetary_picture_outside_orb ... ok
+test uranian::tests::is_planetary_picture_within_orb ... ok
+test uranian::tests::names_and_abbrevs_are_unique ... ok
+test uranian::tests::periods_are_increasing ... ok
+test uranian::tests::planetary_picture_basic_arithmetic ... ok
+test uranian::tests::planetary_picture_full_returns_both_dials ... ok
+test uranian::tests::planetary_picture_identity ... ok
+test uranian::tests::planetary_picture_negative_wraps ... ok
+test uranian::tests::planetary_picture_wraps_around ... ok
+test uranian::tests::scan_finds_exact_picture ... ok
+test uranian::tests::scan_respects_orb ... ok
+test uranian::tests::semi_major_axes_are_increasing ... ok
+test uranian::tests::scan_results_sorted_by_orb ... ok
+test uranian::tests::tnp_at_j2000_returns_epoch_longitude ... ok
+test uranian::tests::tnp_full_orbit_wraps_to_epoch ... ok
+test uranian::tests::tnp_one_year_later ... ok
+
+test result: ok. 317 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/xalen_world-5ef8ab6a50cb7015)
+
+running 127 tests
+test aztec::tests::all_20_day_signs_appear_in_sequence ... ok
+test aztec::tests::anchor_date_is_1_coatl ... ok
+test aztec::tests::day_after_anchor_is_2_miquiztli ... ok
+test aztec::tests::day_number_cycles_through_13 ... ok
+test aztec::tests::from_date_matches_from_jd ... ok
+test aztec::tests::trecena_ruler_is_correct_at_start ... ok
+test aztec::tests::trecena_ruler_stable_within_trecena ... ok
+test aztec::tests::cycle_repeats_at_260 ... ok
+test aztec::tests::display_format ... ok
+test celtic::tests::birch_dec_24_to_jan_20 ... ok
+test celtic::tests::all_13_months_present ... ok
+test celtic::tests::elder_last_day ... ok
+test celtic::tests::nameless_day_dec_23 ... ok
+test celtic::tests::oak_summer_solstice ... ok
+test celtic::tests::every_day_covered_except_dec_23 ... ok
+test celtic::tests::rowan_jan_21 ... ok
+test celtic::tests::year_tree_cycles_at_13 ... ok
+test celtic::tests::year_tree_negative_year ... ok
+test egyptian::tests::all_decans_count ... ok
+test egyptian::tests::boundary_degree_belongs_to_next_decan ... ok
+test egyptian::tests::chaldean_cycle_repeats_every_7 ... ok
+test egyptian::tests::decan_degrees_contiguous ... ok
+test egyptian::tests::decan_numbers_sequential ... ok
+test egyptian::tests::decan_ruler_matches_decan ... ok
+test egyptian::tests::degree_normalisation_negative ... ok
+test egyptian::tests::degree_normalisation_wraps ... ok
+test egyptian::tests::first_decan_aries_is_mars ... ok
+test egyptian::tests::last_decan_pisces ... ok
+test egyptian::tests::second_decan_aries_is_sun ... ok
+test egyptian::tests::taurus_first_decan_is_mercury ... ok
+test egyptian::tests::third_decan_aries_is_venus ... ok
+test mahabote::tests::all_7_days_have_profiles ... ok
+test mahabote::tests::birth_lord_seated_in_binga ... ok
+test mahabote::tests::burmese_names_nonempty ... ok
+test mahabote::tests::compatibility_mutual_harmony ... ok
+test mahabote::tests::compatibility_same_day ... ok
+test mahabote::tests::display_format ... ok
+test mahabote::tests::compatibility_score_range ... ok
+test mahabote::tests::favorable_and_unfavorable_are_different ... ok
+test mahabote::tests::house_names_and_meanings_nonempty ... ok
+test mahabote::tests::jd_known_date ... ok
+test mahabote::tests::jd_weekday_cycle ... ok
+test mahabote::tests::placement_is_birth_anchored_rotation ... ok
+test mahabote::tests::saturday_is_naga_saturn ... ok
+test mahabote::tests::square_from_jd_matches_weekday ... ok
+test mahabote::tests::sunday_is_garuda_sun ... ok
+test mahabote::tests::square_has_seven_distinct_houses_in_order ... ok
+test mahabote::tests::wednesday_am_is_mercury ... ok
+test mahabote::tests::wednesday_am_square_worked_example ... ok
+test mahabote::tests::wednesday_pm_is_rahu ... ok
+test mahabote::tests::wednesday_pm_seats_rahu_in_binga ... ok
+test mayan::tests::calendar_round_creation_date ... ok
+test mayan::tests::calendar_round_display ... ok
+test mayan::tests::calendar_round_repeats_every_18980_days ... ok
+test mayan::tests::gmt_correlation_constant ... ok
+test mayan::tests::haab_19_month_names ... ok
+test mayan::tests::haab_365_day_cycle ... ok
+test mayan::tests::haab_creation_date_is_8_cumku ... ok
+test mayan::tests::haab_wayeb_at_end_of_year ... ok
+test mayan::tests::long_count_2012_end_of_cycle ... ok
+test mayan::tests::long_count_creation_date ... ok
+test mayan::tests::long_count_day_after_2012 ... ok
+test mayan::tests::long_count_display ... ok
+test mayan::tests::long_count_roundtrip ... ok
+test mayan::tests::tzolkin_20_day_names ... ok
+test mayan::tests::tzolkin_260_day_cycle ... ok
+test mayan::tests::tzolkin_creation_date_is_4_ahau ... ok
+test mayan::tests::tzolkin_day_after_creation ... ok
+test mayan::tests::tzolkin_number_wraps_at_13 ... ok
+test nine_star_ki::tests::compatible_stars_all_valid ... ok
+test nine_star_ki::tests::compatible_stars_water ... ok
+test nine_star_ki::tests::month_star_does_not_panic_on_invalid_month ... ok
+test nine_star_ki::tests::month_star_february_group_a ... ok
+test nine_star_ki::tests::january_uses_previous_year ... ok
+test nine_star_ki::tests::month_star_range_1_to_9 ... ok
+test nine_star_ki::tests::profile_display_format ... ok
+test nine_star_ki::tests::profile_has_correct_element ... ok
+test nine_star_ki::tests::star_info_complete ... ok
+test nine_star_ki::tests::year_star_cycle_repeats_at_9 ... ok
+test nine_star_ki::tests::year_star_known_values ... ok
+test nine_star_ki::tests::year_star_range_1_to_9 ... ok
+test persian::tests::cycle_years_is_129 ... ok
+test persian::tests::jarbakhtar_case_insensitive ... ok
+test persian::tests::jarbakhtar_full_cycle_spans_129_years ... ok
+test persian::tests::jarbakhtar_periods_are_contiguous ... ok
+test persian::tests::jarbakhtar_saturn_start ... ok
+test persian::tests::jarbakhtar_unknown_planet_returns_empty ... ok
+test persian::tests::jarbakhtar_venus_start ... ok
+test persian::tests::tasyir_max_is_180 ... ok
+test persian::tests::tasyir_reverse_direction ... ok
+test persian::tests::tasyir_same_degree_is_zero ... ok
+test persian::tests::tasyir_simple_arc ... ok
+test persian::tests::tasyir_wraps_around ... ok
+test saju::tests::all_10_stems_korean ... ok
+test saju::tests::all_12_animals_korean ... ok
+test saju::tests::daeun_male_yang_goes_forward ... ok
+test saju::tests::daeun_periods_are_consecutive ... ok
+test saju::tests::daeun_returns_8_periods ... ok
+test saju::tests::day_master_matches_day_stem ... ok
+test saju::tests::day_pillar_anchors_match_reference ... ok
+test saju::tests::display_format_readable ... ok
+test saju::tests::element_generating_cycle ... ok
+test saju::tests::element_overcoming_cycle ... ok
+test saju::tests::gunghap_identical_charts_high_score ... ok
+test saju::tests::gunghap_score_in_range ... ok
+test saju::tests::month_branch_starts_at_tiger ... ok
+test saju::tests::month_out_of_range_clamps_consistently ... ok
+test saju::tests::sexagenary_cycle_repeats_at_60 ... ok
+test saju::tests::stem_elements_correct ... ok
+test saju::tests::yang_yin_alternates ... ok
+test saju::tests::year_2024_is_gap_jin ... ok
+test tibetan::tests::all_12_animals_covered ... ok
+test tibetan::tests::animal_for_year_helper ... ok
+test tibetan::tests::element_for_year_helper ... ok
+test tibetan::tests::all_5_elements_covered_in_10_years ... ok
+test tibetan::tests::display_format ... ok
+test tibetan::tests::gender_alternates ... ok
+test tibetan::tests::losar_falls_in_february_range ... ok
+test tibetan::tests::rabjung_17_starts_1987 ... ok
+test tibetan::tests::sixty_year_cycle_repeats ... ok
+test tibetan::tests::tibetan_month_from_number ... ok
+test tibetan::tests::tibetan_month_number_roundtrip ... ok
+test tibetan::tests::tibetan_month_from_number_zero_does_not_underflow ... ok
+test tibetan::tests::year_1027_is_fire_female_hare ... ok
+test tibetan::tests::year_1028_is_earth_male_dragon ... ok
+test tibetan::tests::year_1029_is_earth_female_snake ... ok
+test tibetan::tests::year_2024_designation ... ok
+
+test result: ok. 127 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/world_fixtures.rs (target/debug/deps/world_fixtures-ea9a9722262f9ea4)
+
+running 16 tests
+test aztec::anchor_is_1_coatl ... ok
+test mahabote::weekday_matches_pyswisseph ... ok
+test mahabote::ruling_planet_follows_weekday ... ok
+test aztec::modern_date_2024_01_01_is_2_tochtli ... ok
+test mayan::long_count_2012_end_of_baktun_13 ... ok
+test mayan::modern_date_long_count_and_tzolkin ... ok
+test mayan::creation_is_4_ahau ... ok
+test nine_star_ki::february_month_star_group_a ... ok
+test nine_star_ki::published_year_stars ... ok
+test saju_day_pillar::day_pillar_extra_oracle_dates ... ok
+test saju_day_pillar::day_master_consistency ... ok
+test saju_day_pillar::day_pillar_matches_sexagenary_oracle ... ok
+test saju_solar_term_rules::daeun_start_age_depends_on_solar_term_distance ... ok
+test saju_solar_term_rules::daeun_structure_is_sound ... ok
+test saju_solar_term_rules::ipchun_post_boundary_keeps_gregorian_year ... ok
+test saju_solar_term_rules::ipchun_year_boundary_january_birth ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_ayanamsa
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_chart
+
+running 1 test
+test crates/xalen-chart/src/lib.rs - (line 14) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.82s; merged doctests compilation took 0.18s
+   Doc-tests xalen_chinese
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_cloud
+
+running 1 test
+test crates/xalen-cloud/src/lib.rs - (line 9) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.66s; merged doctests compilation took 0.16s
+   Doc-tests xalen_coords
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_ephem
+
+running 7 tests
+test crates/xalen-ephem/src/compat.rs - compat::swe_get_ayanamsa_ut_ex (line 538) ... ok
+test crates/xalen-ephem/src/compat.rs - compat::swe_houses (line 412) ... ok
+test crates/xalen-ephem/src/compat.rs - compat::swe_houses_ex (line 436) ... ok
+test crates/xalen-ephem/src/compat.rs - compat::swe_set_sid_mode (line 136) ... ok
+test crates/xalen-ephem/src/lib.rs - compat (line 32) ... ok
+test crates/xalen-ephem/src/compat.rs - compat::swe_calc_ut (line 315) ... ok
+test crates/xalen-ephem/src/compat.rs - compat::swe_fixstar_mag (line 642) ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+all doctests ran in 0.71s; merged doctests compilation took 0.20s
+   Doc-tests xalen_ephemeris
+
+running 1 test
+test src/lib.rs - (line 10) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.65s; merged doctests compilation took 0.18s
+   Doc-tests xalen_houses
+
+running 1 test
+test crates/xalen-houses/src/geocoding.rs - geocoding::city_coordinates (line 720) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+all doctests ran in 0.64s; merged doctests compilation took 0.18s
+   Doc-tests xalen_iching
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_lalkitab
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_numerology
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_star_anchors
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_stars
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_stars_hip_data
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_time
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_vedic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_wasm
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests xalen_western
+
+running 1 test
+test crates/xalen-western/src/uranian.rs - uranian::tnp_longitude (line 162) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.93s; merged doctests compilation took 0.18s
+   Doc-tests xalen_world
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0  (cargo test --workspace exit code 0 as reported by the task harness; the zsh PIPESTATUS capture above was empty because zsh names it $pipestatus)

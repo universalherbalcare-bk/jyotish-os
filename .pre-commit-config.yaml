@@ -1,0 +1,38 @@
+# Local gates — every hook here also runs in CI (.github/workflows/ci.yml). vendor/ is upstream code and is excluded.
+exclude: ^(vendor/|kernels/|validation/.*\.txt$)
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.7
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: cargo-fmt-jyotish-mcp
+        name: cargo fmt (jyotish-mcp)
+        entry: bash -c 'cd services/jyotish-mcp && [ -f Cargo.toml ] && cargo fmt --check || true'
+        language: system
+        pass_filenames: false
+        files: ^services/jyotish-mcp/.*\.rs$
+      - id: cargo-clippy-jyotish-mcp
+        name: cargo clippy -D warnings (jyotish-mcp)
+        entry: bash -c 'cd services/jyotish-mcp && [ -f Cargo.toml ] && cargo clippy --all-targets -- -D warnings'
+        language: system
+        pass_filenames: false
+        files: ^services/jyotish-mcp/.*\.(rs|toml)$
+      - id: dotnet-format-vedastro-svc
+        name: dotnet format --verify-no-changes (vedastro-svc)
+        entry: bash -c 'cd services/vedastro-svc && ls *.sln */*.csproj >/dev/null 2>&1 && dotnet format --verify-no-changes --exclude Library.Trimmed || true'
+        language: system
+        pass_filenames: false
+        files: ^services/vedastro-svc/.*\.cs$
+      - id: no-vendor-edits
+        name: refuse edits under vendor/
+        entry: bash -c 'echo "vendor/ is upstream — patch at import time in services/, never here"; exit 1'
+        language: system
+        files: ^vendor/
