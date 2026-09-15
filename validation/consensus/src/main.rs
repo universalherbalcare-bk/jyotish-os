@@ -13,10 +13,11 @@ mod rng;
 mod stats;
 
 use chrono::{Duration, NaiveDate};
-use jyotish_mcp::engine::{BodyId, Engine, Instant, UTC_LEAP_SECOND_ERA_START_JD};
+use jyotish_mcp::engine::{BodyId, Engine, Instant, NODE_SOURCE_DE440};
 use jyotish_mcp::tools::consensus::{
-    ASC_TOL_DEG, AYANAMSA_TOL_ARCSEC, NODE_TOL_ARCSEC, sidereal_tolerance_arcsec,
-    tropical_tolerance_arcsec,
+    ASC_TOL_DEG, AYANAMSA_TOL_ARCSEC, NODE_TOL_ANALYTIC_ARCSEC, NODE_TOL_ARCSEC, TimeScaleEra,
+    angular_separation_deg, sidereal_tolerance_arcsec_for, tropical_tolerance_arcsec,
+    tropical_tolerance_for,
 };
 use jyotish_mcp::types::{BirthInput, parse_utc, signed_delta_deg};
 use serde_json::{Value, json};
@@ -30,12 +31,6 @@ use xalen_houses::HouseSystem;
 
 use crate::rng::SplitMix64;
 use crate::stats::{Summary, summarize};
-
-/// JD(UTC) of the Swiss `swe_utc_to_jd` regime change, bisected against
-/// pyswisseph 2.10.03 this session: from 2033-09-17T00:00Z (the first instant
-/// where ΔT(model) − (TAI−UTC + 32.184 s) exceeds 1 s) Swiss abandons the
-/// leap-second TT for `UTC + ΔT(model)`.
-const SWISS_FUTURE_CUTOFF_JD: f64 = 2463857.5;
 
 const PLANETS: [BodyId; 7] = [
     BodyId::Sun,
@@ -172,14 +167,23 @@ fn generate(args: &Args) -> Vec<Sample> {
 
 #[derive(Debug, Clone, Default)]
 struct PerBody {
+    /// XALEN at the ALIGNED instant (Swiss's jd_ut/jd_tt) — what the gate uses.
     xalen_trop: f64,
     xalen_sid: f64,
     jhora_sid: f64,
-    /// Signed arcsec, XALEN − jhora.
+    /// Signed arcsec, XALEN(aligned) − jhora. Gated.
     trop_delta: f64,
     sid_delta: f64,
-    /// XALEN evaluated at Swiss's TT (isolates ΔT convention from ephemeris).
-    trop_delta_tt_aligned: f64,
+    /// Signed arcsec, XALEN at its OWN instant − jhora. Diagnostic only
+    /// (folds the time-scale convention into the ephemeris comparison).
+    trop_delta_own: f64,
+    sid_delta_own: f64,
+    /// Angular separation from the Sun (deg) at the aligned instant.
+    elongation_deg: f64,
+    /// Per-chart tropical tolerance (band-aware); None for the nodes.
+    trop_tol: Option<f64>,
+    in_conjunction_band: bool,
+    source: &'static str,
     xalen_retro: bool,
     jhora_retro: bool,
 }
@@ -203,9 +207,12 @@ struct Record {
     dpsi_delta_mas: f64,
     asc_x: f64,
     asc_j: f64,
+    /// XALEN at Swiss's UT1 − jhora (gated).
     asc_delta_deg: f64,
-    asc_ut1_aligned_delta_deg: f64,
+    /// XALEN at its own UT1 − jhora (diagnostic).
+    asc_delta_own_deg: f64,
     rahu_ketu_consistency_arcsec: f64,
+    time_scale_era: TimeScaleEra,
     bodies: BTreeMap<&'static str, PerBody>,
     attempts: u32,
 }
@@ -219,13 +226,17 @@ struct Failure {
     attempts: u32,
 }
 
-fn era_of(jd_utc: f64) -> &'static str {
-    if jd_utc < UTC_LEAP_SECOND_ERA_START_JD {
-        "pre-1972 (both: UT=UTC, TT=UT+ΔT model)"
-    } else if jd_utc < SWISS_FUTURE_CUTOFF_JD {
-        "1972..2033-09-16 (both: leap-second TT)"
-    } else {
-        "2033-09-17.. (Swiss: UTC+ΔT model; XALEN: leap-second TT)"
+const ERAS: [&str; 3] = [
+    "pre-1972 (both: UT=UTC, TT=UT+ΔT model)",
+    "1972..2033-09-16 (both: leap-second TT)",
+    "2033-09-17.. (Swiss: UTC+ΔT model; XALEN: leap-second TT)",
+];
+
+fn era_label(e: TimeScaleEra) -> &'static str {
+    match e {
+        TimeScaleEra::Pre1972 => ERAS[0],
+        TimeScaleEra::KnownTaiUtc => ERAS[1],
+        TimeScaleEra::Extrapolated => ERAS[2],
     }
 }
 
@@ -284,8 +295,8 @@ async fn fetch_positions(
 
 fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<Record, String> {
     let fields = parse_utc(&s.birth.utc).map_err(|e| e.message)?;
-    let at = Instant::from_utc_fields(&fields);
-    engine.check_coverage(&at).map_err(|e| e.to_string())?;
+    let own = Instant::from_utc_fields(&fields);
+    engine.check_coverage(&own).map_err(|e| e.to_string())?;
 
     let jd_ut_j = num(&resp["jd_ut"], "jd_ut")?;
     let jd_tt_j = num(&resp["jd_tt"], "jd_tt")?;
@@ -297,38 +308,41 @@ fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<R
     let dpsi_j = num(&resp["nutation_dpsi_arcsec"], "nutation_dpsi_arcsec")?;
     let asc_j = num(&resp["ascendant"], "ascendant")?;
 
+    // The gate compares ephemerides at the SAME instant: XALEN at Swiss's jd_ut/jd_tt.
+    let at = Instant::from_parts(jd_ut_j, jd_tt_j);
+    engine.check_coverage(&at).map_err(|e| e.to_string())?;
+
     let aya_true_x = engine.ayanamsa_deg(&at);
     let aya_mean_x = engine.ayanamsa_mean_equinox_deg(&at);
     let dpsi_x = engine.nutation_dpsi_deg(&at) * 3600.0;
-
-    // XALEN at Swiss's time scales: same UT1 as Swiss (Ascendant), same TT as Swiss (bodies).
-    let at_ut1_aligned = Instant::from_parts(jd_ut_j, at.jd_tt.0);
-    let at_tt_aligned = Instant::from_parts(at.jd_ut1.0, jd_tt_j);
 
     let asc_x = engine
         .houses(&at, s.birth.lat, s.birth.lon, HouseSystem::WholeSign)
         .map_err(|e| e.to_string())?
         .ascendant_deg;
-    let asc_x_aligned = engine
-        .houses(
-            &at_ut1_aligned,
-            s.birth.lat,
-            s.birth.lon,
-            HouseSystem::WholeSign,
-        )
+    let asc_x_own = engine
+        .houses(&own, s.birth.lat, s.birth.lon, HouseSystem::WholeSign)
         .map_err(|e| e.to_string())?
         .ascendant_deg;
 
+    let sun = engine
+        .body_state(BodyId::Sun, &at)
+        .map_err(|e| e.to_string())?;
     let mut bodies = BTreeMap::new();
     for id in BodyId::GRAHAS {
         let name = id.name();
         let st = engine.body_state(id, &at).map_err(|e| e.to_string())?;
-        let st_tt = engine
-            .body_state(id, &at_tt_aligned)
-            .map_err(|e| e.to_string())?;
+        let st_own = engine.body_state(id, &own).map_err(|e| e.to_string())?;
         let j = &resp["bodies"][name];
         let jhora_sid = num(&j["lon"], &format!("bodies.{name}.lon"))?;
         let jhora_trop = (jhora_sid + aya_true_j).rem_euclid(360.0);
+        let elongation = angular_separation_deg(
+            st.tropical_lon_deg,
+            st.latitude_deg,
+            sun.tropical_lon_deg,
+            sun.latitude_deg,
+        );
+        let (trop_tol, note) = tropical_tolerance_for(id, elongation);
         bodies.insert(
             name,
             PerBody {
@@ -337,8 +351,12 @@ fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<R
                 jhora_sid,
                 trop_delta: signed_delta_deg(st.tropical_lon_deg, jhora_trop) * 3600.0,
                 sid_delta: signed_delta_deg(st.sidereal_lon_deg, jhora_sid) * 3600.0,
-                trop_delta_tt_aligned: signed_delta_deg(st_tt.tropical_lon_deg, jhora_trop)
-                    * 3600.0,
+                trop_delta_own: signed_delta_deg(st_own.tropical_lon_deg, jhora_trop) * 3600.0,
+                sid_delta_own: signed_delta_deg(st_own.sidereal_lon_deg, jhora_sid) * 3600.0,
+                elongation_deg: elongation,
+                trop_tol,
+                in_conjunction_band: note.is_some(),
+                source: st.source,
                 xalen_retro: st.retrograde,
                 jhora_retro: j["retro"].as_bool().unwrap_or(false),
             },
@@ -354,14 +372,14 @@ fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<R
     Ok(Record {
         idx: s.idx,
         birth: s.birth.clone(),
-        era: era_of(at.jd_ut1.0),
-        jd_ut1_x: at.jd_ut1.0,
+        era: era_label(TimeScaleEra::of_jd_utc(own.jd_ut1.0)),
+        jd_ut1_x: own.jd_ut1.0,
         jd_ut_j,
-        jd_tt_x: at.jd_tt.0,
+        jd_tt_x: own.jd_tt.0,
         jd_tt_j,
-        jd_ut_delta_sec: (at.jd_ut1.0 - jd_ut_j) * 86400.0,
-        jd_tt_delta_sec: (at.jd_tt.0 - jd_tt_j) * 86400.0,
-        delta_t_sigma_sec: at.delta_t_sigma_sec,
+        jd_ut_delta_sec: (own.jd_ut1.0 - jd_ut_j) * 86400.0,
+        jd_tt_delta_sec: (own.jd_tt.0 - jd_tt_j) * 86400.0,
+        delta_t_sigma_sec: own.delta_t_sigma_sec,
         aya_true_x,
         aya_true_j,
         aya_true_delta: signed_delta_deg(aya_true_x, aya_true_j) * 3600.0,
@@ -370,8 +388,9 @@ fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<R
         asc_x,
         asc_j,
         asc_delta_deg: signed_delta_deg(asc_x, asc_j),
-        asc_ut1_aligned_delta_deg: signed_delta_deg(asc_x_aligned, asc_j),
+        asc_delta_own_deg: signed_delta_deg(asc_x_own, asc_j),
         rahu_ketu_consistency_arcsec,
+        time_scale_era: TimeScaleEra::of_jd_utc(own.jd_ut1.0),
         bodies,
         attempts,
     })
@@ -379,15 +398,58 @@ fn compare(engine: &Engine, s: &Sample, resp: &Value, attempts: u32) -> Result<R
 
 /// A category: how to read a signed delta off a record, its unit, tolerance
 /// (None = diagnostic only), and whether it is part of the gate.
+/// A category: how to read a signed delta off a record, its unit, the nominal
+/// tolerance (gates p99.9 and, unless overridden, every chart; None =
+/// diagnostic only), an optional per-chart tolerance override (the solar
+/// conjunction band / node source), and an optional record filter (time-scale eras).
+type Getter = Box<dyn Fn(&Record) -> f64 + Send + Sync>;
+type ChartTol = Box<dyn Fn(&Record) -> Option<f64> + Send + Sync>;
+type Filter = Box<dyn Fn(&Record) -> bool + Send + Sync>;
+
 struct Category {
     name: String,
     unit: &'static str,
     tolerance: Option<f64>,
-    get: Box<dyn Fn(&Record) -> f64 + Send + Sync>,
+    get: Getter,
+    per_chart_tol: Option<ChartTol>,
+    filter: Option<Filter>,
+}
+
+impl Category {
+    fn simple(
+        name: impl Into<String>,
+        unit: &'static str,
+        tolerance: Option<f64>,
+        get: impl Fn(&Record) -> f64 + Send + Sync + 'static,
+    ) -> Self {
+        Self {
+            name: name.into(),
+            unit,
+            tolerance,
+            get: Box::new(get),
+            per_chart_tol: None,
+            filter: None,
+        }
+    }
+    fn applies(&self, r: &Record) -> bool {
+        self.filter.as_ref().is_none_or(|f| f(r))
+    }
+    /// The tolerance this particular chart is held to.
+    fn chart_tol(&self, r: &Record) -> Option<f64> {
+        match &self.per_chart_tol {
+            Some(f) => f(r),
+            None => self.tolerance,
+        }
+    }
+    fn is_gated(&self) -> bool {
+        self.tolerance.is_some()
+    }
 }
 
 fn categories() -> Vec<Category> {
     let mut v: Vec<Category> = Vec::new();
+    // (a) tropical at the aligned instant; the per-chart tolerance widens to 2.5″ inside the
+    //     solar-conjunction band while the p99.9 gate stays at the nominal value.
     for id in PLANETS {
         let n = id.name();
         v.push(Category {
@@ -395,87 +457,143 @@ fn categories() -> Vec<Category> {
             unit: "arcsec",
             tolerance: tropical_tolerance_arcsec(id),
             get: Box::new(move |r| r.bodies[n].trop_delta),
+            per_chart_tol: Some(Box::new(move |r| r.bodies[n].trop_tol)),
+            filter: None,
         });
     }
-    v.push(Category {
-        name: "ayanamsa.true_equinox".into(),
-        unit: "arcsec",
-        tolerance: Some(AYANAMSA_TOL_ARCSEC),
-        get: Box::new(|r| r.aya_true_delta),
-    });
-    v.push(Category {
-        name: "ayanamsa.mean_equinox".into(),
-        unit: "arcsec",
-        tolerance: Some(AYANAMSA_TOL_ARCSEC),
-        get: Box::new(|r| r.aya_mean_delta),
-    });
+    // (b) ayanamsa under matching convention
+    v.push(Category::simple(
+        "ayanamsa.true_equinox",
+        "arcsec",
+        Some(AYANAMSA_TOL_ARCSEC),
+        |r| r.aya_true_delta,
+    ));
+    v.push(Category::simple(
+        "ayanamsa.mean_equinox",
+        "arcsec",
+        Some(AYANAMSA_TOL_ARCSEC),
+        |r| r.aya_mean_delta,
+    ));
+    // (c) sidereal end-to-end at the aligned instant
     for id in PLANETS {
         let n = id.name();
+        v.push(Category::simple(
+            format!("sidereal.{n}"),
+            "arcsec",
+            Some(sidereal_tolerance_arcsec_for(id, NODE_SOURCE_DE440)),
+            move |r| r.bodies[n].sid_delta,
+        ));
+    }
+    // (d) nodes: the per-chart tolerance depends on which node source served the chart
+    for n in ["Rahu", "Ketu"] {
         v.push(Category {
-            name: format!("sidereal.{n}"),
+            name: format!("nodes.{n} (source: de440-osculating)"),
             unit: "arcsec",
-            tolerance: Some(sidereal_tolerance_arcsec(id)),
+            tolerance: Some(NODE_TOL_ARCSEC),
             get: Box::new(move |r| r.bodies[n].sid_delta),
+            per_chart_tol: Some(Box::new(move |r| {
+                Some(if r.bodies[n].source == NODE_SOURCE_DE440 {
+                    NODE_TOL_ARCSEC
+                } else {
+                    NODE_TOL_ANALYTIC_ARCSEC
+                })
+            })),
+            filter: None,
         });
     }
-    v.push(Category {
-        name: "nodes.Rahu (source: analytic)".into(),
-        unit: "arcsec",
-        tolerance: Some(NODE_TOL_ARCSEC),
-        get: Box::new(|r| r.bodies["Rahu"].sid_delta),
-    });
-    v.push(Category {
-        name: "nodes.Ketu (source: analytic)".into(),
-        unit: "arcsec",
-        tolerance: Some(NODE_TOL_ARCSEC),
-        get: Box::new(|r| r.bodies["Ketu"].sid_delta),
-    });
-    v.push(Category {
-        name: "ascendant".into(),
-        unit: "deg",
-        tolerance: Some(ASC_TOL_DEG),
-        get: Box::new(|r| r.asc_delta_deg),
-    });
-    // Diagnostics (never gated): isolate time-scale conventions.
+    // (e) Ascendant at Swiss's UT1
+    v.push(Category::simple(
+        "ascendant",
+        "deg",
+        Some(ASC_TOL_DEG),
+        |r| r.asc_delta_deg,
+    ));
+    // (f) time-scale conventions, gated per era (docs/CONTRACT.md)
+    let era_cat =
+        |name: &str, tol: Option<f64>, era: TimeScaleEra, get: fn(&Record) -> f64| Category {
+            name: name.into(),
+            unit: "sec",
+            tolerance: tol,
+            get: Box::new(get),
+            per_chart_tol: None,
+            filter: Some(Box::new(move |r| r.time_scale_era == era)),
+        };
+    v.push(era_cat(
+        "time_scale.tt (pre-1972, ΔT tables)",
+        Some(1.0),
+        TimeScaleEra::Pre1972,
+        |r| r.jd_tt_delta_sec,
+    ));
+    v.push(era_cat(
+        "time_scale.tt (1972..2033-09-16, known TAI−UTC)",
+        Some(0.01),
+        TimeScaleEra::KnownTaiUtc,
+        |r| r.jd_tt_delta_sec,
+    ));
+    v.push(era_cat(
+        "time_scale.ut1 (1972..2033-09-16, known TAI−UTC)",
+        Some(1.0),
+        TimeScaleEra::KnownTaiUtc,
+        |r| r.jd_ut_delta_sec,
+    ));
+    v.push(era_cat(
+        "diag.time_scale.tt (2033-09-17.., extrapolated — reported, not gated)",
+        None,
+        TimeScaleEra::Extrapolated,
+        |r| r.jd_tt_delta_sec,
+    ));
+    // Diagnostics (never gated): each engine at its OWN instant = ephemeris + convention folded.
     for id in PLANETS {
         let n = id.name();
-        v.push(Category {
-            name: format!("diag.tropical_tt_aligned.{n}"),
-            unit: "arcsec",
-            tolerance: None,
-            get: Box::new(move |r| r.bodies[n].trop_delta_tt_aligned),
-        });
+        v.push(Category::simple(
+            format!("diag.tropical_own_instant.{n}"),
+            "arcsec",
+            None,
+            move |r| r.bodies[n].trop_delta_own,
+        ));
     }
-    v.push(Category {
-        name: "diag.ascendant_ut1_aligned".into(),
-        unit: "deg",
-        tolerance: None,
-        get: Box::new(|r| r.asc_ut1_aligned_delta_deg),
-    });
-    v.push(Category {
-        name: "diag.jd_ut_delta (XALEN UT1 − Swiss UT1)".into(),
-        unit: "sec",
-        tolerance: None,
-        get: Box::new(|r| r.jd_ut_delta_sec),
-    });
-    v.push(Category {
-        name: "diag.jd_tt_delta (XALEN TT − Swiss TT)".into(),
-        unit: "sec",
-        tolerance: None,
-        get: Box::new(|r| r.jd_tt_delta_sec),
-    });
-    v.push(Category {
-        name: "diag.nutation_dpsi_delta".into(),
-        unit: "mas",
-        tolerance: None,
-        get: Box::new(|r| r.dpsi_delta_mas),
-    });
-    v.push(Category {
-        name: "diag.rahu_ketu_180_consistency".into(),
-        unit: "arcsec",
-        tolerance: None,
-        get: Box::new(|r| r.rahu_ketu_consistency_arcsec),
-    });
+    v.push(Category::simple(
+        "diag.sidereal_own_instant.Moon",
+        "arcsec",
+        None,
+        |r| r.bodies["Moon"].sid_delta_own,
+    ));
+    v.push(Category::simple(
+        "diag.nodes_own_instant.Rahu",
+        "arcsec",
+        None,
+        |r| r.bodies["Rahu"].sid_delta_own,
+    ));
+    v.push(Category::simple(
+        "diag.ascendant_own_instant",
+        "deg",
+        None,
+        |r| r.asc_delta_own_deg,
+    ));
+    v.push(Category::simple(
+        "diag.jd_ut_delta (XALEN UT1 − Swiss UT1, all eras)",
+        "sec",
+        None,
+        |r| r.jd_ut_delta_sec,
+    ));
+    v.push(Category::simple(
+        "diag.jd_tt_delta (XALEN TT − Swiss TT, all eras)",
+        "sec",
+        None,
+        |r| r.jd_tt_delta_sec,
+    ));
+    v.push(Category::simple(
+        "diag.nutation_dpsi_delta",
+        "mas",
+        None,
+        |r| r.dpsi_delta_mas,
+    ));
+    v.push(Category::simple(
+        "diag.rahu_ketu_180_consistency",
+        "arcsec",
+        None,
+        |r| r.rahu_ketu_consistency_arcsec,
+    ));
     v
 }
 
@@ -500,10 +618,10 @@ fn csv_header() -> String {
         "ayanamsa_true_delta_arcsec",
         "ayanamsa_mean_delta_arcsec",
         "nutation_dpsi_delta_mas",
-        "asc_xalen_deg",
+        "asc_xalen_aligned_deg",
         "asc_jhora_deg",
         "asc_delta_deg",
-        "asc_ut1_aligned_delta_deg",
+        "asc_delta_own_instant_deg",
         "rahu_ketu_180_consistency_arcsec",
     ]
     .into_iter()
@@ -512,12 +630,16 @@ fn csv_header() -> String {
     for id in BodyId::GRAHAS {
         let n = id.name();
         for suffix in [
-            "tropical_xalen_deg",
-            "sidereal_xalen_deg",
+            "tropical_xalen_aligned_deg",
+            "sidereal_xalen_aligned_deg",
             "sidereal_jhora_deg",
             "tropical_delta_arcsec",
             "sidereal_delta_arcsec",
-            "tropical_tt_aligned_delta_arcsec",
+            "tropical_delta_own_instant_arcsec",
+            "sidereal_delta_own_instant_arcsec",
+            "elongation_from_sun_deg",
+            "tropical_tolerance_arcsec",
+            "source",
             "retro_xalen",
             "retro_jhora",
         ] {
@@ -551,7 +673,7 @@ fn csv_row(r: &Record) -> String {
         format!("{:.9}", r.asc_x),
         format!("{:.9}", r.asc_j),
         format!("{:.8}", r.asc_delta_deg),
-        format!("{:.8}", r.asc_ut1_aligned_delta_deg),
+        format!("{:.8}", r.asc_delta_own_deg),
         format!("{:.6}", r.rahu_ketu_consistency_arcsec),
     ];
     for id in BodyId::GRAHAS {
@@ -561,7 +683,11 @@ fn csv_row(r: &Record) -> String {
         f.push(format!("{:.9}", b.jhora_sid));
         f.push(format!("{:.6}", b.trop_delta));
         f.push(format!("{:.6}", b.sid_delta));
-        f.push(format!("{:.6}", b.trop_delta_tt_aligned));
+        f.push(format!("{:.6}", b.trop_delta_own));
+        f.push(format!("{:.6}", b.sid_delta_own));
+        f.push(format!("{:.4}", b.elongation_deg));
+        f.push(b.trop_tol.map(|t| t.to_string()).unwrap_or_default());
+        f.push(b.source.to_string());
         f.push(b.xalen_retro.to_string());
         f.push(b.jhora_retro.to_string());
     }
@@ -581,12 +707,14 @@ fn md_stats_row(
     s: &Summary,
     tol: Option<f64>,
     over: usize,
+    p999_ok: bool,
     worst: Option<&Record>,
 ) -> String {
     let verdict = match tol {
-        Some(t) if s.p99_9.is_nan() => format!("n/a ({t} {unit})"),
-        Some(t) if s.max <= t => format!("PASS (≤ {t} {unit})"),
-        Some(t) => format!("**FAIL** ({over} over {t} {unit})"),
+        Some(t) if s.n == 0 => format!("n/a ({t} {unit})"),
+        Some(t) if over == 0 && p999_ok => format!("PASS (≤ {t} {unit})"),
+        Some(t) if over == 0 => format!("**FAIL** (p99.9 > {t} {unit})"),
+        Some(t) => format!("**FAIL** ({over} over per-chart tol, nominal {t} {unit})"),
         None => "diagnostic".into(),
     };
     let worst_s = worst
@@ -596,6 +724,55 @@ fn md_stats_row(
         "| {name} | {} | {:+.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {:.4} | {verdict} | {worst_s} |",
         s.n, s.mean_signed, s.mean_abs, s.rms, s.p50, s.p99, s.p99_9, s.max
     )
+}
+
+/// Per-category evaluation over the applicable records.
+struct CatResult {
+    summary: Summary,
+    /// Charts whose |Δ| exceeds their own (per-chart) tolerance.
+    over: usize,
+    /// Charts that were held to a widened per-chart tolerance (conjunction band / analytic node).
+    widened: usize,
+    p999_ok: bool,
+    pass: bool,
+}
+
+fn evaluate(c: &Category, records: &[Record]) -> CatResult {
+    let vals: Vec<(usize, f64)> = records
+        .iter()
+        .enumerate()
+        .filter(|(_, r)| c.applies(r))
+        .map(|(i, r)| (i, (c.get)(r)))
+        .collect();
+    let summary = summarize(&vals);
+    let mut over = 0usize;
+    let mut widened = 0usize;
+    if c.is_gated() {
+        for (i, v) in &vals {
+            let r = &records[*i];
+            let tol = c.chart_tol(r);
+            if tol != c.tolerance {
+                widened += 1;
+            }
+            if let Some(t) = tol
+                && v.abs() > t
+            {
+                over += 1;
+            }
+        }
+    }
+    let p999_ok = match c.tolerance {
+        Some(t) => summary.n == 0 || summary.p99_9 <= t,
+        None => true,
+    };
+    let pass = !c.is_gated() || (over == 0 && p999_ok);
+    CatResult {
+        summary,
+        over,
+        widened,
+        p999_ok,
+        pass,
+    }
 }
 
 #[tokio::main]
@@ -752,90 +929,94 @@ async fn main() {
     let mut all_pass = true;
     let mut table_rows: Vec<String> = Vec::new();
     let mut p999_rows: Vec<String> = Vec::new();
-    let mut cat_summaries: Vec<(String, Summary, Option<f64>, usize)> = Vec::new();
+    let mut machine_cats: Vec<Value> = Vec::new();
     for c in &cats {
-        let vals: Vec<(usize, f64)> = records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, (c.get)(r)))
-            .collect();
-        let s = summarize(&vals);
-        let over = match c.tolerance {
-            Some(t) => vals.iter().filter(|(_, v)| v.abs() > t).count(),
-            None => 0,
-        };
-        if c.tolerance.is_some() && over > 0 {
+        let res = evaluate(c, &records);
+        if !res.pass {
             all_pass = false;
         }
-        let worst = if s.argmax < records.len() {
-            Some(&records[s.argmax])
+        let worst = if res.summary.argmax < records.len() {
+            Some(&records[res.summary.argmax])
         } else {
             None
         };
-        table_rows.push(md_stats_row(&c.name, c.unit, &s, c.tolerance, over, worst));
+        table_rows.push(md_stats_row(
+            &c.name,
+            c.unit,
+            &res.summary,
+            c.tolerance,
+            res.over,
+            res.p999_ok,
+            worst,
+        ));
         if let Some(t) = c.tolerance {
-            let status = if over == 0 { "PASS" } else { "UNDER REVIEW" };
+            let status = if res.summary.n == 0 {
+                "n/a (no charts in era)"
+            } else if res.pass {
+                "PASS"
+            } else {
+                "UNDER REVIEW"
+            };
+            let widened = if res.widened > 0 {
+                format!(" ({} held to a widened per-chart tol)", res.widened)
+            } else {
+                String::new()
+            };
             p999_rows.push(format!(
-                "| {} | {} {} | {:.4} | {:.4} | {} | {} |",
-                c.name, t, c.unit, s.p99_9, s.max, over, status
+                "| {} | {} {} | {} | {:.4} | {:.4} | {}{} | {} |",
+                c.name,
+                t,
+                c.unit,
+                res.summary.n,
+                res.summary.p99_9,
+                res.summary.max,
+                res.over,
+                widened,
+                status
             ));
         }
-        cat_summaries.push((c.name.clone(), s, c.tolerance, over));
+        machine_cats.push(json!({
+            "name": c.name, "unit": c.unit, "tolerance": c.tolerance, "n": res.summary.n,
+            "p99_9": res.summary.p99_9, "max": res.summary.max, "over": res.over, "widened": res.widened, "pass": res.pass,
+        }));
     }
 
-    // ---- era split (gated categories only; p99.9 and max)
-    let eras = [
-        "pre-1972 (both: UT=UTC, TT=UT+ΔT model)",
-        "1972..2033-09-16 (both: leap-second TT)",
-        "2033-09-17.. (Swiss: UTC+ΔT model; XALEN: leap-second TT)",
-    ];
+    // ---- era split (gated categories + the own-instant diagnostics; p99.9 / max / over)
     let mut era_rows: Vec<String> = Vec::new();
     for c in cats.iter().filter(|c| {
-        c.tolerance.is_some()
-            || c.name.starts_with("diag.jd_tt")
-            || c.name.starts_with("diag.tropical_tt_aligned.Moon")
+        c.is_gated()
+            || c.name.starts_with("diag.time_scale")
+            || c.name.starts_with("diag.tropical_own_instant.Moon")
+            || c.name.starts_with("diag.ascendant_own_instant")
     }) {
         let mut cells = vec![c.name.clone()];
-        for era in eras {
-            let vals: Vec<(usize, f64)> = records
-                .iter()
-                .enumerate()
-                .filter(|(_, r)| r.era == era)
-                .map(|(i, r)| (i, (c.get)(r)))
-                .collect();
-            let s = summarize(&vals);
-            let over = match c.tolerance {
-                Some(t) => vals.iter().filter(|(_, v)| v.abs() > t).count(),
-                None => 0,
-            };
-            cells.push(if s.n == 0 {
+        for era in ERAS {
+            let subset: Vec<Record> = records.iter().filter(|r| r.era == era).cloned().collect();
+            let res = evaluate(c, &subset);
+            cells.push(if res.summary.n == 0 {
                 "n=0".into()
             } else {
                 format!(
-                    "n={} p99.9={:.3} max={:.3} over={over}",
-                    s.n, s.p99_9, s.max
+                    "n={} p99.9={:.3} max={:.3} over={}",
+                    res.summary.n, res.summary.p99_9, res.summary.max, res.over
                 )
             });
         }
         era_rows.push(format!("| {} |", cells.join(" | ")));
     }
 
-    // ---- worst epochs: rank by max(|delta|/tol) over gated categories
-    let gated: Vec<&Category> = cats.iter().filter(|c| c.tolerance.is_some()).collect();
+    // ---- worst epochs: rank by max(|delta|/per-chart tol) over gated categories
+    let gated: Vec<&Category> = cats.iter().filter(|c| c.is_gated()).collect();
     let mut ranked: Vec<(f64, usize, String)> = records
         .iter()
         .enumerate()
         .map(|(i, r)| {
             let (ratio, name, val, tol) = gated
                 .iter()
-                .map(|c| {
+                .filter(|c| c.applies(r))
+                .filter_map(|c| {
                     let v = (c.get)(r);
-                    (
-                        v.abs() / c.tolerance.unwrap(),
-                        c.name.as_str(),
-                        v,
-                        c.tolerance.unwrap(),
-                    )
+                    c.chart_tol(r).map(|t| (v.abs() / t, c.name.as_str(), v, t))
                 })
                 .fold(
                     (0.0, "", 0.0, 0.0),
@@ -851,61 +1032,46 @@ async fn main() {
         .map(|(ratio, i, what)| {
             let r = &records[*i];
             format!(
-                "| {} | {} | {:.3},{:.3} | {} | {:.2}× | {} | Moon trop {:+.3}″ / sid {:+.3}″, Rahu {:+.2}″, asc {:+.5}°, ΔTT {:+.3}s |",
+                "| {} | {} | {:.3},{:.3} | {} | {:.2}× | {} | Moon trop {:+.3}″ / sid {:+.3}″, Rahu {:+.3}″ ({}), asc {:+.5}°, ΔTT {:+.3}s |",
                 r.idx, r.birth.utc, r.birth.lat, r.birth.lon, r.era, ratio, what,
-                r.bodies["Moon"].trop_delta, r.bodies["Moon"].sid_delta, r.bodies["Rahu"].sid_delta, r.asc_delta_deg, r.jd_tt_delta_sec
+                r.bodies["Moon"].trop_delta, r.bodies["Moon"].sid_delta, r.bodies["Rahu"].sid_delta, r.bodies["Rahu"].source, r.asc_delta_deg, r.jd_tt_delta_sec
             )
         })
         .collect();
 
-    // ---- ΔUT1 effect characterisation
-    let asc_own = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.asc_delta_deg))
-            .collect::<Vec<_>>(),
-    );
-    let asc_al = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.asc_ut1_aligned_delta_deg))
-            .collect::<Vec<_>>(),
-    );
-    let jdut = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.jd_ut_delta_sec))
-            .collect::<Vec<_>>(),
-    );
-    let jdtt = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.jd_tt_delta_sec))
-            .collect::<Vec<_>>(),
-    );
-    let moon_own = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.bodies["Moon"].trop_delta))
-            .collect::<Vec<_>>(),
-    );
-    let moon_al = summarize(
-        &records
-            .iter()
-            .enumerate()
-            .map(|(i, r)| (i, r.bodies["Moon"].trop_delta_tt_aligned))
-            .collect::<Vec<_>>(),
-    );
-    let asc_attrib: Vec<f64> = records
+    // ---- time-scale characterisation
+    let stat = |f: &dyn Fn(&Record) -> f64| {
+        summarize(
+            &records
+                .iter()
+                .enumerate()
+                .map(|(i, r)| (i, f(r)))
+                .collect::<Vec<_>>(),
+        )
+    };
+    let asc_al = stat(&|r| r.asc_delta_deg);
+    let asc_own = stat(&|r| r.asc_delta_own_deg);
+    let jdut = stat(&|r| r.jd_ut_delta_sec);
+    let jdtt = stat(&|r| r.jd_tt_delta_sec);
+    let moon_al = stat(&|r| r.bodies["Moon"].trop_delta);
+    let moon_own = stat(&|r| r.bodies["Moon"].trop_delta_own);
+    let rahu_al = stat(&|r| r.bodies["Rahu"].sid_delta);
+    let asc_attrib_max = records
         .iter()
-        .map(|r| (r.asc_delta_deg - r.asc_ut1_aligned_delta_deg).abs())
+        .map(|r| (r.asc_delta_own_deg - r.asc_delta_deg).abs())
+        .fold(0.0, f64::max);
+    let in_band: Vec<&Record> = records
+        .iter()
+        .filter(|r| r.bodies.values().any(|b| b.in_conjunction_band))
         .collect();
-    let asc_attrib_max = asc_attrib.iter().cloned().fold(0.0, f64::max);
+    let analytic_nodes = records
+        .iter()
+        .filter(|r| r.bodies["Rahu"].source != NODE_SOURCE_DE440)
+        .count();
+    let node_retro_mismatch = records
+        .iter()
+        .filter(|r| r.bodies["Rahu"].xalen_retro != r.bodies["Rahu"].jhora_retro)
+        .count();
 
     let verdict = if !failures.is_empty() {
         "FAIL (charts could not be computed)"
@@ -923,11 +1089,9 @@ async fn main() {
         records.len(), elapsed, retried, failures.len()
     ));
     md.push_str(&format!("**Verdict: {verdict}**\n\n"));
-    md.push_str("Deltas are XALEN − jhora (signed in the CSV; order statistics below are on |delta|). Tropical = sidereal + each engine's own true-equinox ayanamsa. Categories marked `diag.` are diagnostics, never gated.\n\n");
+    md.push_str("**Principle:** the gate measures ephemeris agreement, so every gated category evaluates XALEN at jhora-svc's own instant (its `jd_tt` for longitudes/ayanamsa, its `jd_ut` for the Ascendant); the time-scale conventions are gated separately per era (`time_scale.*`). Deltas are XALEN − jhora (signed in the CSV; order statistics on |delta|). Tropical = sidereal + each engine's own true-equinox ayanamsa. A category passes when no chart exceeds its per-chart tolerance AND p99.9 ≤ the nominal tolerance; the per-chart tolerance is widened only inside the solar-conjunction band (planets within 1.0° of the Sun: 2.5″, gravitational deflection not modelled in XALEN's DE440 chain) and for a chart whose node had to fall back to the analytic model (120″). `diag.` categories are never gated.\n\n");
     md.push_str("## Per-category p99.9 vs tolerance (the numbers docs/CONTRACT.md cites)\n\n");
-    md.push_str(
-        "| category | tolerance | p99.9 | max | n over tol | status |\n|---|---|---|---|---|---|\n",
-    );
+    md.push_str("| category | tolerance | n | p99.9 | max | n over per-chart tol | status |\n|---|---|---|---|---|---|---|\n");
     for r in &p999_rows {
         md.push_str(r);
         md.push('\n');
@@ -938,16 +1102,16 @@ async fn main() {
         md.push_str(r);
         md.push('\n');
     }
-    md.push_str("\n## By time-scale era (p99.9 / max / count over tolerance)\n\n");
+    md.push_str("\n## By time-scale era (p99.9 / max / count over per-chart tolerance)\n\n");
     md.push_str(&format!(
         "| category | {} | {} | {} |\n|---|---|---|---|\n",
-        eras[0], eras[1], eras[2]
+        ERAS[0], ERAS[1], ERAS[2]
     ));
     for r in &era_rows {
         md.push_str(r);
         md.push('\n');
     }
-    md.push_str("\n## Worst epochs (top 10 by |Δ|/tolerance over gated categories)\n\n");
+    md.push_str("\n## Worst epochs (top 10 by |Δ|/per-chart tolerance over gated categories)\n\n");
     md.push_str(
         "| idx | utc | lat,lon | era | ratio | driver | context |\n|---|---|---|---|---|---|---|\n",
     );
@@ -958,22 +1122,45 @@ async fn main() {
     md.push_str("\n## Time-scale conventions (jd_ut / jd_tt) and their effect\n\n");
     md.push_str(&format!(
         "* `jd_ut` (UT1): XALEN uses UT1 = UTC; Swiss uses UT1 = TT − ΔT(table) inside the leap-second era and UT1 = UTC outside it. \
-         Measured XALEN − Swiss: mean {:+.4} s, RMS {:.4} s, max |Δ| {:.4} s.\n",
+         Measured XALEN − Swiss over all eras: mean {:+.4} s, RMS {:.4} s, max |Δ| {:.4} s.\n",
         jdut.mean_signed, jdut.rms, jdut.max
     ));
     md.push_str(&format!(
-        "* Effect on the Ascendant: |Δasc| at each engine's own UT1 p99.9 {:.5}° / max {:.5}°; with XALEN evaluated at Swiss's UT1 p99.9 {:.5}° / max {:.5}°. \
-         The largest change attributable to the UT1 convention is {:.5}° ({:.2}″), against a 0.01° tolerance.\n",
-        asc_own.p99_9, asc_own.max, asc_al.p99_9, asc_al.max, asc_attrib_max, asc_attrib_max * 3600.0
+        "* Ascendant: gated (XALEN at Swiss's UT1) p99.9 {:.5}° / max {:.5}°; at each engine's own UT1 (diagnostic) p99.9 {:.5}° / max {:.5}°. \
+         The largest change attributable to the UT1 convention is {:.5}° ({:.2}″) against the 0.01° tolerance.\n",
+        asc_al.p99_9, asc_al.max, asc_own.p99_9, asc_own.max, asc_attrib_max, asc_attrib_max * 3600.0
     ));
     md.push_str(&format!(
-        "* `jd_tt` (TT): XALEN − Swiss mean {:+.4} s, RMS {:.4} s, max |Δ| {:.4} s. Longitudes are evaluated in TT, so this — not UT1 — is what moves the Moon (≈0.55″/s).\n",
+        "* `jd_tt` (TT): XALEN − Swiss over all eras: mean {:+.4} s, RMS {:.4} s, max |Δ| {:.4} s. Identical (0.000 s) inside 1972-01-01..2033-09-16; ΔT-table differences before 1972; Swiss's ΔT extrapolation vs XALEN's no-further-leap-seconds assumption (CGPM 2022) from 2033-09-17.\n",
         jdtt.mean_signed, jdtt.rms, jdtt.max
     ));
     md.push_str(&format!(
-        "* Moon tropical |Δ| at own TT: p99.9 {:.4}″ / max {:.4}″; with XALEN evaluated at Swiss's TT: p99.9 {:.4}″ / max {:.4}″ (pure ephemeris disagreement, DE440 vs Swiss's DE431-based files).\n",
-        moon_own.p99_9, moon_own.max, moon_al.p99_9, moon_al.max
+        "* Moon tropical |Δ|: gated (same TT) p99.9 {:.4}″ / max {:.4}″ — pure ephemeris disagreement, DE440 vs Swiss's DE431-based files; at each engine's own TT (diagnostic) p99.9 {:.4}″ / max {:.4}″.\n",
+        moon_al.p99_9, moon_al.max, moon_own.p99_9, moon_own.max
     ));
+    md.push_str(&format!(
+        "* Rahu (DE440 osculating node vs Swiss true node, sidereal, includes the 0.73″ ayanamsa constant): p50 {:.3}″ p99 {:.3}″ p99.9 {:.3}″ max {:.3}″; {} charts fell back to the analytic node; retrograde flag differs in {} charts.\n",
+        rahu_al.p50, rahu_al.p99, rahu_al.p99_9, rahu_al.max, analytic_nodes, node_retro_mismatch
+    ));
+    md.push_str(&format!(
+        "* Solar-conjunction band (planet within 1.0° of the Sun): {} charts had at least one planet in the band and were held to the 2.5″ per-chart tropical tolerance there.\n",
+        in_band.len()
+    ));
+    if !in_band.is_empty() {
+        md.push_str(
+            "\n| utc | body | elongation | tropical Δ | own-instant Δ |\n|---|---|---|---|---|\n",
+        );
+        for r in &in_band {
+            for (n, b) in &r.bodies {
+                if b.in_conjunction_band {
+                    md.push_str(&format!(
+                        "| {} | {n} | {:.3}° | {:+.3}″ | {:+.3}″ |\n",
+                        r.birth.utc, b.elongation_deg, b.trop_delta, b.trop_delta_own
+                    ));
+                }
+            }
+        }
+    }
     if !failures.is_empty() {
         md.push_str("\n## Charts that could not be computed (never dropped silently)\n\n| idx | utc | lat,lon | stage | attempts | message |\n|---|---|---|---|---|---|\n");
         for f in &failures {
@@ -992,7 +1179,7 @@ async fn main() {
     md.push_str(&format!(
         "\nTolerances: {}.\n",
         cats.iter()
-            .filter(|c| c.tolerance.is_some())
+            .filter(|c| c.is_gated())
             .map(|c| format!("{} {}", c.name, fmt_tol(c)))
             .collect::<Vec<_>>()
             .join("; ")
@@ -1012,8 +1199,7 @@ async fn main() {
     println!("CONSENSUS_CORPUS_VERDICT: {verdict}");
     let machine = json!({
         "n": args.n, "seed": args.seed, "computed": records.len(), "failed": failures.len(), "retried": retried,
-        "elapsed_sec": elapsed, "verdict": verdict,
-        "categories": cat_summaries.iter().map(|(n, s, t, over)| json!({"name": n, "tolerance": t, "p99_9": s.p99_9, "max": s.max, "over": over})).collect::<Vec<_>>(),
+        "elapsed_sec": elapsed, "verdict": verdict, "categories": machine_cats,
     });
     println!("CONSENSUS_CORPUS_JSON: {machine}");
     if !failures.is_empty() {

@@ -46,7 +46,7 @@ fn body_json(engine: &Engine, id: BodyId, at: &Instant, varga: Varga) -> Result<
         "pada": p.pada,
         "boundary_distance_sec": b,
         "varga": { "code": varga.code(), "rashi": format!("{vr:?}"), "rashi_index": vr.index() },
-        "source": id.source(),
+        "source": st.source,
     }))
 }
 

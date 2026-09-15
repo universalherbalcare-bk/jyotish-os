@@ -217,7 +217,7 @@ pub fn tool_definitions() -> Vec<Value> {
         json!({
             "name": "engine.consensus",
             "title": "Cross-engine differential (XALEN-DE440 vs PyJHora-Swiss)",
-            "description": "Decomposed differential against jhora-svc /v1/positions: tropical (1.0\", Moon 1.5\"), ayanamsa under matching convention (1.0\"), sidereal end-to-end (2.0\"), Rahu/Ketu analytic node (60\"), Ascendant (0.01 deg). PASS/FAIL, or SIDECAR_UNAVAILABLE.",
+            "description": "Decomposed differential against jhora-svc /v1/positions, XALEN evaluated at the sidecar's own jd_tt/jd_ut: tropical (1.0\", Moon 1.5\", 2.5\" within 1 deg of the Sun), ayanamsa under matching convention (1.0\"), sidereal end-to-end (2.0\"), Rahu/Ketu DE440 osculating node (5.0\"), Ascendant (0.01 deg), time_scale (era-dependent dTT/dUT1). PASS/FAIL, or SIDECAR_UNAVAILABLE.",
             "inputSchema": {
                 "type": "object",
                 "properties": { "birth": birth_schema() },

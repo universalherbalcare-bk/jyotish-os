@@ -46,7 +46,7 @@ fi
 (cd validation/consensus && cargo build --release --quiet)
 
 set +e
-validation/consensus/target/release/consensus-corpus --n "$N" --jhora-url "$JHORA_URL" "${ARGS[@]}"
+validation/consensus/target/release/consensus-corpus --n "$N" --jhora-url "$JHORA_URL" ${ARGS[@]+"${ARGS[@]}"}
 RC=$?
 set -e
 echo "consensus-corpus exit code: $RC" >&2

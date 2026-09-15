@@ -141,13 +141,16 @@ async fn mcp_lifecycle_on_golden_chart() {
             > 0.0
     );
     assert_eq!(sc["bodies"]["Moon"]["retrograde"], false);
-    assert_eq!(
-        sc["bodies"]["Rahu"]["source"],
-        "xalen-true-node (osculating, analytic)"
-    );
+    // Phase 4b: the node comes from DE440's own lunar state vector when the
+    // kernel is loaded (0.014″ from Swiss's true node on this chart).
+    assert_eq!(sc["bodies"]["Rahu"]["source"], "de440-osculating");
+    assert_eq!(sc["bodies"]["Ketu"]["source"], "de440-osculating");
     let rahu = sc["bodies"]["Rahu"]["sidereal_lon_deg"].as_f64().unwrap();
     let ketu = sc["bodies"]["Ketu"]["sidereal_lon_deg"].as_f64().unwrap();
     assert!(((rahu + 180.0).rem_euclid(360.0) - ketu).abs() < 1e-9);
+    // Swiss SE_TRUE_NODE sidereal 292.05962552° PLUS the 0.731″ by which XALEN's
+    // Lahiri sits below Swiss's (sidereal = tropical − ayanamsa) → 292.05983°.
+    assert!((rahu - 292.05983).abs() < 0.5 / 3600.0, "Rahu {rahu}");
     assert_eq!(sc["varga"]["code"], "D9");
     assert!(sc["ascendant"]["sidereal_lon_deg"].is_number());
     assert_eq!(

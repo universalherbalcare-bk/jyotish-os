@@ -59,11 +59,11 @@ without an epoch (catalog, proxied tools).
 
 | Tool | Backed by | Notes |
 |---|---|---|
-| `chart.compute` | XALEN + DE440 | `{birth: BirthInput, varga?: D1…D60}`. Sidereal lon/speed/retrograde, rashi, nakshatra, pada, `boundary_distance_sec` {rashi, nakshatra, pada} (linear from speed; retrograde counts backward), Ascendant (GAST + true obliquity, Swiss-equivalent), Whole-Sign (sidereal sign boundaries) and Sripati cusps, per-body `source`. When jhora-svc is reachable the result is **cross-checked** and any out-of-tolerance body returns `CONSENSUS_FAIL` — never a number. |
+| `chart.compute` | XALEN + DE440 | `{birth: BirthInput, varga?: D1…D60}`. Sidereal lon/speed/retrograde, rashi, nakshatra, pada, `boundary_distance_sec` {rashi, nakshatra, pada} (linear from speed; retrograde counts backward), Ascendant (GAST + true obliquity, Swiss-equivalent), Whole-Sign (sidereal sign boundaries) and Sripati cusps, per-body `source` (`jpl-de440` / `de440-osculating`). When jhora-svc is reachable the result is **cross-checked** by `engine.consensus` (same-instant comparison) and any out-of-tolerance category returns `CONSENSUS_FAIL` — never a number. |
 | `panchang.day` | XALEN + DE440 | `{date, lat, lon, tz_offset_hours}`. Tithi/nakshatra/yoga/karana with start/end instants from sunrise to next sunrise, sunrise/sunset/moonrise/moonset, vara, rahu kala, abhijit. |
 | `transit.window` | XALEN + DE440 | `{from, to, bodies?, birth?, natal_points?, step_hours?}` (≤ 10 years). Bisection to exact rashi ingress and exact conjunction instants, direct and retrograde. |
 | `rectify.birth_time` | XALEN + DE440 | `{birth, window_min?, step_min?, events:[{date|utc, significators[], label?}], top_n?}`. **Heuristic** sweep scored by Vimshottari maha/antar lords vs supplied significators; explicitly labelled. |
-| `engine.consensus` | XALEN vs jhora-svc | Decomposed differential (docs/CONTRACT.md): tropical = sidereal + own true-equinox ayanamsa (1.0″, Moon 1.5″), ayanamsa under matching convention (true & mean equinox, 1.0″ each), sidereal end-to-end (2.0″), Rahu/Ketu analytic node (60″, `source: analytic`), Ascendant (0.01°); `categories{…}`, per-body `tropical`/`sidereal` blocks, `time_scale{jd_ut_delta_sec, jd_tt_delta_sec}`. `PASS` / `FAIL` / `SIDECAR_UNAVAILABLE`. Sized by the 10k-chart corpus in `validation/consensus`. |
+| `engine.consensus` | XALEN vs jhora-svc | Decomposed differential (docs/CONTRACT.md), **XALEN evaluated at the sidecar's own `jd_tt`/`jd_ut`** so ephemeris agreement is measured at the same instant: tropical = sidereal + own true-equinox ayanamsa (1.0″, Moon 1.5″; 2.5″ per chart for a planet within 1.0° of the Sun — deflection not modelled in XALEN), ayanamsa under matching convention (true & mean equinox, 1.0″ each), sidereal end-to-end (2.0″), Rahu/Ketu DE440 osculating node (5.0″; analytic fallback 120″, tagged), Ascendant (0.01°), and a separate era-dependent `time_scale` gate on ΔTT/ΔUT1 (pre-1972 ≤ 1 s; 1972..2033-09-16 ≤ 0.01 s / ≤ 1 s; from 2033-09-17 reported as `extrapolated`, not gated). `PASS` / `FAIL` / `SIDECAR_UNAVAILABLE`. Sized by the 10k-chart corpus in `validation/consensus` (verdict PASS). |
 | `catalog.list` | static | Enabled ayanamsa (LAHIRI only), 21 house systems, 16 vargas, dasha systems. **Gauquelin, QiMenDunJia, PullenSinusoidalRatio are excluded** with reasons. |
 | `dasha.timeline` | jhora-svc `/v1/dasha` | Proxied; `evidence.engine = "jhora-svc"`. |
 | `match.kuta` | jhora-svc `/v1/kuta` | Proxied. |
@@ -83,8 +83,12 @@ A down sidecar yields `SIDECAR_UNAVAILABLE` (structured, `isError: true`); nothi
 
 ## Conventions
 
-* Ayanamsa `Ayanamsa::Lahiri` evaluated in TT (true-equinox value); nodes `Body::TrueNode`
-  (XALEN's osculating node — analytic, tagged `source: "xalen-true-node (osculating, analytic)"`).
+* Ayanamsa `Ayanamsa::Lahiri` evaluated in TT (true-equinox value). Rahu/Ketu are the osculating
+  ascending node of **DE440's own geocentric lunar state vector** (`Engine::de440_osculating_node`:
+  h = r × v in the ecliptic of date, Ω = atan2(h_x, −h_y); the Swiss `SE_TRUE_NODE` definition),
+  tagged `source: "de440-osculating"` — 0.014″ from Swiss on the golden chart, p99.9 1.41″ over the
+  10k corpus. XALEN's analytic `Body::TrueNode` is only a fallback if the kernel cannot serve the Moon,
+  tagged `"xalen-true-node (osculating, analytic)"` (measured p99.9 90.5″ / max 105.2″ vs Swiss).
 * UTC → TT is leap-second exact (`Epoch::from_utc`) from 1972-01-01; **before 1972** the civil time is
   treated as UT1 and TT comes from the SMH2016 ΔT model (xalen-time's leap table returns a fixed 10 s floor
   there, which would put TT 13–44 s late for 1900–1971 — Moon 7–24″; Swiss applies the same pre-1972 rule).

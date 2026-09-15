@@ -1,35 +1,38 @@
-   Compiling jyotish-mcp v0.1.0 (/Users/brijesh/Projects/jyotish-os/services/jyotish-mcp)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
      Running unittests src/lib.rs (target/debug/deps/jyotish_mcp-16c2ed4967db3c79)
 
-running 25 tests
-test engine::tests::boundary_retrograde_counts_backward ... ok
+running 29 tests
+test engine::tests::body_id_parse_roundtrip ... ok
 test engine::tests::boundary_stationary_is_none ... ok
 test engine::tests::boundary_forward_moon_like ... ok
+test engine::tests::boundary_retrograde_counts_backward ... ok
 test engine::tests::boundary_wraps_at_360 ... ok
-test engine::tests::body_id_parse_roundtrip ... ok
-test engine::tests::instant_from_parts_keeps_both_scales ... ok
-test engine::tests::instant_post_1972_is_leap_second_exact ... ok
-test engine::tests::instant_pre_1972_uses_delta_t_model_not_leap_floor ... ok
-test config::tests::non_loopback_urls_rejected ... ok
 test config::tests::loopback_urls_accepted ... ok
-test engine::tests::placement_maps_rashi_nakshatra_pada ... ok
+test config::tests::non_loopback_urls_rejected ... ok
+test engine::tests::instant_post_1972_is_leap_second_exact ... ok
+test engine::tests::instant_from_parts_keeps_both_scales ... ok
+test engine::tests::instant_pre_1972_uses_delta_t_model_not_leap_floor ... ok
 test cache::tests::cache_bounded_and_roundtrips ... ok
+test engine::tests::placement_maps_rashi_nakshatra_pada ... ok
+test cache::tests::key_is_order_independent_and_kernel_bound ... ok
 test mcp::tests::json_rpc_error_shape ... ok
 test mcp::tests::tool_error_wrapping_sets_is_error ... ok
+test tools::consensus::tests::angular_separation_basic ... ok
 test tools::consensus::tests::arcsec_is_wrap_safe ... ok
-test cache::tests::key_is_order_independent_and_kernel_bound ... ok
+test tools::consensus::tests::conjunction_band_applies_to_planets_only ... ok
 test tools::consensus::tests::tolerances_match_contract ... ok
-test types::tests::lat_lon_tz_validation ... ok
-test types::tests::jd_iso_roundtrip ... ok
-test types::tests::parses_z_and_offsets_to_utc ... ok
-test types::tests::signed_delta_wraps ... ok
-test types::tests::varga_enum_matches_blueprint ... ok
 test tools::catalog::tests::catalog_excludes_placeholder_systems ... ok
+test tools::consensus::tests::time_scale_eras_and_gates ... ok
+test types::tests::jd_iso_roundtrip ... ok
 test engine::tests::pinned_sha_parser_accepts_shasum_format ... ok
+test types::tests::signed_delta_wraps ... ok
+test types::tests::lat_lon_tz_validation ... ok
+test types::tests::parses_z_and_offsets_to_utc ... ok
+test types::tests::varga_enum_matches_blueprint ... ok
 test mcp::tests::tool_definitions_cover_contract_tool_list ... ok
+test engine::tests::de440_osculating_node_matches_swiss_true_node_on_golden_chart ... ok
 
-test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.03s
 
      Running unittests src/main.rs (target/debug/deps/jyotish_mcp-02aefcd0f4aafb25)
 

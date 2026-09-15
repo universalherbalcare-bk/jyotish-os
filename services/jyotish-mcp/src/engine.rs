@@ -25,6 +25,11 @@ use crate::cache::hex;
 use crate::types::{ToolError, UtcFields, signed_delta_deg};
 
 pub const ENGINE_NAME: &str = "xalen-de440";
+/// Rahu/Ketu from the osculating node of DE440's geocentric lunar state vector.
+pub const NODE_SOURCE_DE440: &str = "de440-osculating";
+/// Rahu/Ketu from XALEN's analytic osculating node (finite difference on the
+/// analytic Moon) — only reached if the DE440 lunar state is unavailable.
+pub const NODE_SOURCE_ANALYTIC: &str = "xalen-true-node (osculating, analytic)";
 pub const AYANAMSA_NAME: &str = "LAHIRI";
 pub const NAKSHATRA_SPAN_DEG: f64 = 360.0 / 27.0;
 pub const PADA_SPAN_DEG: f64 = NAKSHATRA_SPAN_DEG / 4.0;
@@ -159,13 +164,14 @@ impl BodyId {
         }
     }
 
-    /// Where the number physically comes from. DE440 covers the physical
-    /// bodies; the true node is XALEN's osculating-node computation (analytic,
-    /// finite-difference on the analytic Moon), which is why the contract gates
-    /// it separately at 60″ (`source: analytic`).
+    /// Where the number physically comes from when the kernel is loaded. DE440
+    /// covers the physical bodies AND, since Phase 4b, the lunar node (osculating
+    /// node of DE440's own geocentric lunar state vector, see
+    /// [`Engine::de440_osculating_node`]). The analytic XALEN node is only a
+    /// tagged fallback ([`NODE_SOURCE_ANALYTIC`]).
     pub fn source(self) -> &'static str {
         match self {
-            BodyId::Rahu | BodyId::Ketu => "xalen-true-node (osculating, analytic)",
+            BodyId::Rahu | BodyId::Ketu => NODE_SOURCE_DE440,
             _ => "jpl-de440",
         }
     }
@@ -262,6 +268,20 @@ pub struct BodyState {
     /// Sidereal longitude rate, degrees/day (tropical rate minus ayanamsa rate).
     pub speed_deg_per_day: f64,
     pub retrograde: bool,
+    /// Provenance of the number (`jpl-de440`, [`NODE_SOURCE_DE440`] or
+    /// [`NODE_SOURCE_ANALYTIC`]).
+    pub source: &'static str,
+}
+
+/// Apparent geocentric tropical place (ecliptic of date, true equinox) plus
+/// the tropical longitude rate in degrees/day and the provenance tag.
+#[derive(Debug, Clone, Copy)]
+pub struct TropicalPlace {
+    pub lon_deg: f64,
+    pub lat_deg: f64,
+    pub distance_au: f64,
+    pub lon_rate_deg_per_day: f64,
+    pub source: &'static str,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -469,41 +489,138 @@ impl Engine {
         Ayanamsa::Lahiri.compute_deg(t + 0.5) - Ayanamsa::Lahiri.compute_deg(t - 0.5)
     }
 
-    pub fn body_state(&self, id: BodyId, at: &Instant) -> Result<BodyState, EngineError> {
+    /// Tropical longitude of the Moon's osculating ascending node from DE440's
+    /// own geocentric lunar state vector (ecliptic of date, true equinox), the
+    /// definition Swiss Ephemeris uses for `SE_TRUE_NODE`:
+    ///
+    /// ```text
+    ///   r = Moon geocentric position (Cartesian, ecliptic of date)
+    ///   v = dr/dt                       (central difference, ±0.01 d ≈ ±14.4 min)
+    ///   h = r × v                       (orbital-plane normal)
+    ///   Ω = atan2(h_x, −h_y)            (ascending node = ẑ × h)
+    /// ```
+    ///
+    /// Only the direction of `h` matters, so the light-time shift of the
+    /// apparent Moon (≈1.3 s, a rigid time offset of the whole orbit) and the
+    /// velocity scale cancel. The ±0.01-day step keeps the central-difference
+    /// curvature error at ~1e-6 (the Moon covers 0.13° per step) while staying
+    /// far above DE440's sub-milliarcsecond noise floor.
+    pub fn de440_osculating_node(&self, at: &Instant) -> Result<f64, EngineError> {
+        const DT: f64 = 0.01;
+        let cart = |jd: f64| -> Result<xalen_coords::CartesianPosition, EngineError> {
+            let p = self.almanac.geocentric_ecliptic_tt(Body::Moon, JdTT(jd))?;
+            Ok(xalen_coords::ecliptic_to_cartesian(&p))
+        };
+        let t = at.jd_tt.as_f64();
+        let r = cart(t)?;
+        let a = cart(t + DT)?;
+        let b = cart(t - DT)?;
+        let v = (
+            (a.x - b.x) / (2.0 * DT),
+            (a.y - b.y) / (2.0 * DT),
+            (a.z - b.z) / (2.0 * DT),
+        );
+        let hx = r.y * v.2 - r.z * v.1;
+        let hy = r.z * v.0 - r.x * v.2;
+        Ok(hx.atan2(-hy).to_degrees().rem_euclid(360.0))
+    }
+
+    /// Apparent tropical place of a body at `at`, with the Rahu/Ketu node
+    /// taken from DE440 when the kernel can serve the Moon there (analytic
+    /// fallback otherwise, tagged). Rates are central differences over ±0.5 d
+    /// for the node (the same window XALEN uses for planetary speeds).
+    pub fn tropical_place(&self, id: BodyId, at: &Instant) -> Result<TropicalPlace, EngineError> {
         self.check_coverage(at)?;
-        let body = id.xalen_body();
-        let pos = self.almanac.geocentric_ecliptic_tt(body, at.jd_tt)?;
-        let speed = self.almanac.geocentric_speed_tt(body, at.jd_tt)?;
-        let aya = self.ayanamsa_deg(at);
-        let mut trop = pos.longitude.to_degrees().rem_euclid(360.0);
-        let mut lat = pos.latitude.to_degrees();
-        if id == BodyId::Ketu {
-            trop = (trop + 180.0).rem_euclid(360.0);
-            lat = -lat;
+        match id {
+            BodyId::Rahu | BodyId::Ketu => {
+                let (lon, rate, source) = match self.de440_osculating_node(at) {
+                    Ok(node) => {
+                        let h = 0.5;
+                        let n1 = self.de440_osculating_node(&Instant::from_parts(
+                            at.jd_ut1.as_f64() - h,
+                            at.jd_tt.as_f64() - h,
+                        ))?;
+                        let n2 = self.de440_osculating_node(&Instant::from_parts(
+                            at.jd_ut1.as_f64() + h,
+                            at.jd_tt.as_f64() + h,
+                        ))?;
+                        (
+                            node,
+                            signed_delta_deg(n2, n1) / (2.0 * h),
+                            NODE_SOURCE_DE440,
+                        )
+                    }
+                    Err(EngineError::Ephemeris(_)) => {
+                        let pos = self
+                            .almanac
+                            .geocentric_ecliptic_tt(Body::TrueNode, at.jd_tt)?;
+                        let speed = self.almanac.geocentric_speed_tt(Body::TrueNode, at.jd_tt)?;
+                        (
+                            pos.longitude.to_degrees().rem_euclid(360.0),
+                            speed.longitude_deg_per_day(),
+                            NODE_SOURCE_ANALYTIC,
+                        )
+                    }
+                    Err(e) => return Err(e),
+                };
+                let lon = if id == BodyId::Ketu {
+                    (lon + 180.0).rem_euclid(360.0)
+                } else {
+                    lon
+                };
+                Ok(TropicalPlace {
+                    lon_deg: lon,
+                    lat_deg: 0.0,
+                    distance_au: 0.0,
+                    lon_rate_deg_per_day: rate,
+                    source,
+                })
+            }
+            _ => {
+                let body = id.xalen_body();
+                let pos = self.almanac.geocentric_ecliptic_tt(body, at.jd_tt)?;
+                let speed = self.almanac.geocentric_speed_tt(body, at.jd_tt)?;
+                Ok(TropicalPlace {
+                    lon_deg: pos.longitude.to_degrees().rem_euclid(360.0),
+                    lat_deg: pos.latitude.to_degrees(),
+                    distance_au: pos.distance,
+                    lon_rate_deg_per_day: speed.longitude_deg_per_day(),
+                    source: "jpl-de440",
+                })
+            }
         }
-        let sid = (trop - aya).rem_euclid(360.0);
-        let rate = speed.longitude_deg_per_day() - self.ayanamsa_rate_deg_per_day(at);
+    }
+
+    pub fn body_state(&self, id: BodyId, at: &Instant) -> Result<BodyState, EngineError> {
+        let p = self.tropical_place(id, at)?;
+        let aya = self.ayanamsa_deg(at);
+        let sid = (p.lon_deg - aya).rem_euclid(360.0);
+        let rate = p.lon_rate_deg_per_day - self.ayanamsa_rate_deg_per_day(at);
         Ok(BodyState {
             body: id,
-            tropical_lon_deg: trop,
+            tropical_lon_deg: p.lon_deg,
             sidereal_lon_deg: sid,
-            latitude_deg: lat,
-            distance_au: pos.distance,
+            latitude_deg: p.lat_deg,
+            distance_au: p.distance_au,
             speed_deg_per_day: rate,
             retrograde: rate < 0.0,
+            source: p.source,
         })
     }
 
+    /// Sidereal longitude only (no rate): the cheap path for sweeps.
     pub fn sidereal_lon(&self, id: BodyId, at: &Instant) -> Result<f64, EngineError> {
         self.check_coverage(at)?;
-        let body = id.xalen_body();
-        let pos = self.almanac.geocentric_ecliptic_tt(body, at.jd_tt)?;
-        let aya = self.ayanamsa_deg(at);
-        let mut trop = pos.longitude.to_degrees();
-        if id == BodyId::Ketu {
-            trop += 180.0;
-        }
-        Ok((trop - aya).rem_euclid(360.0))
+        let trop = match id {
+            BodyId::Rahu => self.de440_osculating_node(at)?,
+            BodyId::Ketu => self.de440_osculating_node(at)? + 180.0,
+            _ => self
+                .almanac
+                .geocentric_ecliptic_tt(id.xalen_body(), at.jd_tt)?
+                .longitude
+                .to_degrees(),
+        };
+        Ok((trop - self.ayanamsa_deg(at)).rem_euclid(360.0))
     }
 
     /// Sidereal Sun and Moon longitudes at a UT JD — the closure shape the
@@ -819,6 +936,58 @@ mod tests {
         assert_eq!(at.jd_ut1.as_f64(), 2447965.7708355812);
         assert_eq!(at.jd_tt.as_f64(), 2447965.7714951853);
         assert!(at.delta_t_sigma_sec > 0.0);
+    }
+
+    fn kernel_engine() -> Engine {
+        let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        Engine::load(
+            &root.join("kernels/de440s.bsp"),
+            &root.join("kernels/de440s.sha256"),
+        )
+        .expect("the DE440 kernel is a hard requirement; a missing kernel is a failure")
+    }
+
+    #[test]
+    fn de440_osculating_node_matches_swiss_true_node_on_golden_chart() {
+        // Swiss Ephemeris (pyswisseph 2.10.03, SE_TRUE_NODE, FLG_SWIEPH|FLG_SIDEREAL, Lahiri)
+        // for 1990-03-15T06:30:00Z: Rahu 292.05962552426655°, Ketu 112.05962552426656°
+        // (validation/jyotish-mcp-consensus-golden.json). XALEN's Lahiri sits 0.731″ below
+        // Swiss's, so compare the TROPICAL node (Swiss: sidereal + swe_get_ayanamsa_ex_ut
+        // = 292.05962552 + 23.72360459 = 315.78323011°).
+        let e = kernel_engine();
+        let at = Instant::from_utc_fields(&UtcFields {
+            year: 1990,
+            month: 3,
+            day: 15,
+            hour: 6,
+            minute: 30,
+            second: 0.0,
+        });
+        let rahu = e.body_state(BodyId::Rahu, &at).unwrap();
+        let ketu = e.body_state(BodyId::Ketu, &at).unwrap();
+        assert_eq!(rahu.source, NODE_SOURCE_DE440);
+        let delta_arcsec = signed_delta_deg(rahu.tropical_lon_deg, 315.78323011).abs() * 3600.0;
+        // Measured 0.0141″ (Phase 4b); 0.1″ leaves room for kernel/interpolation noise only.
+        assert!(
+            delta_arcsec < 0.1,
+            "DE440 osculating node {:.6}° vs Swiss true node 315.78323011°: {delta_arcsec:.3}″",
+            rahu.tropical_lon_deg
+        );
+        assert!(
+            (signed_delta_deg(ketu.tropical_lon_deg, rahu.tropical_lon_deg + 180.0)).abs() < 1e-9
+        );
+        assert!(
+            rahu.retrograde,
+            "the node regresses on the golden date (Swiss: retro=true)"
+        );
+        // and the analytic node is a different number (tagged separately)
+        let analytic = e
+            .almanac
+            .geocentric_ecliptic_tt(Body::TrueNode, at.jd_tt)
+            .unwrap()
+            .longitude
+            .to_degrees();
+        assert!(signed_delta_deg(analytic, rahu.tropical_lon_deg).abs() * 3600.0 > 1.0);
     }
 
     #[test]

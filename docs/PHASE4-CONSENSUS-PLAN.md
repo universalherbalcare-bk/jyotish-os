@@ -26,3 +26,9 @@ Files
 Done criteria: cargo test/clippy/fmt clean; pytest clean; golden chart PASS via live tools/call;
 corpus run at N=10000 with per-category p99.9 table; CONTRACT updated with measured values
 (categories over tolerance marked UNDER REVIEW, never loosened).
+
+## Phase 4b (lead decisions, 2026-09-16)
+1. Same-instant comparison (XALEN at the sidecar's jd_tt/jd_ut) + separate era-gated `time_scale` gate → Moon 0.0068″ max, Ascendant 0.0023° max.
+2. Rahu/Ketu from DE440's own lunar state vector (`Engine::de440_osculating_node`, r × v) → 0.014″ golden, p99.9 1.41″ corpus → tolerance 5.0″, default node; analytic fallback 120″ tagged.
+3. No deflection function anywhere in vendor/xalen → documented solar-conjunction band (≤ 1.0° from the Sun: per-chart tropical 2.5″, p99.9 gate unchanged at 1.0″); upstream XALEN item.
+4. Corpus verdict PASS (10,000 charts, 0 failures); docs/CONTRACT.md carries every measured number.

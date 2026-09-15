@@ -13,7 +13,7 @@ matching `kernels/de440s.sha256`, Rust stable ≥ 1.88, `uv`, .NET 10 (vedastro-
 | `pyjhora-pvr-tests-truenodes.txt` | same suite in the jhora-svc configuration (**true** nodes) | `... --nodes true --baseline none` — +184 Rahu/Ketu-dependent cases differ from the mean-node baseline, as expected |
 | `jyotish-mcp-cargo-test.txt`, `jyotish-mcp-clippy.txt` | jyotish-mcp unit + in-process integration tests, clippy `-D warnings` | `cd services/jyotish-mcp && cargo test 2>&1 \| tee ../../validation/jyotish-mcp-cargo-test.txt; cargo clippy --all-targets -- -D warnings` (the integration test needs the real kernel; a missing kernel is a failure, not a skip) |
 | `jyotish-mcp-health.json`, `jyotish-mcp-chart-golden-live7791.json`, `jyotish-mcp-chart-golden-sidecar-down.json`, `jyotish-mcp-panchang-golden.json`, `jyotish-mcp-consensus-golden.json` | Phase-1/2 live captures from the running server (`GET /health`, `tools/call` on the golden chart) — the consensus one is the **pre-Phase-4 FAIL** kept for the record | `curl -s localhost:7791/mcp -H 'content-type: application/json' -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"engine.consensus","arguments":{"birth":{"utc":"1990-03-15T06:30:00Z","lat":28.6139,"lon":77.2090,"tz_offset_hours":5.5}}}}'` |
-| `jyotish-mcp-consensus-golden-v2.json`, `jyotish-mcp-chart-golden-v2.json` | Phase-4 live captures: golden chart `engine.consensus` → `PASS` and `chart.compute` → `consensus_status: PASS` under the decomposed gates | same `tools/call` after rebuilding/restarting both services (see below) |
+| `jyotish-mcp-consensus-golden-v2.json`, `jyotish-mcp-chart-golden-v2.json` | Phase-4b live captures: golden chart `engine.consensus` → `PASS` (same-instant comparison, DE440 node 0.014″) and `chart.compute` → `consensus_status: PASS` | same `tools/call` after rebuilding/restarting both services (see below) |
 | `consensus-corpus.csv`, `consensus-summary.md`, `consensus-run.txt` | the 10,000-chart differential corpus (docs/CONTRACT.md "Consensus tolerances") | `scripts/consensus.sh --full` (≡ `validation/consensus/target/release/consensus-corpus --n 10000 --seed 42`); `consensus-run.txt` is its stdout+stderr with `time` |
 
 ## Service tests (Phase 2/3, re-run in Phase 4)
@@ -34,11 +34,14 @@ sidecar; 5xx/429/transport errors are retried with exponential backoff (`--retri
 4xx or exhausted retries are recorded as failures and make the exit code 2 — no chart is ever dropped.
 
 Per chart it records (CSV): both engines' `jd_ut`/`jd_tt`, ayanamsa under both conventions, the
-Ascendant at each engine's own UT1 and XALEN's at Swiss's UT1, and for each of the 9 grahas the
-tropical (sidereal + own true-equinox ayanamsa), sidereal and TT-aligned tropical deltas plus
-retrograde flags. The summary gives mean (signed) / mean |Δ| / RMS / p50 / p99 / p99.9 / max per
-category, the same split by time-scale era (pre-1972 · 1972..2033-09-16 · 2033-09-17..), the ten
-worst epochs by |Δ|/tolerance, and the jd_ut / jd_tt convention characterisation.
+Ascendant with XALEN at Swiss's UT1 (gated) and at its own UT1 (diagnostic), and for each of the 9
+grahas the tropical (sidereal + own true-equinox ayanamsa) and sidereal deltas at the aligned instant
+(gated) and at XALEN's own instant (diagnostic), the elongation from the Sun, the per-chart tropical
+tolerance (2.5″ inside the 1.0° solar-conjunction band), the node source, and retrograde flags. The summary gives mean (signed) / mean |Δ| / RMS / p50 / p99 / p99.9 / max per
+category (a category passes when no chart exceeds its per-chart tolerance AND p99.9 ≤ the nominal
+tolerance), the same split by time-scale era (pre-1972 · 1972..2033-09-16 · 2033-09-17..), the
+era-gated `time_scale.*` categories, the ten worst epochs by |Δ|/tolerance, the conjunction-band charts,
+and the jd_ut / jd_tt convention characterisation.
 
 ```bash
 scripts/consensus.sh                 # n=500, the CI gate; starts jhora-svc if needed
@@ -51,11 +54,12 @@ Exit codes: 0 every gated category within tolerance · 1 a category over toleran
 3 engine/sidecar boot failure · 64 bad arguments. Timing on this machine (Apple Silicon, 4 sidecar
 workers): 10,000 charts in 6.8 s (≈1460 charts/s), 0 retries, 0 failures.
 
-**Current verdict at N=10000 is FAIL (exit 1)** — by design, not by accident: four categories exceed
-the tolerances the lead set, each with a measured cause (post-2033-09-17 Swiss ΔT convention for the
-Moon; gravitational light deflection at solar conjunction for Venus/Mars/Jupiter maxima; XALEN's
-analytic node for Rahu/Ketu; the UT1 convention for one Ascendant). They are marked UNDER REVIEW in
-docs/CONTRACT.md with the worst epochs; the tolerances were not loosened.
+**Current verdict at N=10000: PASS (exit 0)** — Phase 4b: every gated category is evaluated at the
+same instant (XALEN at jhora-svc's `jd_tt`/`jd_ut`), the time-scale conventions are gated separately per
+era, Rahu/Ketu come from DE440's own lunar state vector (p99.9 1.41″ vs Swiss), and planets within 1.0°
+of the Sun are held to a 2.5″ per-chart tropical tolerance (gravitational deflection is not modelled in
+XALEN's DE440 chain — upstream item; the p99.9 gate stays at 1.0″). Own-instant deltas remain in the
+summary as `diag.*`. All numbers and their attribution: docs/CONTRACT.md "Consensus tolerances".
 
 ## Rebuild + restart both services (what the v2 golden captures were taken from)
 
