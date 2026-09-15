@@ -1,0 +1,24 @@
+$ ironclaw extension search jyotish
+[2m2026-09-15T21:18:24.978384Z[0m [33m WARN[0m [2mironclaw_extension_host::available_extensions[0m[2m:[0m skipping invalid available extension manifest [3mextension_id[0m[2m=[0mjyotish [3mreason[0m[2m=[0minvalid extension manifest: failed to parse extension manifest: TOML parse error at line 29, column 10
+   |
+29 | server = "http://127.0.0.1:7791/mcp"
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invalid https_endpoint id 'http://127.0.0.1:7791/mcp': must use the https scheme
+
+IronClaw Reborn extension search
+phase: installed
+count: 0
+exit=0
+
+$ ironclaw extension install jyotish --json
+[2m2026-09-15T21:18:25.123235Z[0m [33m WARN[0m [2mironclaw_extension_host::available_extensions[0m[2m:[0m skipping invalid available extension manifest [3mextension_id[0m[2m=[0mjyotish [3mreason[0m[2m=[0minvalid extension manifest: failed to parse extension manifest: TOML parse error at line 29, column 10
+   |
+29 | server = "http://127.0.0.1:7791/mcp"
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invalid https_endpoint id 'http://127.0.0.1:7791/mcp': must use the https scheme
+
+Error: extension lifecycle failed: product surface error: InvalidRequest
+
+Caused by:
+    product surface error: InvalidRequest
+exit=1

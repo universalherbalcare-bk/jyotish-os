@@ -1,0 +1,9 @@
+{
+  "$comment": "Weekly Monday 06:00 local muhurta scan over config/activities.json (enabled entries only).",
+  "name": "jyotish-weekly-muhurta",
+  "schedule_kind": "cron",
+  "schedule_expression": "0 6 * * 1",
+  "schedule_timezone": "Asia/Kolkata",
+  "delivery_target": null,
+  "prompt": "You are running the Jyotish-OS weekly muhurta scan. Read the activity list from memory path jyotish/activities.json (a copy of services/ironclaw-ext/config/activities.json); if it is missing, use exactly one activity: GoodLunarDayForTravel at lat 28.6139, lon 77.2090, tz_offset_hours 5.5, step_minutes 60. For each enabled activity call jyotish.muhurta.find with from_utc = now and to_utc = now + 7 days at the configured location and step. Report at most the top 3 windows per activity with local start/end (state the UTC offset used), and for each window list the passed_rules and vetoed_by rule ids verbatim so a human astrologer can audit it. Include evidence.consensus_status per call. If a call errors, report the exact error and continue with the next activity. Never claim certainty. Write the report to memory at jyotish/muhurta/<YYYY-WW>.md and return it as the reply."
+}

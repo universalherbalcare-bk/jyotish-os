@@ -1,0 +1,355 @@
+$ ironclaw --help
+IronClaw agent runtime
+
+Usage: ironclaw [COMMAND]
+
+Commands:
+  channels    Inspect configured Reborn channels
+  completion  Generate shell completion scripts
+  config      Inspect Reborn configuration paths without creating state
+  doctor      Check Reborn binary configuration without creating state
+  extension   Manage local Reborn extension lifecycle
+  hooks       Inspect configured Reborn hooks
+  ironhub     Search and install signed registry packages from IronHub [aliases: iron-hub, hub]
+  logs        Inspect Reborn logs
+  models      Inspect Reborn model slots and route status
+  onboard     Initialize the standalone Reborn home and first-run setup marker
+  profile     Inspect supported Reborn boot profiles
+  repl        Start the composed Reborn CLI REPL
+  run         Initialize the minimal Reborn runtime shell and exit
+  serve       Start the Reborn WebUI service
+  service     Install/start/stop/status/uninstall the standalone Reborn binary as an OS-native service (launchd on macOS, systemd on Linux). The installed unit runs `serve`
+  skills      Inspect configured Reborn skills
+  status      Show Reborn runtime status snapshot
+  traces      Manage trace contributions to TraceCommons
+  help        Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+exit=0
+
+$ ironclaw onboard --help
+Initialize the standalone Reborn home and first-run setup marker
+
+Usage: ironclaw onboard [OPTIONS]
+
+Options:
+      --force
+          Overwrite generated config.toml, providers.json, and the completion marker
+
+      --dry-run
+          Show what would be initialized without writing files
+
+      --import-history
+          Reserve the history-import step in the onboarding summary.
+          
+          History import is not wired in this slice; the flag makes the missing step explicit without touching v1 setup/import state.
+
+      --no-service
+          Skip installing/starting the OS service (launchd/systemd) at the end of onboarding. Always effectively on in a non-interactive session (headless CI, a piped/scripted invocation) regardless of this flag — see `execute()`'s service step
+
+  -h, --help
+          Print help (see a summary with '-h')
+exit=0
+
+$ ironclaw status --help
+Show Reborn runtime status snapshot
+
+Usage: ironclaw status [OPTIONS]
+
+Options:
+      --json  Output as JSON
+  -h, --help  Print help
+exit=0
+
+$ ironclaw config --help
+Inspect Reborn configuration paths without creating state
+
+Usage: ironclaw config <COMMAND>
+
+Commands:
+  path  Show resolved Reborn configuration paths without creating state
+  init  Write a commented stub `config.toml` and `providers.json` into the Reborn home directory. Refuses to clobber unless --force
+  list  List all configuration keys and their values
+  get   Get a single configuration value by dot-separated key
+  set   Set a single configuration value by dot-separated key, routed through the alias table to its destination (config.toml, the encrypted secret store, or the WebChat v2 token file)
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw models --help
+Inspect Reborn model slots and route status
+
+Usage: ironclaw models <COMMAND>
+
+Commands:
+  list          List Reborn LLM providers, or show one provider
+  status        Show Reborn model route status
+  set           Set the default Reborn model for the active provider
+  set-provider  Set the default Reborn LLM provider
+  help          Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw extension --help
+Manage local Reborn extension lifecycle
+
+Usage: ironclaw extension [OPTIONS] <COMMAND>
+
+Commands:
+  search   Search local Reborn extension packages
+  install  Install a local Reborn extension package
+  remove   Remove an installed local Reborn extension package
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw routine --help
+error: unrecognized subcommand 'routine'
+
+  tip: a similar subcommand exists: 'profile'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw service --help
+Install/start/stop/status/uninstall the standalone Reborn binary as an OS-native service (launchd on macOS, systemd on Linux). The installed unit runs `serve`
+
+Usage: ironclaw service <COMMAND>
+
+Commands:
+  install    Install the OS service (launchd on macOS, systemd on Linux)
+  start      Start the installed service
+  stop       Stop the running service
+  restart    Restart the service: stop then start if running, or just start if stopped. Errors if the service is not installed
+  status     Show service status
+  uninstall  Uninstall the OS service and remove the unit file
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw serve --help
+Start the Reborn WebUI service
+
+Usage: ironclaw serve [OPTIONS]
+
+Options:
+      --host <HOST>          Host interface for the Reborn WebChat v2 HTTP listener. Overrides `[webui].listen_host` from the boot config file. Default (when neither is set) is `127.0.0.1`
+      --port <PORT>          Port for the Reborn WebChat v2 HTTP listener. `0` lets the kernel pick a free port (useful for tests). Overrides `[webui].listen_port` from the boot config file. Default (when neither is set) is 3000
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw extension install --help
+error: unrecognized subcommand 'extension install'
+
+  tip: a similar subcommand exists: 'extension'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw extension search --help
+error: unrecognized subcommand 'extension search'
+
+  tip: a similar subcommand exists: 'extension'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw extension remove --help
+error: unrecognized subcommand 'extension remove'
+
+  tip: a similar subcommand exists: 'extension'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw config set --help
+error: unrecognized subcommand 'config set'
+
+  tip: a similar subcommand exists: 'config'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw config list --help
+error: unrecognized subcommand 'config list'
+
+  tip: a similar subcommand exists: 'config'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw config path --help
+error: unrecognized subcommand 'config path'
+
+  tip: a similar subcommand exists: 'config'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw models set-provider --help
+error: unrecognized subcommand 'models set-provider'
+
+  tip: a similar subcommand exists: 'models'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw models set --help
+error: unrecognized subcommand 'models set'
+
+  tip: a similar subcommand exists: 'models'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw models list --help
+error: unrecognized subcommand 'models list'
+
+  tip: a similar subcommand exists: 'models'
+
+Usage: ironclaw [COMMAND]
+
+For more information, try '--help'.
+exit=2
+
+$ ironclaw profile --help
+Inspect supported Reborn boot profiles
+
+Usage: ironclaw profile <COMMAND>
+
+Commands:
+  list  List supported Reborn boot profiles
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw doctor --help
+Check Reborn binary configuration without creating state
+
+Usage: ironclaw doctor [OPTIONS]
+
+Options:
+      --json  Output as JSON
+  -h, --help  Print help
+exit=0
+
+$ ironclaw repl --help
+Start the composed Reborn CLI REPL
+
+Usage: ironclaw repl [OPTIONS]
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw run --help
+Initialize the minimal Reborn runtime shell and exit
+
+Usage: ironclaw run [OPTIONS]
+
+Options:
+  -m, --message <MESSAGE>    Send a single message, print the assistant reply, and exit. Without this flag, the CLI reads lines from stdin in a loop
+      --dry-run              Print the substrate readiness snapshot and exit without starting the agent. Preserves the legacy `run` diagnostic shape so existing smoke tests keep passing
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw ironhub --help
+Search and install signed registry packages from IronHub
+
+Usage: ironclaw ironhub [OPTIONS] <COMMAND>
+
+Commands:
+  search   Search the signed IronHub catalog
+  list     List available IronHub tools or skills
+  info     Show one IronHub catalog entry
+  install  Install an IronHub tool or skill into Reborn state
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for local-dev-yolo
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw skills --help
+Inspect configured Reborn skills
+
+Usage: ironclaw skills <COMMAND>
+
+Commands:
+  list  List configured Reborn skills
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw hooks --help
+Inspect configured Reborn hooks
+
+Usage: ironclaw hooks <COMMAND>
+
+Commands:
+  list  List configured Reborn hooks
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw channels --help
+Inspect configured Reborn channels
+
+Usage: ironclaw channels <COMMAND>
+
+Commands:
+  list  List configured Reborn channels
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw logs --help
+Inspect Reborn logs
+
+Usage: ironclaw logs [OPTIONS]
+
+Options:
+  -v, --verbose  Show extra status details
+      --json     Output log status as JSON
+  -h, --help     Print help
+exit=0

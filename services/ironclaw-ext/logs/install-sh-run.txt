@@ -1,0 +1,56 @@
+$ ./install.sh --dry-run
+[install] ironclaw 1.4.0
+[install] reborn_home=/Users/brijesh/.ironclaw/reborn profile=local-dev
+[install] ollama ok, model qwen3.6:latest present
+[install] already onboarded
+[install] provider already ollama / qwen3.6:latest
+[dry-run] mkdir -p /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts
+[dry-run] cp /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts/default-system.md /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts/default-system.md.orig
+[dry-run] cp /Users/brijesh/Projects/jyotish-os/services/ironclaw-ext/identity/default-system.md /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts/default-system.md
+[install] persona installed at /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts/default-system.md
+[dry-run] mkdir -p /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions
+[dry-run] rm -rf /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+[dry-run] cp -R /Users/brijesh/Projects/jyotish-os/services/ironclaw-ext/jyotish /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+[install] package copied to /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+[dry-run] ironclaw extension install jyotish --json
+[install] jyotish-mcp is NOT answering at http://127.0.0.1:7791/health (Phase 1-4 service not running yet); the extension cannot serve tools until it is
+[install] done
+exit=0
+
+$ ./install.sh
+[install] ironclaw 1.4.0
+[install] reborn_home=/Users/brijesh/.ironclaw/reborn profile=local-dev
+[install] ollama ok, model qwen3.6:latest present
+[install] already onboarded
+[install] provider already ollama / qwen3.6:latest
+[install] persona installed at /Users/brijesh/.ironclaw/reborn/local-dev/system/prompts/default-system.md
+[install] package copied to /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+2026-09-15T21:27:17.956643Z  WARN ironclaw_extension_host::available_extensions: skipping invalid available extension manifest extension_id=jyotish reason=invalid extension manifest: failed to parse extension manifest: TOML parse error at line 29, column 10
+   |
+29 | server = "http://127.0.0.1:7791/mcp"
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invalid https_endpoint id 'http://127.0.0.1:7791/mcp': must use the https scheme
+
+Error: extension lifecycle failed: product surface error: InvalidRequest
+
+Caused by:
+    product surface error: InvalidRequest
+[install] BLOCKED by IronClaw, not by this package:
+  IronClaw 1.4.0 types a hosted-MCP `server` as an https-only endpoint and its hosted-MCP
+  egress policy denies private/loopback IPs, so the contract endpoint
+  http://127.0.0.1:7791/mcp cannot be registered or called. The manifest is otherwise
+  valid (an https:// copy installs and activates with all 10 tools visible; see
+  logs/ext-install-https-variant.txt). Options are listed in README.md "Blocker".
+exit=2
+
+$ diff identity/default-system.md ~/.ironclaw/reborn/local-dev/system/prompts/default-system.md && echo persona-identical
+persona-identical
+total 16
+drwxr-xr-x@ 4 brijesh  staff   128 Sep 16 02:57 .
+drwxr-xr-x@ 5 brijesh  staff   160 Sep 16 02:39 ..
+-rw-r--r--@ 1 brijesh  staff  3669 Sep 16 02:57 default-system.md
+-rw-r--r--@ 1 brijesh  staff  1927 Sep 16 02:57 default-system.md.orig
+
+$ curl -sS --max-time 3 http://127.0.0.1:7791/health
+curl: (7) Failed to connect to 127.0.0.1 port 7791 after 0 ms: Couldn't connect to server
+exit=7

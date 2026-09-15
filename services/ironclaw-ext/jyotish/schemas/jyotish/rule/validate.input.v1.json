@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "jyotish.rule.validate input",
+  "description": "Input for rule.validate (mirrors vedastro-svc POST /v1/rule/validate).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "rule_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "description": "VedAstro HoroscopeDataList rule id."
+    },
+    "dataset": {
+      "type": "string",
+      "enum": [
+        "marriage",
+        "person"
+      ],
+      "description": "Which local dataset to test against."
+    },
+    "outcome_column": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_]+$",
+      "description": "Outcome column in the dataset."
+    }
+  },
+  "required": [
+    "rule_id",
+    "dataset",
+    "outcome_column"
+  ]
+}

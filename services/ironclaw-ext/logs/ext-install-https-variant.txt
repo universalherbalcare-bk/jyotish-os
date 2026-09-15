@@ -1,0 +1,21 @@
+$ ironclaw extension search jyotish   # https:// variant (evidence only)
+IronClaw Reborn extension search
+phase: installed
+count: 1
+- jyotish: Jyotish-OS 0.1.0 (installed)
+  description: Jyotish-OS astrology tools: JPL-DE440 sidereal charts, panchanga, dasha, transits, muhurta, kuta matching, birth-time rectification, rule validation and engine consensus over the local jyotish-mcp server.
+  capability: jyotish.chart.compute
+  capability: jyotish.panchang.day
+  capability: jyotish.dasha.timeline
+  capability: jyotish.transit.window
+  capability: jyotish.muhurta.find
+  capability: jyotish.match.kuta
+  capability: jyotish.rectify.birth_time
+  capability: jyotish.rule.validate
+  capability: jyotish.engine.consensus
+  capability: jyotish.catalog.list
+exit=0
+
+$ ironclaw extension install jyotish --json
+{"message":"Extension activation succeeded and its tools are now available. No additional authorization or configuration is needed, including for write-capable tools, unless a later tool call reports auth_required. Do not ask the user for a token, OAuth, authorization, or configuration after activated=true. These tools are now callable by exact name — invoke one directly with tool_call(name=\"<tool>\", arguments={ ... }), or tool_describe(name=\"<tool>\") first if you need its full schema. Do NOT call tool_search for these; you already have their names: jyotish.chart.compute, jyotish.panchang.day, jyotish.dasha.timeline, jyotish.transit.window, jyotish.muhurta.find, jyotish.match.kuta, jyotish.rectify.birth_time, jyotish.rule.validate, jyotish.engine.consensus, jyotish.catalog.list.","package_ref":{"id":"jyotish","kind":"extension"},"payload":{"installed":true,"kind":"extension_install","next_step":"Activation completed; model-visible extension tools are ready.","visible_capability_ids":["jyotish.chart.compute","jyotish.panchang.day","jyotish.dasha.timeline","jyotish.transit.window","jyotish.muhurta.find","jyotish.match.kuta","jyotish.rectify.birth_time","jyotish.rule.validate","jyotish.engine.consensus","jyotish.catalog.list"]},"phase":"active"}
+exit=0

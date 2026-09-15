@@ -1,0 +1,34 @@
+Warning: The following taps are not trusted:
+  silverstein/tap
+
+Homebrew is currently ignoring formulae, casks and commands
+from these taps because tap trust is required.
+Untap them with:
+  brew untap silverstein/tap
+Trust specific formulae, casks and commands with:
+  brew trust --formula <user>/<tap>/<formula>
+  brew trust --cask <user>/<tap>/<cask>
+  brew trust --command <user>/<tap>/<command>
+Whole-tap trust is broader and includes all current and future formulae,
+casks and commands from the listed taps. Trust whole taps with:
+  brew trust silverstein/tap
+For more information, see:
+  https://docs.brew.sh/Tap-Trust
+==> Downloading bottle manifests
+✔︎ Bottle Manifest ironclaw (1.4.0)
+==> Would install 1 formula:
+ironclaw
+==> Would upgrade 1 dependency for ironclaw:
+openssl@3
+==> Fetching downloads for: ironclaw
+✔︎ Bottle openssl@3 (3.6.4)
+✔︎ Bottle ironclaw (1.4.0)
+==> Pouring ironclaw--1.4.0.arm64_tahoe.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/ironclaw/1.4.0: 14 files, 130.3MB
+==> Caveats
+==> ironclaw
+To start ironclaw now and restart at login:
+  brew services start ironclaw
+Or, if you don't want/need a background service you can just run:
+  /opt/homebrew/opt/ironclaw/bin/ironclaw serve
+exit=0

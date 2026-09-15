@@ -1,0 +1,106 @@
+$ ironclaw traces --help
+Manage trace contributions to TraceCommons
+
+Usage: ironclaw traces <COMMAND>
+
+Commands:
+  opt-in            Enable autonomous trace contribution after local redaction
+  opt-out           Disable autonomous trace contribution. With --user-scope: opt out ONLY that user (instance-level enrollment untouched). Without: disable the global/instance policy AND the owner scope (full off switch)
+  enroll-instance   Enroll this ENTIRE INSTANCE in Trace Commons with an operator invite link (admin operation — requires shell access to the instance host). Every user without a personal enrollment inherits it, attributed via a salted per-user pseudonym. Exclude a single user with `traces opt-out --user-scope <tenant-id>/<user-id>` (bare `traces opt-out` disables the entire instance enrollment)
+  status            Show local standing trace contribution policy
+  preview           Preview a redacted contribution envelope from a recorded trace file
+  enqueue           Add an already-previewed envelope to the autonomous submission queue
+  flush-queue       Submit eligible queued envelopes using the standing opt-in policy
+  queue-status      Show local autonomous trace queue diagnostics
+  credit            Show local credit totals and recent credit explanations
+  submit            Submit an already-previewed redacted contribution envelope
+  list-submissions  List local trace contribution submission records
+  revoke            Revoke a trace contribution locally and, optionally, at an ingestion API
+  ingest-health     Check a Trace Commons ingestion service /health endpoint
+  profile           Manage the optional public community profile (second opt-in)
+  help              Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw traces status
+Trace contribution policy:
+  scope: global CLI policy
+  enabled: false
+  endpoint: not configured
+  bearer token env: IRONCLAW_TRACE_SUBMIT_TOKEN
+  upload claim issuer configured: false
+  include message text: false
+  include tool payloads: false
+  manual review when PII detected: true
+  min submission score: 0.35
+  credit notice interval: 168 hour(s)
+  queued envelopes: 0
+exit=0
+
+$ ironclaw channels list
+Error: `channels list` is not implemented yet
+exit=1
+
+$ ironclaw skills list
+IronClaw Reborn skills
+configured: 15
+source: standalone
+- coding (system)
+  description: Best practices for code editing, search, and file operations
+- commit (system)
+  description: Generate git commit messages from staged changes
+- commitment-digest (system)
+  description: Compose and deliver summaries of open commitments, deadlines, pending signals, and resolution suggestions.
+- commitment-triage (system)
+  description: Recognize obligations in conversation, extract signals with immediacy and expiration, create and manage commitments in the workspace.
+- decision-capture (system)
+  description: Detect decisions in conversation and record them with rationale, alternatives, and outcome tracking.
+- delegation (system)
+  description: Helps users delegate tasks, break them into steps, set deadlines, and track progress via routines and memory.
+- delegation-tracker (system)
+  description: Track delegated commitments, set follow-up timers, and generate nudge reminders when updates are overdue.
+- idea-parking (system)
+  description: Park interesting ideas for later consideration, resurface them periodically, and promote to commitments when ready.
+- product-prioritization (system)
+  description: Product strategy and feature prioritization — score features by user demand evidence, effort (human vs AI-assisted), strategic alignment, and market signal. Anti-sycophantic forcing questions to cut through opinion.
+- qa-review (system)
+  description: QA review for code changes — test coverage analysis, edge case identification, test plan generation, regression detection, test health tracking over time.
+- review-checklist (system)
+  description: Pre-merge review checklist based on recurring AI reviewer feedback patterns
+- review-readiness (system)
+  description: PR readiness dashboard — tracks which reviews have been completed per branch and gates merge decisions. Shows code review, tests, security, QA, and linting status.
+- routine-advisor (system)
+  description: Suggests relevant cron routines based on user context, goals, and observed patterns
+- security-review (system)
+  description: Security audit for code changes and PRs — OWASP top 10, auth flows, data handling, secrets exposure, supply chain risks. Writes findings as actionable items.
+- tech-debt-tracker (system)
+  description: Detect and track technical debt from conversation and PR review comments. Resurface in weekly retros, promote to commitments when ready to fix.
+exit=0
+
+$ ironclaw hooks list
+Error: `hooks list` is not implemented yet
+exit=1
+
+$ ironclaw logs
+Error: `logs` is not implemented yet
+exit=1
+
+$ ironclaw config get storage.backend
+(not set)
+$ ironclaw config get boot.profile
+local-dev
+
+$ ls -la ~/.ironclaw/reborn/local-dev
+total 6296
+drwxr-xr-x@ 7 brijesh  staff      224 Sep 16 02:39 .
+drwxr-xr-x@ 8 brijesh  staff      256 Sep 16 02:50 ..
+-rw-------@ 1 brijesh  staff       65 Sep 16 02:39 .reborn-local-dev-secrets-master-key
+-rw-r--r--@ 1 brijesh  staff     4096 Sep 16 02:39 reborn-local-dev.db
+-rw-r--r--@ 1 brijesh  staff    32768 Sep 16 02:57 reborn-local-dev.db-shm
+-rw-r--r--@ 1 brijesh  staff  2776912 Sep 16 02:57 reborn-local-dev.db-wal
+drwxr-xr-x@ 5 brijesh  staff      160 Sep 16 02:39 system
+
+$ lsof -nP -iTCP -sTCP:LISTEN | grep -i ironclaw || echo "no ironclaw listener (service not installed, serve not running)"
+no ironclaw listener (service not installed, serve not running)

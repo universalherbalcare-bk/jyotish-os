@@ -1,0 +1,101 @@
+$ ironclaw status
+IronClaw Reborn status
+
+version:             1.4.0
+reborn_home:         /Users/brijesh/.ironclaw/reborn
+home_source:         default
+profile:             local-dev
+config_file:         /Users/brijesh/.ironclaw/reborn/config.toml (present)
+providers_file:      /Users/brijesh/.ironclaw/reborn/providers.json (present)
+model_slots:         default, mission
+service:             not installed
+login_note:          service is not running — start with `ironclaw service restart`; link available once running
+
+drivers:
+  text_only: initialized
+  planned: initialized
+  subagent_planned: initialized
+  planned_default_profile: initialized
+exit=0
+
+$ ironclaw config list
+IronClaw Reborn config (/Users/brijesh/.ironclaw/reborn/config.toml)
+
+api_version                                  ironclaw.runtime/v1
+boot.profile                                 local-dev
+budget.background_job_default_usd            (not set)
+budget.default_tz                            (not set)
+budget.heartbeat_per_tick_usd                (not set)
+budget.mission_per_tick_usd                  (not set)
+budget.overestimate_factor                   (not set)
+budget.pause_at                              (not set)
+budget.project_daily_usd                     (not set)
+budget.routine_lightweight_usd               (not set)
+budget.routine_standard_usd                  (not set)
+budget.user_daily_usd                        (not set)
+budget.warn_at                               (not set)
+drivers.additional                           (not set)
+drivers.default                              (not set)
+google.client_id                             (not set)
+google.hosted_domain_hint                    (not set)
+google.redirect_uri                          (not set)
+harness.id                                   (not set)
+identity.default_agent                       (not set)
+identity.default_owner                       reborn-cli
+identity.default_project                     (not set)
+identity.tenant                              (not set)
+llm.default.api_key_env                      (not set)
+llm.default.base_url                         (not set)
+llm.default.model                            qwen3.6:latest
+llm.default.provider_id                      ollama
+memory.admin_overrides                       []
+memory.curation_interval_turns               (not set)
+memory.mem0_base_url                         (not set)
+memory.provider                              (not set)
+policy.default_approval_policy               (not set)
+policy.default_profile                       (not set)
+policy.deployment_mode                       (not set)
+runner.heartbeat_interval_secs               15
+runner.max_concurrent_conversation_runs      (not set)
+runner.max_concurrent_runs_per_user          (not set)
+runner.max_concurrent_trigger_runs           (not set)
+runner.max_concurrent_unbound_runs           (not set)
+runner.poll_interval_ms                      200
+runner.worker_count                          (not set)
+skills.regex_activation_enabled              true
+storage.backend                              (not set)
+storage.pool_max_size                        (not set)
+storage.secret_master_key_env                (not set)
+storage.url_env                              (not set)
+trigger_poller.enabled                       (not set)
+trigger_poller.fires_per_tick                (not set)
+trigger_poller.max_concurrent_fires_per_trigger (not set)
+trigger_poller.poll_interval_secs            (not set)
+trigger_poller.startup_jitter_max_secs       (not set)
+trigger_poller.tick_jitter_max_secs          (not set)
+webui.allowed_origins                        (not set)
+webui.canonical_host                         (not set)
+webui.csp_header_override                    (not set)
+webui.env_token_var                          (not set)
+webui.env_user_id_var                        (not set)
+webui.listen_host                            (not set)
+webui.listen_port                            (not set)
+webui.max_body_bytes_fallback                (not set)
+exit=0
+
+$ ironclaw doctor
+IronClaw Reborn doctor
+
+  Core
+  ✔ reborn_home                  /Users/brijesh/.ironclaw/reborn (default)
+  ✔ profile                      local-dev
+  ✔ config_file                  valid
+  ✔ providers_file               valid provider catalog
+  Drivers
+  ✔ text_only_driver             initialized
+  ✔ planned_driver               initialized
+  ✔ subagent_planned_driver      initialized
+  ✔ planned_default_profile      initialized
+
+8 passed, 0 failed, 0 skipped
+exit=0

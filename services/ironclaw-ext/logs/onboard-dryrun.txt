@@ -1,0 +1,12 @@
+$ ironclaw onboard --dry-run --no-service < /dev/null
+IronClaw Reborn onboarding dry run
+reborn_home: /Users/brijesh/.ironclaw/reborn
+home_source: default
+would_ensure: /Users/brijesh/.ironclaw/reborn
+would_write_or_preserve: /Users/brijesh/.ironclaw/reborn/config.toml
+would_write_or_preserve: /Users/brijesh/.ironclaw/reborn/providers.json
+would_write: /Users/brijesh/.ironclaw/reborn/webui-token
+would_write: /Users/brijesh/.ironclaw/reborn/.onboard-completed.json
+import_history_requested: false
+v1_state: not-used
+exit=0

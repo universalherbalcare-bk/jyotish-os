@@ -14,3 +14,6 @@ obj/
 *.log
 .claude/.verified.*
 .claude/execution_state.json
+.claude/.agents-used.*
+.claude/.needs-verify.*
+audit/

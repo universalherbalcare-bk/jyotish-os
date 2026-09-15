@@ -1,0 +1,12 @@
+$ ollama ps
+NAME              ID              SIZE     PROCESSOR          CONTEXT    UNTIL              
+qwen3.6:latest    07d35212591f    29 GB    46%/54% CPU/GPU    262144     4 minutes from now    
+$ warm-up: curl /api/chat (qwen3.6:latest, keep_alive 30m)
+Tue Sep 15 21:24:05 UTC 2026
+{"model":"qwen3.6:latest","content":"","total_duration_s":105.0233695,"load_duration_s":0.077979}
+curl -sS --max-time 560 http://127.0.0.1:11434/api/chat -d   0.01s user 0.05s system 0% cpu 1:45.20 total
+jq -c   0.00s user 0.01s system 0% cpu 1:45.20 total
+Tue Sep 15 21:25:51 UTC 2026
+$ ollama ps
+NAME              ID              SIZE     PROCESSOR          CONTEXT    UNTIL               
+qwen3.6:latest    07d35212591f    29 GB    46%/54% CPU/GPU    262144     29 minutes from now    

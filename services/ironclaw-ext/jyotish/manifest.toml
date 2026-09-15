@@ -1,0 +1,120 @@
+# Jyotish-OS extension for IronClaw — wraps the jyotish-mcp server (docs/CONTRACT.md).
+#
+# Shape: IronClaw `reborn.extension_manifest.v3`, derived from the bundled
+# hosted-MCP packages (crates/extensions/packages/{notion-mcp,nearai-mcp}/manifest.toml).
+# A hosted-MCP package declares `[mcp]` instead of `[runtime]`; the `[[tools]]`
+# entries are statically pinned so the ten contract tools are model-visible from
+# first boot, and a successful `tools/list` discovery replaces them with the
+# live catalog (tool ids become `jyotish.<mcp tool name>`).
+#
+# KNOWN LIMIT (verified against ironclaw 1.4.0, see ../README.md):
+# IronClaw types `[mcp].server` as an HttpsEndpoint and its hosted-MCP egress
+# policy denies private/loopback IPs, so the contract URL below is rejected at
+# manifest parse time ("must use the https scheme"). The URL is kept exactly as
+# the contract specifies; do not "fix" it here — the fix belongs in IronClaw or
+# in an https+public-host front for jyotish-mcp (see README "Blocker").
+
+schema_version = "reborn.extension_manifest.v3"
+id = "jyotish"
+name = "Jyotish-OS"
+version = "0.1.0"
+description = "Jyotish-OS astrology tools: JPL-DE440 sidereal charts, panchanga, dasha, transits, muhurta, kuta matching, birth-time rectification, rule validation and engine consensus over the local jyotish-mcp server."
+trust = "third_party"
+
+[mcp]
+# loop_run: the astrologer answering a chat turn; automation: cron/heartbeat
+# routines (daily brief, weekly muhurta, nightly consensus). Both are gated
+# behind an explicit grant. product (management surface) never calls tools.
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+server = "http://127.0.0.1:7791/mcp"
+namespace = "jyotish"
+max_tools = 16
+default_permission = "allow"
+# Read-only computations; no credentials (jyotish-mcp is loopback, no auth).
+effects = ["network"]
+
+# ---------------------------------------------------------------------------
+# Statically pinned tools — one per docs/CONTRACT.md "jyotish-mcp tools" entry.
+# Schema/prompt refs follow the hosted-MCP discovery convention
+# (`schemas/<ext>/<tool name with . -> />.input.v1.json`).
+# ---------------------------------------------------------------------------
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.chart.compute"
+description = "Compute a sidereal (Lahiri, true nodes, JPL DE440) chart with rashi, nakshatra+pada, bhava cusps and boundary_distance_sec for every value."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/chart/compute.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/chart/compute.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.panchang.day"
+description = "Daily panchanga for a place: tithi, nakshatra, yoga, karana with start/end instants, sunrise/sunset, hora table, rahu kala, abhijit."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/panchang/day.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/panchang/day.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.dasha.timeline"
+description = "Nested dasha periods (55 systems; Vimshottari cross-checked XALEN vs PyJHora to <= 1 day) with UTC instants and balance at birth."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/dasha/timeline.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/dasha/timeline.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.transit.window"
+description = "Exact transit ingress/aspect instants over a window, Sade Sati windows, Ashtakavarga bindu at transit."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/transit/window.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/transit/window.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.muhurta.find"
+description = "Ranked muhurta windows for a VedAstro activity rule with the exact rule ids that passed and vetoed."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/muhurta/find.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/muhurta/find.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.match.kuta"
+description = "Kuta compatibility for two births: per-kuta scores, dosha flags, PyJHora and VedAstro totals side by side."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/match/kuta.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/match/kuta.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "forbidden" }
+id = "jyotish.rectify.birth_time"
+description = "Heuristic birth-time rectification: sweeps candidate minutes around the stated time and ranks them by fit to dated life events."
+default_permission = "ask"
+input_schema_ref = "schemas/jyotish/rectify/birth_time.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/rectify/birth_time.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "forbidden" }
+id = "jyotish.rule.validate"
+description = "Validate a VedAstro rule against local datasets: hit rate vs base rate, n, 95% CI, verdict PROMOTE or KEEP_UNPROVED (appends to the promotion log)."
+default_permission = "ask"
+input_schema_ref = "schemas/jyotish/rule/validate.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/rule/validate.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.engine.consensus"
+description = "Per-body delta in arcseconds between XALEN-DE440 and PyJHora-Swiss with pass/fail against contract tolerances."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/engine/consensus.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/engine/consensus.md"
+
+[[tools]]
+origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
+id = "jyotish.catalog.list"
+description = "List exactly which ayanamsas, house systems, dasha systems and muhurta activity rules are enabled."
+default_permission = "allow"
+input_schema_ref = "schemas/jyotish/catalog/list.input.v1.json"
+prompt_doc_ref = "prompts/jyotish/catalog/list.md"

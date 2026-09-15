@@ -1,0 +1,34 @@
+$ curl -s http://127.0.0.1:11434/api/tags | jq -r ".models[].name"
+qwen3.6:latest
+qwen2.5vl:7b
+exit=0
+
+$ ironclaw models set-provider ollama --model qwen3.6:latest
+Provider set to `ollama`, model set to `qwen3.6:latest`
+Saved to /Users/brijesh/.ironclaw/reborn/config.toml
+v1_state: not-used
+exit=0
+
+$ ironclaw models status
+IronClaw Reborn model status
+config_file: /Users/brijesh/.ironclaw/reborn/config.toml
+providers_file: /Users/brijesh/.ironclaw/reborn/providers.json
+default.provider: ollama
+default.provider_known: yes
+default.model: qwen3.6:latest
+v1_state: not-used
+exit=0
+
+$ ironclaw models list ollama -v
+Provider: ollama
+Description: Local Ollama instance (no API key needed)
+Default model: llama3
+Active: yes
+Protocol: ollama
+Model env: OLLAMA_MODEL
+Base URL: http://localhost:11434
+Credential kind: ollama
+Can list models: true
+Provider catalog: /Users/brijesh/.ironclaw/reborn/providers.json
+v1_state: not-used
+exit=0

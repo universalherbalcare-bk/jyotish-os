@@ -1,0 +1,9 @@
+{
+  "name": "jyotish",
+  "display_name": "Jyotish-OS",
+  "kind": "mcp_server",
+  "description": "Local Jyotish-OS astrology engine: JPL-DE440 sidereal charts, panchanga, dasha, transits, muhurta, kuta, rectification, rule validation, engine consensus",
+  "keywords": ["jyotish", "astrology", "vedic", "panchang", "dasha", "muhurta", "kundali"],
+  "url": "http://127.0.0.1:7791/mcp",
+  "auth": "none"
+}

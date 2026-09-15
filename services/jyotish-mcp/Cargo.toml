@@ -1,0 +1,38 @@
+[package]
+name = "jyotish-mcp"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+description = "JYOTISH-OS L4 server: MCP JSON-RPC 2.0 over HTTP, XALEN + JPL DE440 linked natively, PyJHora/VedAstro sidecars proxied"
+publish = false
+
+[[bin]]
+name = "jyotish-mcp"
+path = "src/main.rs"
+
+[dependencies]
+# Vendored XALEN crates, linked BY PATH (no registry dependency; pinned by vendor/SOURCE-ARCHIVES.sha256).
+# xalen-ephem default features are OFF so the CC BY-NC Hipparcos catalog is never linked.
+xalen-ephem = { path = "../../vendor/xalen/crates/xalen-ephem", default-features = false }
+xalen-time = { path = "../../vendor/xalen/crates/xalen-time" }
+xalen-coords = { path = "../../vendor/xalen/crates/xalen-coords" }
+xalen-houses = { path = "../../vendor/xalen/crates/xalen-houses" }
+xalen-ayanamsa = { path = "../../vendor/xalen/crates/xalen-ayanamsa" }
+xalen-vedic = { path = "../../vendor/xalen/crates/xalen-vedic" }
+
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "signal", "time"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# Sidecars are plain http on loopback; no TLS stack is linked.
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+sha2 = "0.10"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time"] }
+
+[lints.clippy]
+needless_range_loop = "allow"
+too_many_arguments = "allow"

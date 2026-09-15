@@ -1,0 +1,14 @@
+$ IRONCLAW_REBORN_WORKSPACE_ROOT=<scratch> ironclaw run -m "..."
+Tue Sep 15 21:20:10 UTC 2026
+[2m2026-09-15T21:20:10.363480Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+[2m2026-09-15T21:20:10.562887Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+ironclaw: runtime started
+  profile     : local-dev
+  reborn_home : /Users/brijesh/.ironclaw/reborn
+
+[2m2026-09-15T21:21:10.988243Z[0m [33m WARN[0m [1mprocess[0m[1m{[0m[3mprocess_id[0m[2m=[0m5db9fe0f-9846-416c-817f-24cafb19ec3d [3mprocess_kind[0m[2m=[0mAgentTurn[1m}[0m[2m:[0m [2mironclaw_llm::retry[0m[2m:[0m Retrying after transient error (tools streaming) [3mprovider[0m[2m=[0mqwen3.6:latest [3mattempt[0m[2m=[0m1 [3mmax_retries[0m[2m=[0m3 [3mdelay_ms[0m[2m=[0m936 [3merror[0m[2m=[0mProvider ollama request failed: HttpError: Http client error: error sending request for url (http://localhost:11434/api/chat)
+[2m2026-09-15T21:22:27.904604Z[0m [33m WARN[0m [1mprocess[0m[1m{[0m[3mprocess_id[0m[2m=[0m5db9fe0f-9846-416c-817f-24cafb19ec3d [3mprocess_kind[0m[2m=[0mAgentTurn[1m}[0m[2m:[0m [2mironclaw_llm::retry[0m[2m:[0m Retrying after transient error (tools streaming) [3mprovider[0m[2m=[0mqwen3.6:latest [3mattempt[0m[2m=[0m1 [3mmax_retries[0m[2m=[0m3 [3mdelay_ms[0m[2m=[0m1244 [3merror[0m[2m=[0mProvider ollama request failed: HttpError: Http client error: error sending request for url (http://localhost:11434/api/chat)
+Error: run did not reach a terminal state within 180s
+IRONCLAW_REBORN_WORKSPACE_ROOT="$WS" ironclaw run -m  < /dev/null  1.72s user 0.89s system 1% cpu 3:01.21 total
+exit=1
+Tue Sep 15 21:23:11 UTC 2026

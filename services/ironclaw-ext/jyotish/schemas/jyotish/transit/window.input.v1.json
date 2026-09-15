@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "jyotish.transit.window input",
+  "description": "Input for transit.window.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "birth": {
+      "$ref": "#/$defs/BirthInput"
+    },
+    "from_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "Window start (UTC)."
+    },
+    "to_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "Window end (UTC), after from_utc."
+    },
+    "bodies": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Sun",
+          "Moon",
+          "Mercury",
+          "Venus",
+          "Mars",
+          "Jupiter",
+          "Saturn",
+          "Rahu",
+          "Ketu",
+          "Uranus",
+          "Neptune"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1,
+      "default": [
+        "Saturn",
+        "Jupiter",
+        "Rahu",
+        "Ketu"
+      ],
+      "description": "Transiting bodies to sweep."
+    },
+    "natal_points": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Sun",
+          "Moon",
+          "Mercury",
+          "Venus",
+          "Mars",
+          "Jupiter",
+          "Saturn",
+          "Rahu",
+          "Ketu",
+          "Uranus",
+          "Neptune",
+          "Ascendant",
+          "MC"
+        ]
+      },
+      "uniqueItems": true,
+      "minItems": 1,
+      "default": [
+        "Moon",
+        "Ascendant"
+      ],
+      "description": "Natal reference points."
+    }
+  },
+  "required": [
+    "birth",
+    "from_utc",
+    "to_utc"
+  ],
+  "$defs": {
+    "BirthInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "utc",
+        "lat",
+        "lon",
+        "tz_offset_hours"
+      ],
+      "properties": {
+        "utc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+          "description": "Authoritative birth instant in UTC, RFC 3339 with trailing Z (e.g. 1990-03-15T06:30:00Z)."
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Geographic latitude in decimal degrees (north positive)."
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Geographic longitude in decimal degrees (east positive)."
+        },
+        "tz_offset_hours": {
+          "type": "number",
+          "minimum": -14,
+          "maximum": 14,
+          "description": "Local UTC offset in hours, only for local rendering (sunrise-relative panchanga). `utc` remains authoritative."
+        }
+      }
+    }
+  }
+}

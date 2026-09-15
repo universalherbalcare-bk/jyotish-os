@@ -1,0 +1,278 @@
+
+$ ironclaw config path
+IronClaw Reborn config path
+reborn_home: /Users/brijesh/.ironclaw/reborn
+home_source: default
+profile: local-dev
+config_file: /Users/brijesh/.ironclaw/reborn/config.toml (absent (optional; falls back to defaults))
+providers: /Users/brijesh/.ironclaw/reborn/providers.json (absent (optional; falls back to defaults))
+v1_state: not-used
+exit=0
+
+$ ironclaw profile list
+IronClaw Reborn profiles
+- local-dev (default)
+- local-dev-yolo
+- hosted-single-tenant
+- hosted-single-tenant-volume
+- hosted-single-tenant-volume-sandboxed
+- hosted-single-tenant-volume-sandboxed-railway
+- production
+- migration-dry-run
+Select with IRONCLAW_REBORN_PROFILE=<profile>
+exit=0
+
+$ ironclaw doctor
+IronClaw Reborn doctor
+
+  Core
+  ✘ reborn_home                  /Users/brijesh/.ironclaw/reborn (default)
+  ✔ profile                      local-dev
+  - config_file                  absent (using defaults)
+  - providers_file               absent (using built-in providers)
+  Drivers
+  ✔ text_only_driver             initialized
+  ✔ planned_driver               initialized
+  ✔ subagent_planned_driver      initialized
+  ✔ planned_default_profile      initialized
+
+5 passed, 1 failed, 2 skipped
+exit=0
+
+$ ironclaw status
+IronClaw Reborn status
+
+version:             1.4.0
+reborn_home:         /Users/brijesh/.ironclaw/reborn
+home_source:         default
+profile:             local-dev
+config_file:         /Users/brijesh/.ironclaw/reborn/config.toml (absent)
+providers_file:      /Users/brijesh/.ironclaw/reborn/providers.json (absent)
+model_slots:         default, mission
+service:             not installed
+login_note:          service is not running — start with `ironclaw service restart`; link available once running
+
+drivers:
+  text_only: initialized
+  planned: initialized
+  subagent_planned: initialized
+  planned_default_profile: initialized
+exit=0
+
+$ ironclaw extension search
+IronClaw Reborn extension search
+phase: installed
+count: 13
+- nearai: NEAR AI 0.1.0 (host_bundled)
+  description: NEAR AI MCP tools for web search and hosted agent capabilities.
+  capability: nearai.web_search
+- github: GitHub 0.2.8 (host_bundled)
+  description: GitHub repository, issue, pull request, search, branch, file, release, workflow, fork, and webhook capabilities.
+  capability: github.get_repo
+  capability: github.create_repo
+  capability: github.list_issues
+  capability: github.create_issue
+  capability: github.update_issue
+  capability: github.add_issue_labels
+  capability: github.remove_issue_label
+  capability: github.add_issue_assignees
+  capability: github.remove_issue_assignees
+  capability: github.get_issue
+  capability: github.list_issue_comments
+  capability: github.create_issue_comment
+  capability: github.comment_issue
+  capability: github.list_pull_requests
+  capability: github.create_pull_request
+  capability: github.update_pull_request
+  capability: github.get_pull_request
+  capability: github.get_pull_request_files
+  capability: github.create_pr_review
+  capability: github.list_pull_request_comments
+  capability: github.reply_pull_request_comment
+  capability: github.get_pull_request_reviews
+  capability: github.list_pull_request_review_threads
+  capability: github.resolve_review_thread
+  capability: github.unresolve_review_thread
+  capability: github.get_combined_status
+  capability: github.merge_pull_request
+  capability: github.get_authenticated_user
+  capability: github.list_repos
+  capability: github.search_repositories
+  capability: github.search_code
+  capability: github.search_issues
+  capability: github.search_issues_pull_requests
+  capability: github.list_branches
+  capability: github.create_branch
+  capability: github.get_file_content
+  capability: github.create_or_update_file
+  capability: github.delete_file
+  capability: github.list_releases
+  capability: github.create_release
+  capability: github.trigger_workflow
+  capability: github.get_workflow_runs
+  capability: github.get_workflow_run_jobs
+  capability: github.get_job_logs
+  capability: github.get_workflow_run_artifacts
+  capability: github.rerun_failed_workflow_run_jobs
+  capability: github.rerun_workflow_job
+  capability: github.fork_repo
+  capability: github.handle_webhook
+- gmail: Gmail 0.1.0 (host_bundled)
+  description: First-party Gmail capabilities for Reborn.
+  capability: gmail.list_messages
+  capability: gmail.get_message
+  capability: gmail.send_message
+  capability: gmail.create_draft
+  capability: gmail.reply_to_message
+  capability: gmail.trash_message
+- google-calendar: Google Calendar 0.1.0 (host_bundled)
+  description: First-party Google Calendar capabilities for Reborn.
+  capability: google-calendar.list_calendars
+  capability: google-calendar.list_events
+  capability: google-calendar.get_event
+  capability: google-calendar.find_free_slots
+  capability: google-calendar.create_event
+  capability: google-calendar.update_event
+  capability: google-calendar.delete_event
+  capability: google-calendar.add_attendees
+  capability: google-calendar.set_reminder
+- google-docs: Google Docs 0.2.0 (host_bundled)
+  description: Google Docs capabilities for semantic and low-level document creation, inspection, editing, formatting, and verification.
+  capability: google-docs.create_document
+  capability: google-docs.get_document
+  capability: google-docs.read_content
+  capability: google-docs.insert_text
+  capability: google-docs.delete_content
+  capability: google-docs.replace_text
+  capability: google-docs.format_text
+  capability: google-docs.format_paragraph
+  capability: google-docs.insert_table
+  capability: google-docs.create_list
+  capability: google-docs.batch_update
+  capability: google-docs.inspect_document
+  capability: google-docs.apply_text_edits
+  capability: google-docs.create_table_with_data
+  capability: google-docs.verify_document
+- google-drive: Google Drive 0.1.0 (host_bundled)
+  description: Google Drive capabilities for searching, accessing, uploading, sharing, and organizing files and folders, including finding Google Sheets/spreadsheets, Docs, and Slides by name or title.
+  capability: google-drive.list_files
+  capability: google-drive.get_file
+  capability: google-drive.download_file
+  capability: google-drive.upload_file
+  capability: google-drive.update_file
+  capability: google-drive.create_folder
+  capability: google-drive.delete_file
+  capability: google-drive.trash_file
+  capability: google-drive.share_file
+  capability: google-drive.list_permissions
+  capability: google-drive.remove_permission
+  capability: google-drive.list_shared_drives
+- google-sheets: Google Sheets 0.1.0 (host_bundled)
+  description: Google Sheets capabilities for creating, reading, writing, and formatting spreadsheets. Use Google Drive list_files to find existing spreadsheets by name/title.
+  capability: google-sheets.create_spreadsheet
+  capability: google-sheets.get_spreadsheet
+  capability: google-sheets.read_values
+  capability: google-sheets.batch_read_values
+  capability: google-sheets.write_values
+  capability: google-sheets.append_values
+  capability: google-sheets.clear_values
+  capability: google-sheets.add_sheet
+  capability: google-sheets.delete_sheet
+  capability: google-sheets.rename_sheet
+  capability: google-sheets.format_cells
+- google-slides: Google Slides 0.1.0 (host_bundled)
+  description: Google Slides capabilities for creating, reading, editing, and formatting presentations.
+  capability: google-slides.create_presentation
+  capability: google-slides.get_presentation
+  capability: google-slides.get_thumbnail
+  capability: google-slides.create_slide
+  capability: google-slides.delete_object
+  capability: google-slides.insert_text
+  capability: google-slides.delete_text
+  capability: google-slides.replace_all_text
+  capability: google-slides.create_shape
+  capability: google-slides.insert_image
+  capability: google-slides.format_text
+  capability: google-slides.format_paragraph
+  capability: google-slides.replace_shapes_with_image
+  capability: google-slides.batch_update
+- notion: Notion 0.1.0 (host_bundled)
+  description: Notion MCP tools for creating, searching, fetching, querying, and managing Notion workspace content.
+- slack: Slack 0.1.0 (host_bundled)
+  description: Slack: DM the assistant via the Slack Events API channel (workspace bot), and act as you via your own user token (xoxp-): search and read all your messages, post, edit, delete, and react as you, open DMs, and look up people in your workspace.
+  capability: slack.search_messages
+  capability: slack.list_conversations
+  capability: slack.get_conversation_info
+  capability: slack.get_conversation_history
+  capability: slack.get_thread_replies
+  capability: slack.get_user_info
+  capability: slack.whoami
+  capability: slack.send_message
+  capability: slack.edit_message
+  capability: slack.delete_message
+  capability: slack.add_reaction
+  capability: slack.remove_reaction
+  capability: slack.open_dm
+  capability: slack.get_message
+  capability: slack.resolve_user
+  capability: slack.list_members
+- telegram: Telegram 0.1.0 (host_bundled)
+  description: Telegram: DM the assistant through the workspace bot, and \u{2014} once you link your own Telegram account as a device \u{2014} read your chats and send messages as you.
+  capability: telegram.send_message
+  capability: telegram.edit_message
+  capability: telegram.delete_message
+  capability: telegram.add_reaction
+  capability: telegram.remove_reaction
+  capability: telegram.open_dm
+  capability: telegram.list_conversations
+  capability: telegram.get_conversation_info
+  capability: telegram.get_conversation_history
+  capability: telegram.get_message
+  capability: telegram.search_messages
+  capability: telegram.whoami
+  capability: telegram.get_user_info
+  capability: telegram.resolve_user
+  capability: telegram.list_members
+- web-access: Web Access 0.1.0 (host_bundled)
+  description: Zero-config web search through Exa MCP for Reborn.
+  capability: web-access.search
+  capability: web-access.get_content
+- web-app: Web UI 0.1.0 (host_bundled)
+  description: Web Push notifications to the web UI\'s enrolled browsers
+exit=0
+
+$ ironclaw models list
+IronClaw Reborn LLM providers
+config_file: /Users/brijesh/.ironclaw/reborn/config.toml
+providers_file: /Users/brijesh/.ironclaw/reborn/providers.json
+active: not-configured
+
+nearai                   deepseek-ai/DeepSeek-V4-Flash        multi-model access via NEAR account
+gemini_oauth             gemini-2.5-flash                     Official Gemini API via Gemini CLI OAuth
+openai_codex             gpt-5.5                              ChatGPT subscription (Plus/Pro/Max)
+openai                   gpt-5-mini                           OpenAI GPT models (direct API)
+anthropic                claude-sonnet-4-20250514             Anthropic Claude models (direct API)
+ollama                   llama3                               Local Ollama instance (no API key needed)
+openai_compatible        default                              Custom OpenAI-compatible endpoint (vLLM, LiteLLM, etc.)
+github_copilot           gpt-4o                               GitHub Copilot Chat API (OAuth token from IDE sign-in)
+tinfoil                  kimi-k2-5                            Tinfoil private inference (hardware-attested TEE)
+openrouter               openai/gpt-4o                        OpenRouter multi-provider gateway (200+ models, preserves reasoning across turns)
+groq                     llama-3.3-70b-versatile              Groq LPU inference (ultra-fast)
+nvidia                   meta/llama-3.3-70b-instruct          NVIDIA NIM API (high-performance inference)
+venice                   llama-3.3-70b                        Venice.ai privacy-focused inference
+together                 meta-llama/Llama-3-70b-chat-hf       Together AI inference
+fireworks                accounts/fireworks/models/llama-v3p1-70b-instruct Fireworks AI inference
+deepseek                 deepseek-chat                        DeepSeek inference API (preserves reasoning_content for thinking-mode models)
+zai                      glm-5                                Z.AI GLM inference API
+cerebras                 llama-3.3-70b                        Cerebras wafer-scale inference
+sambanova                Meta-Llama-3.1-70B-Instruct          SambaNova Cloud inference
+gemini                   gemini-2.5-flash                     Google Gemini native API (preserves thought_signature on tool calls)
+ionet                    deepseek-coder-v2-instruct           io.net Intelligence API
+mistral                  mistral-large-latest                 Mistral AI API
+yandex                   yandexgpt-lite                       Yandex AI Studio (YandexGPT)
+minimax                  MiniMax-M2.7                         MiniMax API (MiniMax-M2.7, MiniMax-M2.7-highspeed, MiniMax-M2.5 and MiniMax-M2.5-highspeed models)
+cloudflare               @cf/meta/llama-3.3-70b-instruct-fp8-fast Cloudflare Workers AI
+bedrock                  anthropic.claude-sonnet-4-20250514-v1:0 Claude & other models via AWS (IAM, SSO)
+
+* = active provider. v1_state: not-used
+exit=0

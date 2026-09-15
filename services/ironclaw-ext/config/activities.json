@@ -1,0 +1,11 @@
+{
+  "$comment": "Muhurta activities scanned by the weekly routine. Each `activity` must be a VedAstro EventDataList rule <Name>; verify against jyotish.catalog.list before adding. Location is the user's default place (no runtime geocoding anywhere - lat/lon/tz are passed explicitly).",
+  "location": { "label": "New Delhi", "lat": 28.6139, "lon": 77.2090, "tz_offset_hours": 5.5 },
+  "step_minutes": 60,
+  "activities": [
+    { "activity": "GoodLunarDayForTravel", "label": "Travel", "enabled": true },
+    { "activity": "GoodLunarDayForMarriage", "label": "Marriage / engagement", "enabled": false },
+    { "activity": "GoodLunarDayForBuyingHouse", "label": "Property purchase", "enabled": false },
+    { "activity": "GoodLunarDayForStartingBusiness", "label": "Starting a business", "enabled": false }
+  ]
+}

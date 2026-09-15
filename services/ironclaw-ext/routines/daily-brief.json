@@ -1,0 +1,9 @@
+{
+  "$comment": "IronClaw 1.4.0 scheduled trigger (builtin.trigger_create). Field names match the trigger_records table in the binary: name, schedule_kind, schedule_expression, schedule_timezone, prompt, delivery_target.",
+  "name": "jyotish-daily-brief",
+  "schedule_kind": "cron",
+  "schedule_expression": "0 4 * * *",
+  "schedule_timezone": "Asia/Kolkata",
+  "delivery_target": null,
+  "prompt": "You are running the Jyotish-OS daily brief. Birth data for the brief is the GOLDEN chart until the user stores their own under memory path jyotish/birth.md: {\"utc\": \"1990-03-15T06:30:00Z\", \"lat\": 28.6139, \"lon\": 77.2090, \"tz_offset_hours\": 5.5}. If jyotish/birth.md exists in memory, use it instead. Steps: (1) call jyotish.panchang.day for today's civil date at that location; (2) call jyotish.transit.window from now to now+24h with bodies [Sun, Moon, Mars, Jupiter, Saturn, Rahu, Ketu] and natal_points [Moon, Ascendant]; (3) call jyotish.dasha.timeline with system vimshottari and depth 3 and pick the period containing now. Write a brief of at most 20 lines: tithi and nakshatra with exact end times in local time (UTC+5.5), rahu kala, abhijit, the transit that changes today, and the running mahadasha/antardasha/pratyantardasha with the antardasha end instant. Every section carries evidence.consensus_status. Flag any boundary_distance_sec below 120. Never claim certainty. Do not send birth data to any tool other than jyotish.*. Write the brief to memory at jyotish/brief/<YYYY-MM-DD>.md and return it as the reply; it is delivered to the REPL/WebUI conversation (no Telegram unless that extension is installed and set as delivery_target)."
+}

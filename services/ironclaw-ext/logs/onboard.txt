@@ -1,0 +1,35 @@
+$ ironclaw onboard --no-service < /dev/null
+IronClaw Reborn onboarding
+reborn_home: /Users/brijesh/.ironclaw/reborn
+home_source: default
+wrote: /Users/brijesh/.ironclaw/reborn/config.toml
+wrote: /Users/brijesh/.ironclaw/reborn/providers.json
+webui_token: /Users/brijesh/.ironclaw/reborn/webui-token (wrote)
+onboarding_marker: /Users/brijesh/.ironclaw/reborn/.onboard-completed.json (wrote)
+master_key: cached dotfile already present
+llm_credentials: skipped (non-interactive session; partial environment LLM config: environment LLM configuration is incomplete: Authentication failed for provider 'anthropic'. Set ANTHROPIC_API_KEY (from https://console.anthropic.com/settings/keys). Or run `ironclaw onboard --step provider` to configure interactively.)
+v1_state: not-used
+
+completed:
+- reborn home initialized
+- config.toml and providers.json available
+- webui bearer token provisioned (used by `serve` when the env var is unset)
+- onboarding completion marker available
+
+remaining:
+- configure LLM credentials: rerun `ironclaw onboard` from an interactive terminal, run `ironclaw models set-provider <provider> --model <model>` directly, or export a provider's LLM environment variables (e.g. `LLM_BACKEND` or `OPENAI_API_KEY`; see `.env.example`) before the next `onboard`/`serve`
+- history import not requested
+service: skipped (--no-service)
+login_link: http://127.0.0.1:3000/login?token=<REDACTED>
+hint: add Gmail or Slack any time: ironclaw config set --help
+exit=0
+
+$ ls -la ~/.ironclaw/reborn
+total 40
+drwxr-xr-x@ 7 brijesh  staff   224 Sep 16 02:43 .
+drwxr-xr-x@ 3 brijesh  staff    96 Sep 16 02:39 ..
+-rw-------@ 1 brijesh  staff   621 Sep 16 02:43 .onboard-completed.json
+-rw-------@ 1 brijesh  staff  4470 Sep 16 02:43 config.toml
+drwxr-xr-x@ 7 brijesh  staff   224 Sep 16 02:39 local-dev
+-rw-------@ 1 brijesh  staff   623 Sep 16 02:43 providers.json
+-rw-------@ 1 brijesh  staff    64 Sep 16 02:43 webui-token

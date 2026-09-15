@@ -1,0 +1,193 @@
+
+$ ironclaw extension install --help
+Install a local Reborn extension package
+
+Usage: ironclaw extension install [OPTIONS] <ID>
+
+Arguments:
+  <ID>  Extension id from `ironclaw extension search`
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+      --json                 Output the lifecycle response as JSON
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw extension search --help
+Search local Reborn extension packages
+
+Usage: ironclaw extension search [OPTIONS] [QUERY]
+
+Arguments:
+  [QUERY]  Query extension id, name, or description. Omit to list all local packages
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+      --json                 Output the lifecycle response as JSON
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw extension remove --help
+Remove an installed local Reborn extension package
+
+Usage: ironclaw extension remove [OPTIONS] <ID>
+
+Arguments:
+  <ID>  Extension id from `ironclaw extension search`
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for the unrestricted standalone profile
+      --json                 Output the lifecycle response as JSON
+  -h, --help                 Print help
+exit=0
+
+$ ironclaw config set --help
+Set a single configuration value by dot-separated key, routed through the alias table to its destination (config.toml, the encrypted secret store, or the WebChat v2 token file)
+
+Usage: ironclaw config set [OPTIONS] <KEY> [VALUE]
+
+Arguments:
+  <KEY>    Dot-separated config key (e.g. google.client_id, openai.api_key, webui.token)
+  [VALUE]  Value to set for non-secret keys. Secret-destination keys (`<provider>.api_key`, `google.client_secret`) reject positional values and always prompt with input hidden
+
+Options:
+      --rotate  `webui.token` only: rotate the WebChat v2 bearer token. Invalidates every existing browser session (the token doubles as the session-signing key)
+  -h, --help    Print help
+exit=0
+
+$ ironclaw config list --help
+List all configuration keys and their values
+
+Usage: ironclaw config list [OPTIONS]
+
+Options:
+      --json  Output as JSON
+  -h, --help  Print help
+exit=0
+
+$ ironclaw config get --help
+Get a single configuration value by dot-separated key
+
+Usage: ironclaw config get [OPTIONS] <KEY>
+
+Arguments:
+  <KEY>  Dot-separated config key (e.g. boot.profile, llm.default.model)
+
+Options:
+      --json  Output as JSON
+  -h, --help  Print help
+exit=0
+
+$ ironclaw config path --help
+Show resolved Reborn configuration paths without creating state
+
+Usage: ironclaw config path
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw models set-provider --help
+Set the default Reborn LLM provider
+
+Usage: ironclaw models set-provider [OPTIONS] <PROVIDER>
+
+Arguments:
+  <PROVIDER>  Provider id or alias (for example, openai, anthropic, ollama)
+
+Options:
+      --model <MODEL>  Also set the model. Defaults to the provider's catalog default
+  -h, --help           Print help
+exit=0
+
+$ ironclaw models set --help
+Set the default Reborn model for the active provider
+
+Usage: ironclaw models set <MODEL>
+
+Arguments:
+  <MODEL>  Model name (for example, gpt-5-mini or claude-sonnet-4-6-20250514)
+
+Options:
+  -h, --help  Print help
+exit=0
+
+$ ironclaw models list --help
+List Reborn LLM providers, or show one provider
+
+Usage: ironclaw models list [OPTIONS] [PROVIDER]
+
+Arguments:
+  [PROVIDER]  Show only a specific provider by id or alias
+
+Options:
+  -v, --verbose  Show provider protocol and credential metadata
+      --json     Output providers as JSON
+  -h, --help     Print help
+exit=0
+
+$ ironclaw models status --help
+Show Reborn model route status
+
+Usage: ironclaw models status [OPTIONS]
+
+Options:
+      --json  Output model status as JSON
+  -h, --help  Print help
+exit=0
+
+$ ironclaw ironhub install --help
+Install an IronHub tool or skill into Reborn state
+
+Usage: ironclaw ironhub install [OPTIONS] <NAME>
+
+Arguments:
+  <NAME>
+          Tool or skill name
+
+Options:
+      --confirm-host-access
+          Confirm trusted-laptop host filesystem access for local-dev-yolo
+
+      --kind <KIND>
+          Disambiguate when a name exists as both a tool and a skill
+          
+          [possible values: tool, skill]
+
+      --force
+          Replace an existing registry package
+
+      --acknowledge-unverified
+          Acknowledge installing unverified community content
+
+      --expected-version <EXPECTED_VERSION>
+          Require the catalog entry to still have this version
+
+      --expected-artifact-digest <EXPECTED_ARTIFACT_DIGEST>
+          Require the catalog entry to still have this signed artifact digest
+
+      --private-manifest-url-file <PATH>
+          Install from an org-scoped signed manifest URL read from this file.
+          
+          Reading the URL from a file keeps its access token out of argv and shell history.
+
+      --json
+          Output the response as JSON
+
+  -h, --help
+          Print help (see a summary with '-h')
+exit=0
+
+$ ironclaw ironhub search --help
+Search the signed IronHub catalog
+
+Usage: ironclaw ironhub search [OPTIONS] [QUERY]
+
+Arguments:
+  [QUERY]  Optional query by name or description. Omit to list all entries
+
+Options:
+      --confirm-host-access  Confirm trusted-laptop host filesystem access for local-dev-yolo
+      --json                 Output the response as JSON
+  -h, --help                 Print help
+exit=0

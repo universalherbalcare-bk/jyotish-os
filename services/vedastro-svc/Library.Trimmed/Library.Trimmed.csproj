@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    VedAstro.Library — TRIMMED fork for jyotish-os vedastro-svc.
+    Source: vendor/vedastro/Library (MIT, VedAstro) + two MIT files restored from upstream
+    commit dc7880af6a6782efe71d08c01c9ecc4699613e63 (2023-09-28) — see README.md.
+    Removed: every Azure / OpenAI / Bing / Functions / JSInterop / EPPlus / ScottPlot / Svg /
+    HtmlAgilityPack / Mime-Detective / CodeAnalysis package and every file that needed them.
+    Only SwissEphNet (positions for rule predicates) and Newtonsoft.Json remain.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>VedAstro.Library.Trimmed</AssemblyName>
+    <RootNamespace>VedAstro.Library</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- vendor code is warning-heavy; the service project is the strict one -->
+    <NoWarn>$(NoWarn);CS1998;CS0162;CS0168;CS0219;CS8981;CS0108;CS0114;CS1591;CS0649;CS0169;CS0414;CS8632;CS0472;CS1717;CS0067;CS0105</NoWarn>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SwissEphNet" Version="2.8.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="XMLData\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

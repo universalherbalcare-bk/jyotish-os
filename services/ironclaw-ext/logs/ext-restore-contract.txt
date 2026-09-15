@@ -1,0 +1,18 @@
+$ ironclaw extension remove jyotish --json   # remove the evidence-only https variant
+{"package_ref":{"id":"jyotish","kind":"extension"},"payload":{"kind":"extension_remove","removed":true},"phase":"uninstalled"}
+exit=0
+
+$ diff -r jyotish ~/.ironclaw/reborn/local-dev/system/extensions/jyotish && echo identical
+identical
+
+$ ironclaw extension search jyotish   # contract package (http) back in place
+2026-09-15T21:26:27.191333Z  WARN ironclaw_extension_host::available_extensions: skipping invalid available extension manifest extension_id=jyotish reason=invalid extension manifest: failed to parse extension manifest: TOML parse error at line 29, column 10
+   |
+29 | server = "http://127.0.0.1:7791/mcp"
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+invalid https_endpoint id 'http://127.0.0.1:7791/mcp': must use the https scheme
+
+IronClaw Reborn extension search
+phase: installed
+count: 0
+exit=0

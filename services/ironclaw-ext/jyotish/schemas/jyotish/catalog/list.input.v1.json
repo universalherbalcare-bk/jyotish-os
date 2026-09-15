@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "jyotish.catalog.list input",
+  "description": "Input for catalog.list (no parameters).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "required": []
+}
