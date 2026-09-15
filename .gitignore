@@ -1,0 +1,16 @@
+# vendored upstream sources are restored by scripts/vendor.sh from the source zips (see vendor/SOURCE-ARCHIVES.sha256)
+vendor/
+kernels/*.bsp
+target/
+**/target/
+.venv/
+**/.venv/
+__pycache__/
+bin/
+obj/
+**/bin/
+**/obj/
+*.db
+*.log
+.claude/.verified.*
+.claude/execution_state.json
