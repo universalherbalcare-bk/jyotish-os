@@ -147,4 +147,9 @@ impl SidecarClient {
         }
         up
     }
+
+    /// Liveness of vedastro-svc, not memoised (only `/health` calls it).
+    pub async fn vedastro_is_up(&self) -> bool {
+        self.get_json(Sidecar::Vedastro, "/v1/health").await.is_ok()
+    }
 }

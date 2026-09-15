@@ -104,7 +104,7 @@ pub fn tool_definitions() -> Vec<Value> {
                 "type": "object",
                 "properties": {
                     "birth": birth_schema(),
-                    "system": { "type": "string", "description": "System id from jhora-svc GET /v1/catalog/dasha (e.g. vimsottari)" },
+                    "system": { "type": "string", "description": "System id `<family>.<module>` from jhora-svc GET /v1/catalog/dasha, e.g. graha.vimsottari, raasi.narayana, annual.mudda", "pattern": "^[a-z]+\\.[a-z_0-9]+$" },
                     "depth": { "type": "integer", "minimum": 1, "maximum": 5, "default": 2 }
                 },
                 "required": ["birth", "system"],
@@ -207,7 +207,9 @@ pub fn tool_definitions() -> Vec<Value> {
                 "properties": {
                     "rule_id": { "type": "string" },
                     "dataset": { "type": "string", "enum": ["marriage", "person"] },
-                    "outcome_column": { "type": "string" }
+                    "outcome_column": { "type": "string" },
+                    "max_rows": { "type": "integer", "minimum": 1, "maximum": 20000, "description": "Rows to evaluate (sidecar default 300)" },
+                    "offset": { "type": "integer", "minimum": 0, "maximum": 1000000 }
                 },
                 "required": ["rule_id", "dataset", "outcome_column"],
                 "additionalProperties": false
@@ -234,6 +236,33 @@ pub fn tool_definitions() -> Vec<Value> {
             "outputSchema": out
         }),
     ]
+}
+
+/// Walk `value` against `schema`; return the dotted path of the first key that
+/// the schema does not declare wherever `additionalProperties` is `false`.
+/// Only object schemas with an explicit `properties` map are enforced; arrays
+/// of objects recurse through `items`.
+fn reject_unknown_keys(schema: &Value, value: &Value, path: &str) -> Result<(), String> {
+    let Some(obj) = value.as_object() else {
+        if let (Some(items), Some(arr)) = (schema.get("items"), value.as_array()) {
+            for (i, v) in arr.iter().enumerate() {
+                reject_unknown_keys(items, v, &format!("{path}[{i}]"))?;
+            }
+        }
+        return Ok(());
+    };
+    let Some(props) = schema.get("properties").and_then(Value::as_object) else {
+        return Ok(());
+    };
+    let closed = schema.get("additionalProperties") == Some(&Value::Bool(false));
+    for (k, v) in obj {
+        match props.get(k) {
+            Some(sub) => reject_unknown_keys(sub, v, &format!("{path}.{k}"))?,
+            None if closed => return Err(format!("{path}.{k}")),
+            None => {}
+        }
+    }
+    Ok(())
 }
 
 fn rpc_error(id: Value, code: i64, message: impl Into<String>, data: Option<Value>) -> Value {
@@ -288,6 +317,20 @@ async fn handle_tools_call(state: &AppState, params: &Value) -> Result<Value, (i
         return Err((
             INVALID_PARAMS,
             "params.arguments must be an object".to_string(),
+        ));
+    }
+    // Enforce the published `additionalProperties: false` — the schema is the
+    // contract the client sees, so an unknown key is rejected rather than
+    // silently dropped (which would make e.g. `max_rows` look accepted).
+    if let Some(schema) = tool_definitions()
+        .into_iter()
+        .find(|d| d["name"] == name)
+        .map(|d| d["inputSchema"].clone())
+        && let Err(path) = reject_unknown_keys(&schema, &args, "arguments")
+    {
+        return Err((
+            INVALID_PARAMS,
+            format!("unknown field {path} (schema has additionalProperties: false)"),
         ));
     }
     let request_hash = request_key(name, &args, &state.engine.kernel_sha256);
@@ -415,6 +458,7 @@ pub async fn get_mcp() -> Response {
 
 pub async fn health(State(state): State<Arc<AppState>>) -> Response {
     let jhora_up = state.sidecars.jhora_is_up().await;
+    let vedastro_up = state.sidecars.vedastro_is_up().await;
     (
         StatusCode::OK,
         Json(json!({
@@ -429,7 +473,7 @@ pub async fn health(State(state): State<Arc<AppState>>) -> Response {
             "ayanamsa": AYANAMSA_NAME,
             "nodes": "TRUE",
             "golden": state.golden,
-            "sidecars": { "jhora": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Jhora), "up": jhora_up }, "vedastro": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Vedastro) } },
+            "sidecars": { "jhora": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Jhora), "up": jhora_up }, "vedastro": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Vedastro), "up": vedastro_up } },
             "cache_entries": state.cache.len(),
             "tools": TOOL_NAMES,
         })),
@@ -451,6 +495,28 @@ mod tests {
             assert_eq!(d["inputSchema"]["type"], "object");
             assert!(d["description"].as_str().unwrap().len() > 20);
         }
+    }
+
+    #[test]
+    fn unknown_keys_rejected_per_published_schema() {
+        let defs = tool_definitions();
+        let chart = defs.iter().find(|d| d["name"] == "chart.compute").unwrap();
+        let schema = &chart["inputSchema"];
+        let ok = json!({ "birth": { "utc": "1990-03-15T06:30:00Z", "lat": 28.6, "lon": 77.2, "tz_offset_hours": 5.5 } });
+        assert!(reject_unknown_keys(schema, &ok, "arguments").is_ok());
+        let bad_top = json!({ "birth": { "utc": "1990-03-15T06:30:00Z", "lat": 28.6, "lon": 77.2, "tz_offset_hours": 5.5 }, "bogus": 1 });
+        assert_eq!(
+            reject_unknown_keys(schema, &bad_top, "arguments").unwrap_err(),
+            "arguments.bogus"
+        );
+        let bad_nested = json!({ "birth": { "utc": "1990-03-15T06:30:00Z", "lat": 28.6, "lon": 77.2, "tz_offset_hours": 5.5, "name": "x" } });
+        assert_eq!(
+            reject_unknown_keys(schema, &bad_nested, "arguments").unwrap_err(),
+            "arguments.birth.name"
+        );
+        let rv = defs.iter().find(|d| d["name"] == "rule.validate").unwrap();
+        let with_max = json!({ "rule_id": "r", "dataset": "marriage", "outcome_column": "married", "max_rows": 50 });
+        assert!(reject_unknown_keys(&rv["inputSchema"], &with_max, "arguments").is_ok());
     }
 
     #[test]

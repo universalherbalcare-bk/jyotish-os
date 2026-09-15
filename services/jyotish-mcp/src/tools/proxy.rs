@@ -26,14 +26,12 @@ pub async fn dasha_timeline(ctx: &Ctx, args: Value) -> Result<ToolOutput, ToolEr
     let m = args::obj(&args, "arguments")?;
     let birth = args::birth(m, "birth")?;
     let system = args::str_req(m, "system")?;
-    if system.is_empty()
-        || system.len() > 64
-        || !system
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
-    {
+    // Must match jhora-svc's own id grammar `^[a-z]+\.[a-z_0-9]+$`
+    // (e.g. `graha.vimsottari`, `raasi.narayana`, `annual.mudda`); anything
+    // else is rejected here so the sidecar never sees an unparseable id.
+    if !valid_dasha_system_id(system) {
         return Err(ToolError::invalid(
-            "system must be a short alphanumeric identifier (see jhora-svc /v1/catalog/dasha)",
+            "system must be `<family>.<module>` in lowercase, e.g. graha.vimsottari (see catalog.list / jhora-svc /v1/catalog/dasha)",
         ));
     }
     let depth = args::u64_opt(m, "depth", 2)?;
@@ -113,10 +111,72 @@ pub async fn rule_validate(ctx: &Ctx, args: Value) -> Result<ToolOutput, ToolErr
     if outcome.is_empty() || outcome.len() > 128 {
         return Err(ToolError::invalid("outcome_column must be 1–128 chars"));
     }
-    let body = json!({ "rule_id": rule_id, "dataset": dataset, "outcome_column": outcome });
+    let mut body = json!({ "rule_id": rule_id, "dataset": dataset, "outcome_column": outcome });
+    // Optional sampling controls forwarded verbatim to vedastro-svc (its
+    // defaults apply when absent). Bounded here so a caller cannot ask the
+    // sidecar for an unbounded evaluation.
+    if m.contains_key("max_rows") {
+        let max_rows = args::u64_opt(m, "max_rows", 300)?;
+        if !(1..=20_000).contains(&max_rows) {
+            return Err(ToolError::invalid("max_rows must be within [1, 20000]"));
+        }
+        body["max_rows"] = json!(max_rows);
+    }
+    if m.contains_key("offset") {
+        let offset = args::u64_opt(m, "offset", 0)?;
+        if offset > 1_000_000 {
+            return Err(ToolError::invalid("offset must be within [0, 1000000]"));
+        }
+        body["offset"] = json!(offset);
+    }
     let resp = ctx
         .sidecars
         .post_json(Sidecar::Vedastro, "/v1/rule/validate", &body)
         .await?;
     Ok(out(resp, "vedastro-svc"))
+}
+
+/// jhora-svc accepts dasha ids matching `^[a-z]+\.[a-z_0-9]+$`.
+pub fn valid_dasha_system_id(id: &str) -> bool {
+    if id.len() > 64 {
+        return false;
+    }
+    let Some((family, module)) = id.split_once('.') else {
+        return false;
+    };
+    !family.is_empty()
+        && family.bytes().all(|b| b.is_ascii_lowercase())
+        && !module.is_empty()
+        && module
+            .bytes()
+            .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_')
+}
+
+#[cfg(test)]
+mod id_tests {
+    use super::valid_dasha_system_id;
+
+    #[test]
+    fn dasha_id_grammar_matches_sidecar() {
+        for ok in [
+            "graha.vimsottari",
+            "raasi.narayana",
+            "annual.mudda",
+            "graha.yoga_vimsottari",
+        ] {
+            assert!(valid_dasha_system_id(ok), "{ok}");
+        }
+        for bad in [
+            "vimsottari",
+            "graha_vimsottari",
+            "Graha.Vimsottari",
+            "graha.",
+            ".x",
+            "a.b.c",
+            "graha.vim-sottari",
+            "",
+        ] {
+            assert!(!valid_dasha_system_id(bad), "{bad}");
+        }
+    }
 }

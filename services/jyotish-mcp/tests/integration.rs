@@ -13,19 +13,35 @@ fn repo_root() -> PathBuf {
 }
 
 async fn boot_test_server() -> (String, Arc<jyotish_mcp::AppState>) {
+    boot_test_server_with("http://127.0.0.1:1").await
+}
+
+/// Same boot, but pointing the jhora sidecar at a caller-supplied URL.
+async fn boot_test_server_with(jhora_url: &str) -> (String, Arc<jyotish_mcp::AppState>) {
     let root = repo_root();
-    let audit = std::env::temp_dir().join(format!("jyotish-mcp-test-{}.jsonl", std::process::id()));
+    // One audit file per booted server: the integration tests run in parallel
+    // inside one process and must not interleave their audit lines.
+    static BOOTS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+    let boot_no = BOOTS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    let audit = std::env::temp_dir().join(format!(
+        "jyotish-mcp-test-{}-{boot_no}.jsonl",
+        std::process::id()
+    ));
     let config = Config {
         bind: "127.0.0.1:0".parse().unwrap(),
         kernel_path: root.join("kernels/de440s.bsp"),
         kernel_sha_path: root.join("kernels/de440s.sha256"),
         // Port 1 on loopback: nothing listens there, so sidecar paths are
         // exercised in their "unavailable" branch deterministically.
-        jhora_url: "http://127.0.0.1:1".into(),
+        jhora_url: jhora_url.into(),
         vedastro_url: "http://127.0.0.1:1".into(),
         audit_path: audit,
         cache_cap: 64,
-        sidecar_timeout_ms: 500,
+        sidecar_timeout_ms: if jhora_url.ends_with(":1") {
+            500
+        } else {
+            10_000
+        },
     };
     let state =
         jyotish_mcp::boot(config.clone()).expect("boot guard must pass with the real kernel");
@@ -211,11 +227,51 @@ async fn mcp_lifecycle_on_golden_chart() {
     );
 
     // proxied tool with the sidecar down -> structured SIDECAR_UNAVAILABLE, isError
-    let d = rpc(&base, 7, "tools/call", json!({ "name": "dasha.timeline", "arguments": { "birth": golden(), "system": "vimsottari", "depth": 2 } })).await;
+    let d = rpc(&base, 7, "tools/call", json!({ "name": "dasha.timeline", "arguments": { "birth": golden(), "system": "graha.vimsottari", "depth": 2 } })).await;
     assert_eq!(d["result"]["isError"], true);
     assert_eq!(
         d["result"]["structuredContent"]["error"]["code"],
         "SIDECAR_UNAVAILABLE"
+    );
+
+    // unknown top-level and nested keys are rejected per the published schema
+    let u1 = rpc(
+        &base,
+        71,
+        "tools/call",
+        json!({ "name": "chart.compute", "arguments": { "birth": golden(), "bogus": 1 } }),
+    )
+    .await;
+    assert_eq!(u1["error"]["code"], -32602, "{u1}");
+    assert!(
+        u1["error"]["message"]
+            .as_str()
+            .unwrap()
+            .contains("arguments.bogus")
+    );
+    let mut b = golden();
+    b["name"] = json!("x");
+    let u2 = rpc(
+        &base,
+        72,
+        "tools/call",
+        json!({ "name": "chart.compute", "arguments": { "birth": b } }),
+    )
+    .await;
+    assert!(
+        u2["error"]["message"]
+            .as_str()
+            .unwrap()
+            .contains("arguments.birth.name"),
+        "{u2}"
+    );
+
+    // dasha id grammar: bare `vimsottari` is INVALID_PARAMS locally (never reaches the sidecar)
+    let d2 = rpc(&base, 73, "tools/call", json!({ "name": "dasha.timeline", "arguments": { "birth": golden(), "system": "vimsottari" } })).await;
+    assert_eq!(d2["result"]["isError"], true);
+    assert_eq!(
+        d2["result"]["structuredContent"]["error"]["code"], "INVALID_PARAMS",
+        "{d2}"
     );
 
     // engine.consensus with the sidecar down -> not an error, status reported
@@ -336,4 +392,39 @@ async fn panchang_transit_rectify_on_golden() {
         .collect();
     assert!(scores.windows(2).all(|w| w[0] >= w[1]));
     assert!(sc["candidates"][0]["events"][0]["maha"].is_string());
+}
+
+/// Success path for the proxied dasha tool. Runs only when a real jhora-svc
+/// answers on JHORA_URL (default 127.0.0.1:7792); otherwise it is skipped
+/// loudly so CI without the sidecar still passes but says so.
+#[tokio::test]
+async fn dasha_timeline_success_path_with_live_sidecar() {
+    let jhora = std::env::var("JHORA_URL").unwrap_or_else(|_| "http://127.0.0.1:7792".into());
+    let probe = reqwest::Client::new()
+        .get(format!("{jhora}/v1/health"))
+        .send()
+        .await;
+    if !probe.map(|r| r.status().is_success()).unwrap_or(false) {
+        eprintln!("SKIP dasha_timeline_success_path_with_live_sidecar: no jhora-svc at {jhora}");
+        return;
+    }
+    let (base, _guard) = boot_test_server_with(&jhora).await;
+    let d = rpc(&base, 90, "tools/call", json!({ "name": "dasha.timeline", "arguments": { "birth": golden(), "system": "graha.vimsottari", "depth": 2 } })).await;
+    assert_eq!(d["result"]["isError"], false, "{d}");
+    let sc = &d["result"]["structuredContent"];
+    let periods = sc["periods"].as_array().expect("periods array");
+    assert_eq!(periods.len(), 9, "nine maha-dashas");
+    assert_eq!(periods[0]["lord"], "Rahu");
+    let years: f64 = periods
+        .iter()
+        .map(|p| p["duration_years"].as_f64().unwrap_or(0.0))
+        .sum();
+    assert!((years - 120.0).abs() < 0.01, "maha periods sum {years}");
+    assert!(
+        periods[0]["children"]
+            .as_array()
+            .map(|c| !c.is_empty())
+            .unwrap_or(false)
+    );
+    assert_eq!(sc["evidence"]["engine"], "jhora-svc");
 }

@@ -15,7 +15,7 @@ repos:
     hooks:
       - id: cargo-fmt-jyotish-mcp
         name: cargo fmt (jyotish-mcp)
-        entry: bash -c 'cd services/jyotish-mcp && [ -f Cargo.toml ] && cargo fmt --check || true'
+        entry: bash -c 'cd services/jyotish-mcp && cargo fmt --check'
         language: system
         pass_filenames: false
         files: ^services/jyotish-mcp/.*\.rs$
@@ -27,7 +27,7 @@ repos:
         files: ^services/jyotish-mcp/.*\.(rs|toml)$
       - id: dotnet-format-vedastro-svc
         name: dotnet format --verify-no-changes (vedastro-svc)
-        entry: bash -c 'cd services/vedastro-svc && ls *.sln */*.csproj >/dev/null 2>&1 && dotnet format --verify-no-changes --exclude Library.Trimmed || true'
+        entry: bash -c 'cd services/vedastro-svc && DOTNET_SYSTEM_NET_DISABLEIPV6=1 dotnet format --verify-no-changes --exclude Library.Trimmed'
         language: system
         pass_filenames: false
         files: ^services/vedastro-svc/.*\.cs$
