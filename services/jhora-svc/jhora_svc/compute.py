@@ -97,10 +97,21 @@ def positions(jd_ut: float, lat: float, lon: float, tz: float) -> dict[str, Any]
     bodies["Ketu"] = _body(rahu[0] + 180.0, -rahu[1], rahu[3])
     ordered = {k: bodies[k] for k in PLANETS[:9]}
 
-    place = drik.Place("svc", lat, lon, tz)
-    jd_local = timeconv.jd_ut_to_local_jd(jd_ut, tz)
-    asc_sign, asc_deg_in_sign, _nak, _pada = drik.ascendant(jd_local, place)
-    asc = (asc_sign * 30.0 + asc_deg_in_sign) % 360.0
+    # Ascendant: Whole-Sign house call (never fails at polar latitudes, unlike PyJHora's
+    # default Placidus call in drik.ascendant); the ascendant is house-system independent.
+    _cusps, ascmc = swe.houses_ex(
+        jd_ut, lat, lon, b"W", swe.FLG_SWIEPH | swe.FLG_SIDEREAL
+    )
+    asc = ascmc[0] % 360.0
+    if abs(lat) < 60.0:  # cross-check against drik.ascendant where Placidus is defined
+        place = drik.Place("svc", lat, lon, tz)
+        jd_local = timeconv.jd_ut_to_local_jd(jd_ut, tz)
+        asc_sign, asc_deg_in_sign, _nak, _pada = drik.ascendant(jd_local, place)
+        drik_asc = (asc_sign * 30.0 + asc_deg_in_sign) % 360.0
+        if abs(((asc - drik_asc + 180.0) % 360.0) - 180.0) > 0.01:
+            raise ValueError(
+                f"ascendant cross-check failed: swe {asc:.6f} vs drik {drik_asc:.6f}"
+            )
     ayan = float(swe.get_ayanamsa_ut(jd_ut))
     # leave the process in the state PyJHora expects
     drik.set_ayanamsa_mode(_bootstrap.AYANAMSA)
@@ -117,7 +128,7 @@ def positions(jd_ut: float, lat: float, lon: float, tz: float) -> dict[str, Any]
             "positions_semantics": "apparent geocentric sidereal (FLG_SWIEPH|FLG_SIDEREAL|FLG_SPEED)",
             "pyjhora_internal_flags": int(drik.PLANET_FLAGS),
             "node": "TRUE_NODE",
-            "ascendant_source": "drik.ascendant (swe.houses_ex sidereal)",
+            "ascendant_source": "swe.houses_ex(W, sidereal) cross-checked with drik.ascendant for |lat|<60",
         },
     }
 
@@ -192,6 +203,24 @@ def panchang(
     day_jd_ut = timeconv.local_date_midnight_jd_ut(y, m, d, tz)
     jd_local_midnight = swe.julday(int(y), int(m), int(d), 0.0, swe.GREG_CAL)
 
+    # PyJHora ignores swe.rise_trans's return flag and yields garbage where the Sun does not
+    # rise/set (polar day/night); refuse explicitly instead.
+    for day_offset, rsmi in (
+        (0.0, drik.RISE_FLAGS),
+        (0.0, drik.SET_FLAGS),
+        (1.0, drik.RISE_FLAGS),
+    ):
+        rc, _res = swe.rise_trans(
+            day_jd_ut + day_offset,
+            swe.SUN,
+            geopos=(lon, lat, 0.0),
+            rsmi=rsmi,
+            flags=drik.PLANET_FLAGS,
+        )
+        if rc < 0:
+            raise ValueError(
+                f"no sunrise/sunset at lat={lat} on {int(y):04d}-{int(m):02d}-{int(d):02d} (polar day/night); panchang undefined"
+            )
     with contextlib.redirect_stdout(io.StringIO()):
         rise_h, _s1, _j1 = drik.sunrise(jd_local_midnight, place)
         set_h, _s2, _j2 = drik.sunset(jd_local_midnight, place)

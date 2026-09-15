@@ -350,6 +350,26 @@ def test_panchang_golden_day(client):
         assert p["next_tithi"]["index"] == t % 30 + 1
 
 
+def test_polar_latitude_fails_closed_but_positions_work(client):
+    r = client.post(
+        "/v1/panchang",
+        json={"date": "2026-06-21", "lat": 80.0, "lon": 20.0, "tz_offset_hours": 1.0},
+    )
+    assert r.status_code == 422 and "polar" in r.json()["detail"]
+    r = client.post(
+        "/v1/positions",
+        json={
+            "utc": "2026-06-21T12:00:00Z",
+            "lat": 80.0,
+            "lon": 20.0,
+            "tz_offset_hours": 1.0,
+        },
+    )
+    assert r.status_code == 200, r.text
+    _c, ascmc = swe.houses_ex(r.json()["jd_ut"], 80.0, 20.0, b"W", swe.FLG_SIDEREAL)
+    assert _angle_diff(r.json()["ascendant"], ascmc[0]) < 0.01
+
+
 def test_panchang_high_latitude_and_bad_date(client):
     r = client.post(
         "/v1/panchang",
