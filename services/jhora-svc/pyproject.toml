@@ -18,3 +18,11 @@ test = ["pytest", "httpx"]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = ["ignore::SyntaxWarning"]
+
+[tool.ruff]
+# Makes this file the ruff config root so `ruff check .` here and pre-commit from the repo root agree
+# (without it, first-party detection of `jhora_svc` depends on the working directory).
+target-version = "py312"
+
+[tool.ruff.lint.isort]
+known-first-party = ["jhora_svc"]

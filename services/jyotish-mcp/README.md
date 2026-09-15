@@ -63,7 +63,7 @@ without an epoch (catalog, proxied tools).
 | `panchang.day` | XALEN + DE440 | `{date, lat, lon, tz_offset_hours}`. Tithi/nakshatra/yoga/karana with start/end instants from sunrise to next sunrise, sunrise/sunset/moonrise/moonset, vara, rahu kala, abhijit. |
 | `transit.window` | XALEN + DE440 | `{from, to, bodies?, birth?, natal_points?, step_hours?}` (≤ 10 years). Bisection to exact rashi ingress and exact conjunction instants, direct and retrograde. |
 | `rectify.birth_time` | XALEN + DE440 | `{birth, window_min?, step_min?, events:[{date|utc, significators[], label?}], top_n?}`. **Heuristic** sweep scored by Vimshottari maha/antar lords vs supplied significators; explicitly labelled. |
-| `engine.consensus` | XALEN vs jhora-svc | Per-body Δ in arcsec vs contract tolerances; `PASS` / `FAIL` / `SIDECAR_UNAVAILABLE`. Ayanamsa is compared under both the true-equinox (XALEN) and mean-equinox (`swe_get_ayanamsa_ut`) conventions and the matched one is reported. |
+| `engine.consensus` | XALEN vs jhora-svc | Decomposed differential (docs/CONTRACT.md): tropical = sidereal + own true-equinox ayanamsa (1.0″, Moon 1.5″), ayanamsa under matching convention (true & mean equinox, 1.0″ each), sidereal end-to-end (2.0″), Rahu/Ketu analytic node (60″, `source: analytic`), Ascendant (0.01°); `categories{…}`, per-body `tropical`/`sidereal` blocks, `time_scale{jd_ut_delta_sec, jd_tt_delta_sec}`. `PASS` / `FAIL` / `SIDECAR_UNAVAILABLE`. Sized by the 10k-chart corpus in `validation/consensus`. |
 | `catalog.list` | static | Enabled ayanamsa (LAHIRI only), 21 house systems, 16 vargas, dasha systems. **Gauquelin, QiMenDunJia, PullenSinusoidalRatio are excluded** with reasons. |
 | `dasha.timeline` | jhora-svc `/v1/dasha` | Proxied; `evidence.engine = "jhora-svc"`. |
 | `match.kuta` | jhora-svc `/v1/kuta` | Proxied. |
@@ -85,7 +85,10 @@ A down sidecar yields `SIDECAR_UNAVAILABLE` (structured, `isError: true`); nothi
 
 * Ayanamsa `Ayanamsa::Lahiri` evaluated in TT (true-equinox value); nodes `Body::TrueNode`
   (XALEN's osculating node — analytic, tagged `source: "xalen-true-node (osculating, analytic)"`).
-* UTC → TT is leap-second exact (`Epoch::from_utc`); UT1 ≈ UTC (|DUT1| < 0.9 s).
+* UTC → TT is leap-second exact (`Epoch::from_utc`) from 1972-01-01; **before 1972** the civil time is
+  treated as UT1 and TT comes from the SMH2016 ΔT model (xalen-time's leap table returns a fixed 10 s floor
+  there, which would put TT 13–44 s late for 1900–1971 — Moon 7–24″; Swiss applies the same pre-1972 rule).
+  UT1 ≈ UTC (|DUT1| < 0.9 s) — this is what limits the Ascendant consensus to ≈0.01° at high latitude.
 * Speeds are sidereal rates (tropical rate minus ayanamsa rate).
 
 ## Tests

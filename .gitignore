@@ -17,3 +17,5 @@ obj/
 .claude/.agents-used.*
 .claude/.needs-verify.*
 audit/
+validation/consensus-corpus.csv
+validation/consensus/target/

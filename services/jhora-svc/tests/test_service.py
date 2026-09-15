@@ -153,6 +153,64 @@ def test_positions_match_pyswisseph_direct(client, golden):
     assert _angle_diff(p["ascendant"], ascmc[0]) < 0.01
 
 
+def test_positions_ayanamsa_conventions_and_time_scale(client, golden):
+    """Both ayanamsa conventions are explicit and self-consistent with Swiss's own tropical
+    longitudes; jd_tt is the TT swe.calc_ut evaluates at (docs/CONTRACT.md consensus categories)."""
+    r = client.post("/v1/positions", json=golden)
+    assert r.status_code == 200, r.text
+    p = r.json()
+    jd = p["jd_ut"]
+    swe.set_sid_mode(swe.SIDM_LAHIRI)
+    mean = swe.get_ayanamsa_ut(jd)
+    _rf, true_eq = swe.get_ayanamsa_ex_ut(jd, swe.FLG_SWIEPH)
+    assert abs(p["ayanamsa_mean_equinox_deg"] - mean) < 1e-9
+    assert abs(p["ayanamsa_deg"] - mean) < 1e-9
+    assert abs(p["ayanamsa_true_equinox_deg"] - true_eq) < 1e-9
+    # true - mean == nutation in longitude (Δψ), reported in arcsec
+    assert abs((true_eq - mean) * 3600.0 - p["nutation_dpsi_arcsec"]) < 1e-3, p[
+        "nutation_dpsi_arcsec"
+    ]
+    assert 0.0 < abs(p["nutation_dpsi_arcsec"]) < 20.0  # |Δψ| < 17.2" always
+    # sidereal + true-equinox ayanamsa reproduces Swiss's apparent tropical longitude
+    flags = swe.FLG_SWIEPH | swe.FLG_SPEED
+    for name, pid in (
+        ("Sun", swe.SUN),
+        ("Moon", swe.MOON),
+        ("Mars", swe.MARS),
+        ("Rahu", swe.TRUE_NODE),
+    ):
+        trop, _ = swe.calc_ut(jd, pid, flags)
+        recon = p["bodies"][name]["lon"] + p["ayanamsa_true_equinox_deg"]
+        assert _angle_diff(recon, trop[0]) < 1e-6 * ARCSEC, name
+        # ... and the MEAN convention does NOT (it is off by exactly Δψ)
+        recon_mean = p["bodies"][name]["lon"] + p["ayanamsa_deg"]
+        assert (
+            abs(
+                _angle_diff(recon_mean, trop[0]) * 3600.0
+                - abs(p["nutation_dpsi_arcsec"])
+            )
+            < 1e-3
+        ), name
+    # time scale: jd_tt = jd_ut + ΔT, ΔT within the physically plausible range
+    assert abs(p["jd_tt"] - (jd + p["delta_t_sec"] / 86400.0)) < 1e-12
+    assert 50.0 < p["delta_t_sec"] < 70.0  # 1990: TT-UT ≈ 57 s
+    et, _ut = swe.utc_to_jd(1990, 3, 15, 6, 30, 0.0, swe.GREG_CAL)
+    assert (
+        abs(p["jd_tt"] - et) * 86400.0 < 1e-3
+    )  # leap-second exact TT in the 1972..2033 era
+
+
+def test_positions_pre_1972_treats_utc_as_ut(client, golden):
+    """Swiss swe_utc_to_jd: before 1972 UTC is UT and TT = UT + ΔT(model). The service must echo
+    that convention so the cross-engine consensus can align time scales explicitly."""
+    r = client.post("/v1/positions", json=dict(golden, utc="1950-06-15T06:30:00Z"))
+    assert r.status_code == 200, r.text
+    p = r.json()
+    naive = swe.julday(1950, 6, 15, 6.5, swe.GREG_CAL)
+    assert abs(p["jd_ut"] - naive) * 86400.0 < 1e-3
+    assert 28.0 < p["delta_t_sec"] < 30.5  # 1950: ΔT ≈ 29.1 s
+
+
 def test_positions_reject_naive_and_out_of_range(client, golden):
     bad = dict(golden, utc="1990-03-15 06:30")
     r = client.post("/v1/positions", json=bad)

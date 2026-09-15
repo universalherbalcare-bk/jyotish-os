@@ -1,30 +1,35 @@
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.34s
+   Compiling jyotish-mcp v0.1.0 (/Users/brijesh/Projects/jyotish-os/services/jyotish-mcp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.18s
      Running unittests src/lib.rs (target/debug/deps/jyotish_mcp-16c2ed4967db3c79)
 
-running 21 tests
-test engine::tests::body_id_parse_roundtrip ... ok
+running 25 tests
 test engine::tests::boundary_retrograde_counts_backward ... ok
+test engine::tests::boundary_stationary_is_none ... ok
 test engine::tests::boundary_forward_moon_like ... ok
 test engine::tests::boundary_wraps_at_360 ... ok
-test engine::tests::boundary_stationary_is_none ... ok
-test engine::tests::placement_maps_rashi_nakshatra_pada ... ok
-test config::tests::loopback_urls_accepted ... ok
-test cache::tests::cache_bounded_and_roundtrips ... ok
+test engine::tests::body_id_parse_roundtrip ... ok
+test engine::tests::instant_from_parts_keeps_both_scales ... ok
+test engine::tests::instant_post_1972_is_leap_second_exact ... ok
+test engine::tests::instant_pre_1972_uses_delta_t_model_not_leap_floor ... ok
 test config::tests::non_loopback_urls_rejected ... ok
+test config::tests::loopback_urls_accepted ... ok
+test engine::tests::placement_maps_rashi_nakshatra_pada ... ok
+test cache::tests::cache_bounded_and_roundtrips ... ok
 test mcp::tests::json_rpc_error_shape ... ok
-test tools::consensus::tests::tolerances_match_contract ... ok
 test mcp::tests::tool_error_wrapping_sets_is_error ... ok
-test types::tests::lat_lon_tz_validation ... ok
+test tools::consensus::tests::arcsec_is_wrap_safe ... ok
 test cache::tests::key_is_order_independent_and_kernel_bound ... ok
-test types::tests::signed_delta_wraps ... ok
-test types::tests::parses_z_and_offsets_to_utc ... ok
+test tools::consensus::tests::tolerances_match_contract ... ok
+test types::tests::lat_lon_tz_validation ... ok
 test types::tests::jd_iso_roundtrip ... ok
+test types::tests::parses_z_and_offsets_to_utc ... ok
+test types::tests::signed_delta_wraps ... ok
 test types::tests::varga_enum_matches_blueprint ... ok
 test tools::catalog::tests::catalog_excludes_placeholder_systems ... ok
 test engine::tests::pinned_sha_parser_accepts_shasum_format ... ok
 test mcp::tests::tool_definitions_cover_contract_tool_list ... ok
 
-test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
      Running unittests src/main.rs (target/debug/deps/jyotish_mcp-02aefcd0f4aafb25)
 
@@ -38,7 +43,7 @@ running 2 tests
 test mcp_lifecycle_on_golden_chart ... ok
 test panchang_transit_rectify_on_golden ... ok
 
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.62s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.59s
 
    Doc-tests jyotish_mcp
 

@@ -37,7 +37,7 @@ Boot fails closed: every worker's initializer runs `bootstrap.self_check()` (dri
 | Method/path | Input | Output |
 |---|---|---|
 | `GET /v1/health` | – | `{ok, ayanamsa:"LAHIRI", true_nodes:true, pyswisseph, ephe_files, workers, self_check{…}, golden{…}, catalog{…}}` |
-| `POST /v1/positions` | `BirthInput` | `{bodies{Sun…Ketu:{lon,speed,retro,lat,rasi,nakshatra,pada}}, ascendant, ayanamsa_deg, jd_ut, flags}` |
+| `POST /v1/positions` | `BirthInput` | `{bodies{Sun…Ketu:{lon,speed,retro,lat,rasi,nakshatra,pada}}, ascendant, ayanamsa_deg (mean equinox = swe_get_ayanamsa_ut), ayanamsa_true_equinox_deg (swe_get_ayanamsa_ex_ut FLG_SWIEPH — sidereal = tropical − this), ayanamsa_mean_equinox_deg, nutation_dpsi_arcsec, jd_ut, jd_tt (jd_ut + swe.deltat_ex), delta_t_sec, flags}` |
 | `GET /v1/catalog/dasha` | – | every module under `jhora/horoscope/dhasa/{graha,raasi,annual}` with `status`, `entry_function`, `golden_smoke` |
 | `POST /v1/dasha` | `{birth, system:"graha.vimsottari", depth:1..5}` | nested periods with UTC ISO instants, `balance_at_birth_years` (+`balance_source`) |
 | `POST /v1/panchang` | `{date:"YYYY-MM-DD", lat, lon, tz_offset_hours}` | tithi/nakshatra/yoga/karana (+ next ones in the day) with start/end UTC, sunrise/sunset/next sunrise UTC, vaara |
@@ -54,7 +54,14 @@ faults (`period_data_error`, e.g. `raasi.brahma` returns a −1-year period for 
   needs local clock time, derived as `jd_ut + tz_offset_hours/24`; all outputs are converted back
   to UTC ISO strings (`jhora_svc/timeconv.py`).
 * **Positions** are apparent geocentric sidereal Lahiri (`FLG_SWIEPH|FLG_SIDEREAL|FLG_SPEED`), the
-  Swiss default used for cross-engine consensus. PyJHora's *internal* techniques (dasha seeds,
+  Swiss default used for cross-engine consensus. Both ayanamsa conventions are reported: Swiss subtracts
+  the **true-equinox** value (`ayanamsa_true_equinox_deg`, verified `sidereal + it == tropical` to 2e-10″),
+  while `ayanamsa_deg` keeps the contract's `swe_get_ayanamsa_ut` (mean-equinox) meaning; they differ by
+  the nutation Δψ (`nutation_dpsi_arcsec`), cross-checked at request time (fail closed).
+* **Time scale**: `swe.utc_to_jd` treats UTC as UT before 1972-01-01 (TT = UT + ΔT model), is leap-second
+  exact from 1972 to 2033-09-16, and from 2033-09-17 (when ΔT(model) exceeds TAI−UTC+32.184 s by > 1 s)
+  reverts to `TT = UTC + ΔT(model)`. `jd_tt`/`delta_t_sec` expose what `swe.calc_ut` actually used so the
+  consensus corpus can separate ephemeris from ΔT-convention effects (docs/CONTRACT.md). PyJHora's *internal* techniques (dasha seeds,
   panchang longitudes) use PyJHora's own `PLANET_FLAGS` (geometric `FLG_TRUEPOS`, ≈20″ different);
   both flag values are echoed in responses (`flags`, `longitude_swe_flags`).
 * **Dasha** rows are PyJHora's deepest-level list `[lords, (Y,M,D,local h), duration]`, grouped into

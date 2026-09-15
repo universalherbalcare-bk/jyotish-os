@@ -53,8 +53,19 @@ class PositionsResponse(BaseModel):
     bodies: dict[str, BodyPosition]
     ascendant: float
     ascendant_rasi: str
-    ayanamsa_deg: float
+    ayanamsa_deg: float = Field(
+        description="Lahiri ayanamsa, MEAN-equinox convention (swe_get_ayanamsa_ut, no nutation)"
+    )
+    ayanamsa_true_equinox_deg: float = Field(
+        description="Lahiri ayanamsa, TRUE-equinox convention (swe_get_ayanamsa_ex_ut FLG_SWIEPH); sidereal = tropical - this"
+    )
+    ayanamsa_mean_equinox_deg: float
+    nutation_dpsi_arcsec: float
     jd_ut: float
+    jd_tt: float = Field(
+        description="jd_ut + swe.deltat_ex(jd_ut): the TT swe.calc_ut evaluates at"
+    )
+    delta_t_sec: float
     ayanamsa: Literal["LAHIRI"]
     true_nodes: Literal[True]
     flags: dict[str, Any]

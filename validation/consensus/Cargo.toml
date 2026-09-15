@@ -1,0 +1,25 @@
+[package]
+name = "consensus-corpus"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "Apache-2.0"
+description = "JYOTISH-OS differential corpus: XALEN-DE440 (via the jyotish-mcp library) vs jhora-svc (PyJHora / Swiss) over N seeded pseudo-random births"
+publish = false
+
+[[bin]]
+name = "consensus-corpus"
+path = "src/main.rs"
+
+[dependencies]
+# The engine under test, linked exactly as the server links it (kernel pin, DE440 provenance, coverage guard).
+jyotish-mcp = { path = "../../services/jyotish-mcp" }
+xalen-houses = { path = "../../vendor/xalen/crates/xalen-houses" }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+
+[profile.release]
+debug = 1

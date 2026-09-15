@@ -112,7 +112,26 @@ def positions(jd_ut: float, lat: float, lon: float, tz: float) -> dict[str, Any]
             raise ValueError(
                 f"ascendant cross-check failed: swe {asc:.6f} vs drik {drik_asc:.6f}"
             )
+    # Two ayanamsa conventions, both explicit (docs/CONTRACT.md "Consensus tolerances"):
+    #  * mean-equinox (no nutation): swe_get_ayanamsa_ut / FLG_NONUT
+    #  * true-equinox (with nutation): swe_get_ayanamsa_ex_ut(jd, FLG_SWIEPH) — this is the value
+    #    Swiss actually subtracts from the apparent tropical longitude to form the sidereal one
+    #    (verified: sidereal + ayanamsa_true == tropical to 2e-10 arcsec).
     ayan = float(swe.get_ayanamsa_ut(jd_ut))
+    _rflag, ayan_true = swe.get_ayanamsa_ex_ut(jd_ut, swe.FLG_SWIEPH)
+    ayan_true = float(ayan_true) % 360.0
+    # Nutation in longitude (Δψ) from the same ephemeris flags, for the convention cross-check.
+    ecl_nut, _rf = swe.calc_ut(jd_ut, swe.ECL_NUT, swe.FLG_SWIEPH)
+    dpsi_arcsec = float(ecl_nut[2]) * 3600.0
+    # TT actually used by swe.calc_ut for this UT instant (jd_ut + ΔT); exposes the time-scale
+    # convention of swe.utc_to_jd (pre-1972 and post-2033 it is ΔT-model based, otherwise
+    # leap-second exact) so a cross-engine comparison can separate ephemeris from ΔT effects.
+    delta_t_days = float(swe.deltat_ex(jd_ut, swe.FLG_SWIEPH))
+    if abs(((ayan_true - ayan) * 3600.0) - dpsi_arcsec) > 0.01:
+        raise ValueError(
+            "ayanamsa convention check failed: true-mean "
+            f"{(ayan_true - ayan) * 3600.0:.6f} arcsec vs nutation {dpsi_arcsec:.6f} arcsec"
+        )
     # leave the process in the state PyJHora expects
     drik.set_ayanamsa_mode(_bootstrap.AYANAMSA)
     return {
@@ -120,7 +139,12 @@ def positions(jd_ut: float, lat: float, lon: float, tz: float) -> dict[str, Any]
         "ascendant": asc,
         "ascendant_rasi": RASIS[int(asc // 30)],
         "ayanamsa_deg": ayan,
+        "ayanamsa_true_equinox_deg": ayan_true,
+        "ayanamsa_mean_equinox_deg": ayan,
+        "nutation_dpsi_arcsec": dpsi_arcsec,
         "jd_ut": jd_ut,
+        "jd_tt": jd_ut + delta_t_days,
+        "delta_t_sec": delta_t_days * 86400.0,
         "ayanamsa": "LAHIRI",
         "true_nodes": True,
         "flags": {
@@ -129,6 +153,9 @@ def positions(jd_ut: float, lat: float, lon: float, tz: float) -> dict[str, Any]
             "pyjhora_internal_flags": int(drik.PLANET_FLAGS),
             "node": "TRUE_NODE",
             "ascendant_source": "swe.houses_ex(W, sidereal) cross-checked with drik.ascendant for |lat|<60",
+            "ayanamsa_deg_convention": "mean_equinox (swe_get_ayanamsa_ut, no nutation)",
+            "ayanamsa_true_equinox_convention": "true_equinox (swe_get_ayanamsa_ex_ut FLG_SWIEPH; sidereal = tropical - this)",
+            "time_scale": "jd_ut from swe.utc_to_jd; jd_tt = jd_ut + swe.deltat_ex (what swe.calc_ut uses)",
         },
     }
 

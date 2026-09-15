@@ -160,8 +160,9 @@ impl BodyId {
     }
 
     /// Where the number physically comes from. DE440 covers the physical
-    /// bodies; the true node is XALEN's osculating-node computation (analytic),
-    /// which is why the contract gives it a looser 5″ consensus tolerance.
+    /// bodies; the true node is XALEN's osculating-node computation (analytic,
+    /// finite-difference on the analytic Moon), which is why the contract gates
+    /// it separately at 60″ (`source: analytic`).
     pub fn source(self) -> &'static str {
         match self {
             BodyId::Rahu | BodyId::Ketu => "xalen-true-node (osculating, analytic)",
@@ -185,8 +186,23 @@ impl BodyId {
     }
 }
 
+/// JD(UTC) of 1972-01-01T00:00:00Z — the first instant of leap-second UTC.
+/// Before it, "UTC" was a rubber-second scale that xalen-time explicitly does
+/// not model (`leap_seconds.rs`: a fixed TAI−UTC = 10 s floor is returned), so
+/// a civil timestamp is treated as UT1 and TT comes from the ΔT model — the
+/// same rule Swiss `swe_utc_to_jd` applies.
+pub const UTC_LEAP_SECOND_ERA_START_JD: f64 = 2441317.5;
+
 /// A fully resolved instant: UT1 (≈UTC, DUT1 not applied, |err| < 0.9 s),
-/// leap-second-exact TT, and the 1σ ΔT-model envelope at that epoch.
+/// TT, and the 1σ ΔT-model envelope at that epoch.
+///
+/// Time-scale policy (measured against Swiss in validation/consensus-summary.md):
+/// * `UTC < 1972-01-01`: UT1 = civil time, TT = UT1 + ΔT(SMH2016). The
+///   leap-second table does not apply; using it would place TT 13–44 s late
+///   for 1900–1971 (Moon 7–24″).
+/// * `UTC ≥ 1972-01-01`: TT is leap-second exact (`Epoch::from_utc`); the
+///   sigma is the ΔT model's envelope for the epoch (0 inside the table would
+///   overstate certainty about UT1, which is still ≈ UTC ± 0.9 s).
 #[derive(Debug, Clone, Copy)]
 pub struct Instant {
     pub jd_ut1: JdUT1,
@@ -198,14 +214,28 @@ pub struct Instant {
 impl Instant {
     pub fn from_utc_fields(f: &UtcFields) -> Self {
         let e = Epoch::from_utc(f.year, f.month, f.day, f.hour, f.minute, f.second, 0.0);
+        let jd_utc = e.jd_ut1.as_f64();
+        if jd_utc < UTC_LEAP_SECOND_ERA_START_JD {
+            return Self::from_jd_ut1(jd_utc);
+        }
         let tt = e.jd_tt();
-        let (_, sigma) = delta_t_with_uncertainty(
-            e.jd_ut1.as_f64(),
-            &DeltaTModel::StephensonMorrisonHohenkerk2016,
-        );
+        let (_, sigma) =
+            delta_t_with_uncertainty(jd_utc, &DeltaTModel::StephensonMorrisonHohenkerk2016);
         Self {
             jd_ut1: e.jd_ut1,
             jd_tt: tt,
+            delta_t_sigma_sec: sigma,
+        }
+    }
+
+    /// An instant with both scales supplied explicitly (differential tooling
+    /// that wants to evaluate XALEN at another engine's UT1/TT pair).
+    pub fn from_parts(jd_ut1: f64, jd_tt: f64) -> Self {
+        let (_, sigma) =
+            delta_t_with_uncertainty(jd_ut1, &DeltaTModel::StephensonMorrisonHohenkerk2016);
+        Self {
+            jd_ut1: JdUT1(jd_ut1),
+            jd_tt: JdTT(jd_tt),
             delta_t_sigma_sec: sigma,
         }
     }
@@ -413,8 +443,24 @@ impl Engine {
         Ok(())
     }
 
+    /// Lahiri ayanamsa, TRUE-equinox convention (with nutation) — the value
+    /// subtracted from apparent tropical longitudes to form sidereal ones
+    /// (Swiss `swe_get_ayanamsa_ex_ut(jd, SEFLG_SWIEPH)` equivalent).
     pub fn ayanamsa_deg(&self, at: &Instant) -> f64 {
         Ayanamsa::Lahiri.compute_deg(at.jd_tt.as_f64())
+    }
+
+    /// Nutation in longitude Δψ (IAU 2000B), degrees, at the instant's TT.
+    pub fn nutation_dpsi_deg(&self, at: &Instant) -> f64 {
+        xalen_coords::nutation_2000b(at.jd_tt.julian_centuries_from_j2000())
+            .delta_psi
+            .to_degrees()
+    }
+
+    /// Lahiri ayanamsa, MEAN-equinox convention (no nutation) — Swiss
+    /// `swe_get_ayanamsa_ut` equivalent. Equals `ayanamsa_deg − Δψ`.
+    pub fn ayanamsa_mean_equinox_deg(&self, at: &Instant) -> f64 {
+        self.ayanamsa_deg(at) - self.nutation_dpsi_deg(at)
     }
 
     /// Ayanamsa rate, degrees/day (≈ 50.29″/yr).
@@ -699,6 +745,80 @@ mod tests {
         std::fs::write(&p, "not a hash\n").unwrap();
         assert!(read_pinned_sha256(&p).is_err());
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn instant_post_1972_is_leap_second_exact() {
+        // 1990-03-15T06:30:00Z: TAI-UTC = 25 s → TT-UTC = 57.184 s (Swiss utc_to_jd agrees:
+        // jd_et 2447965.7714951853 for the golden chart).
+        let f = UtcFields {
+            year: 1990,
+            month: 3,
+            day: 15,
+            hour: 6,
+            minute: 30,
+            second: 0.0,
+        };
+        let at = Instant::from_utc_fields(&f);
+        assert!((at.jd_ut1.as_f64() - 2447965.7708333335).abs() * 86400.0 < 1e-3);
+        assert!((at.jd_tt.as_f64() - 2447965.7714951853).abs() * 86400.0 < 1e-3);
+        assert!(((at.jd_tt.as_f64() - at.jd_ut1.as_f64()) * 86400.0 - 57.184).abs() < 1e-3);
+    }
+
+    #[test]
+    fn instant_pre_1972_uses_delta_t_model_not_leap_floor() {
+        // 1950-06-15T06:30:00Z: ΔT ≈ 29.1 s. The leap-second floor would give 42.184 s,
+        // 13 s late (Moon 7″) — Swiss utc_to_jd gives jd_et 2433447.7711702073.
+        let f = UtcFields {
+            year: 1950,
+            month: 6,
+            day: 15,
+            hour: 6,
+            minute: 30,
+            second: 0.0,
+        };
+        let at = Instant::from_utc_fields(&f);
+        let tt_minus_ut = (at.jd_tt.as_f64() - at.jd_ut1.as_f64()) * 86400.0;
+        assert!(
+            (28.5..30.0).contains(&tt_minus_ut),
+            "TT-UT1 = {tt_minus_ut}"
+        );
+        assert!((at.jd_tt.as_f64() - 2433447.7711702073).abs() * 86400.0 < 0.3);
+        // 1900: ΔT is slightly negative; the floor would be +42 s.
+        let f = UtcFields {
+            year: 1900,
+            month: 6,
+            day: 15,
+            hour: 6,
+            minute: 30,
+            second: 0.0,
+        };
+        let at = Instant::from_utc_fields(&f);
+        let tt_minus_ut = (at.jd_tt.as_f64() - at.jd_ut1.as_f64()) * 86400.0;
+        assert!((-3.0..1.0).contains(&tt_minus_ut), "TT-UT1 = {tt_minus_ut}");
+        // The boundary instant itself is in the leap-second era (TAI-UTC = 10 s).
+        let f = UtcFields {
+            year: 1972,
+            month: 1,
+            day: 1,
+            hour: 0,
+            minute: 0,
+            second: 0.0,
+        };
+        let at = Instant::from_utc_fields(&f);
+        let tt_minus_ut = (at.jd_tt.as_f64() - at.jd_ut1.as_f64()) * 86400.0;
+        assert!(
+            (tt_minus_ut - 42.184).abs() < 1e-3,
+            "TT-UT1 = {tt_minus_ut}"
+        );
+    }
+
+    #[test]
+    fn instant_from_parts_keeps_both_scales() {
+        let at = Instant::from_parts(2447965.7708355812, 2447965.7714951853);
+        assert_eq!(at.jd_ut1.as_f64(), 2447965.7708355812);
+        assert_eq!(at.jd_tt.as_f64(), 2447965.7714951853);
+        assert!(at.delta_t_sigma_sec > 0.0);
     }
 
     #[test]

@@ -40,8 +40,46 @@ jobs:
         with: { dotnet-version: "10.0.x" }
       - run: cd services/vedastro-svc && dotnet build -warnaserror:CS8600,CS8602 && dotnet test && dotnet list package --vulnerable --include-transitive
   consensus:
+    # Differential corpus gate (docs/CONTRACT.md "Consensus tolerances"): XALEN-DE440 vs jhora-svc on 500
+    # seeded charts. The job is RED whenever any category exceeds its tolerance — tolerances are never
+    # loosened here; UNDER REVIEW categories are decided in docs/CONTRACT.md, not by editing this job.
     runs-on: ubuntu-latest
     needs: [jyotish-mcp, jhora-svc]
+    env:
+      CONSENSUS_N: "500"
+      CONSENSUS_SEED: "42"
     steps:
       - uses: actions/checkout@v4
-      - run: echo "differential corpus runner is wired in validation/ (Phase 4) — see validation/README.md"
+      - name: vendor present
+        run: |
+          test -d vendor/xalen || { echo "vendor/ missing — upload source archives and run scripts/vendor.sh"; exit 1; }
+          test -d vendor/pyjhora || { echo "vendor/ missing"; exit 1; }
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: astral-sh/setup-uv@v5
+      - name: kernel (pinned sha256)
+        run: |
+          mkdir -p kernels && curl -L -o kernels/de440s.bsp https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp
+          shasum -a 256 -c kernels/de440s.sha256
+      - name: jhora-svc up
+        run: |
+          cd services/jhora-svc && ./setup_env.sh
+          nohup ./run.sh > /tmp/jhora-svc.log 2>&1 &
+          for i in $(seq 1 180); do
+            sleep 1
+            curl -sf -m 3 http://127.0.0.1:7792/v1/health >/dev/null && exit 0
+          done
+          echo "jhora-svc did not become healthy"; cat /tmp/jhora-svc.log; exit 1
+      - name: build corpus runner
+        run: cd validation/consensus && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test --release && cargo build --release
+      - name: run corpus (fails on any category over tolerance)
+        run: |
+          validation/consensus/target/release/consensus-corpus --n "$CONSENSUS_N" --seed "$CONSENSUS_SEED" \
+            --csv validation/ci-consensus-corpus.csv --summary validation/ci-consensus-summary.md | tail -n 60
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: consensus-corpus
+          path: |
+            validation/ci-consensus-corpus.csv
+            validation/ci-consensus-summary.md
+            /tmp/jhora-svc.log
