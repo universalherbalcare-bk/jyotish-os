@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Library.Trimmed/Library.Trimmed.csproj" />
+  <Project Path="VedAstroSvc/VedAstroSvc.csproj" />
+  <Project Path="VedAstroSvc.Tests/VedAstroSvc.Tests.csproj" />
+</Solution>

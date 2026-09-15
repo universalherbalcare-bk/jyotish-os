@@ -20,7 +20,6 @@ namespace VedAstro.Library
         private static List<Event> EventList { get; set; } = new List<Event>();
 
         //we use direct storage URL for fast access & solid
-        private const string AzureStorage = "vedastrowebsitestorage.z5.web.core.windows.net";
 
 
 
