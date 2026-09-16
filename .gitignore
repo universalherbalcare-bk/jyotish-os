@@ -1,6 +1,21 @@
-# vendored upstream sources are restored by scripts/vendor.sh from the source zips (see vendor/SOURCE-ARCHIVES.sha256)
-vendor/
+# vendored upstream sources are restored by scripts/vendor.sh (zips: vendor/SOURCE-ARCHIVES.sha256;
+# CI: --from-git at the commits in vendor/UPSTREAM-PINS.txt). Only the three pin/manifest files are tracked.
+vendor/*
+!vendor/SOURCE-ARCHIVES.sha256
+!vendor/UPSTREAM-PINS.txt
+!vendor/xalen.Cargo.lock
 kernels/*.bsp
+# append-only logs (jyotish-mcp audit, vedastro-svc rule-promotions) and local databases never leave the host
+*.jsonl
+!services/ironclaw-ext/logs/*.audit.jsonl
+!services/ironclaw-ext/logs/*.stub.jsonl
+data/*.db
+**/data/*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.key
+*.pem
 target/
 **/target/
 .venv/

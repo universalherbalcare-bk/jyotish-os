@@ -14,14 +14,20 @@ public sealed class RuleValidator
     private readonly PredicateRegistry _predicates;
     private readonly DatasetStore _store;
     private readonly Evidence _evidence;
+    private readonly PromotionLog _promotions;
 
-    public RuleValidator(RuleCatalog catalog, PredicateRegistry predicates, DatasetStore store, Evidence evidence)
+    public const string PromotionScope = "natal_confidence_reporting_only; never changes rule_status, the XML, or muhurta.find eligibility (quarantined rules stay excluded)";
+
+    public RuleValidator(RuleCatalog catalog, PredicateRegistry predicates, DatasetStore store, Evidence evidence, PromotionLog promotions)
     {
         _catalog = catalog;
         _predicates = predicates;
         _store = store;
         _evidence = evidence;
+        _promotions = promotions;
     }
+
+    public PromotionLog Promotions => _promotions;
 
     public string? Validate(RuleValidateRequest req, out RuleEntry? rule)
     {
@@ -79,25 +85,29 @@ public sealed class RuleValidator
             CacheManager.ResetAll();
         }
 
-        var hitRate = fired == 0 ? 0 : hits / (double)fired;
-        var baseRate = n == 0 ? 0 : outcomeTrue / (double)n;
-        var (lo, hi) = Wilson95(hits, fired);
-        string verdict, reason;
-        if (fired < PromoteMinFired)
-        {
-            verdict = "KEEP_UNPROVED";
-            reason = $"rule fired on {fired} rows; PROMOTE requires >= {PromoteMinFired} firing rows and ci95.lo > base_rate";
-        }
-        else if (lo > baseRate)
-        {
-            verdict = "PROMOTE";
-            reason = $"ci95.lo {lo:F4} > base_rate {baseRate:F4} with {fired} firing rows";
-        }
-        else
-        {
-            verdict = "KEEP_UNPROVED";
-            reason = $"ci95.lo {lo:F4} <= base_rate {baseRate:F4}";
-        }
+        var (verdict, reason, hitRate, baseRate, lo, hi) = Decide(n, fired, hits, outcomeTrue);
+        var datasetSha = req.Dataset == "person" ? _store.PersonsSha256 : _store.MarriageSha256;
+
+        // Blueprint §6: every verdict is a row in the hash-chained promotion log. No row → no verdict (fail closed):
+        // PromotionLogException propagates to the HTTP layer as 503 promotion_log_unavailable.
+        var entry = _promotions.Append(new PromotionEntry(
+            Ts: DateTimeOffset.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fffffff'Z'", System.Globalization.CultureInfo.InvariantCulture),
+            RuleId: rule.Id,
+            Dataset: req.Dataset,
+            DatasetSha256: datasetSha,
+            OutcomeColumn: req.OutcomeColumn,
+            N: n,
+            Fired: fired,
+            Hits: hits,
+            HitRate: Math.Round(hitRate, 6),
+            BaseRate: Math.Round(baseRate, 6),
+            Ci95: new[] { Math.Round(lo, 6), Math.Round(hi, 6) },
+            Verdict: verdict,
+            PrevHash: PromotionLog.GenesisHash));
+
+        // Promotion state is read back from the file, never from the value we just computed.
+        var promotionStatus = _promotions.StatusOf(rule.Id);
+        var validationStatus = ValidationStatus(promotionStatus, rule.Status);
 
         return new RuleValidateResponse(
             RuleId: rule.Id,
@@ -113,10 +123,50 @@ public sealed class RuleValidator
             Ci95: new Ci95(Math.Round(lo, 6), Math.Round(hi, 6)),
             Verdict: verdict,
             VerdictReason: reason,
+            ValidationStatus: validationStatus,
+            PromotionStatus: promotionStatus,
+            PromotionScope: PromotionScope,
+            PromotionEntryHash: entry.EntryHash!,
             RowErrors: errors,
             ElapsedMs: sw.ElapsedMilliseconds,
-            Evidence: _evidence with { DatasetSha256 = req.Dataset == "person" ? _store.PersonsSha256 : _store.MarriageSha256 });
+            Evidence: _evidence with { DatasetSha256 = datasetSha });
     }
+
+    /// <summary>
+    /// The promotion rule (blueprint §4 VedAstro): PROMOTE only if <c>fired ≥ 200</c> and the Wilson 95% lower bound on
+    /// hits/fired exceeds the base rate over the same rows; otherwise KEEP_UNPROVED. Pure function so the gate is testable
+    /// without a 200-row ephemeris run.
+    /// </summary>
+    public static (string Verdict, string Reason, double HitRate, double BaseRate, double Lo, double Hi) Decide(int n, int fired, int hits, int outcomeTrue)
+    {
+        if (n < 0 || fired < 0 || hits < 0 || outcomeTrue < 0 || fired > n || hits > fired || outcomeTrue > n)
+        {
+            throw new ArgumentOutOfRangeException(nameof(n), $"inconsistent counts n={n} fired={fired} hits={hits} outcome_true={outcomeTrue}");
+        }
+        var hitRate = fired == 0 ? 0 : hits / (double)fired;
+        var baseRate = n == 0 ? 0 : outcomeTrue / (double)n;
+        var (lo, hi) = Wilson95(hits, fired);
+        if (fired < PromoteMinFired)
+        {
+            return ("KEEP_UNPROVED", $"rule fired on {fired} rows; PROMOTE requires >= {PromoteMinFired} firing rows and ci95.lo > base_rate", hitRate, baseRate, lo, hi);
+        }
+        if (lo > baseRate)
+        {
+            return ("PROMOTE", $"ci95.lo {lo:F4} > base_rate {baseRate:F4} with {fired} firing rows", hitRate, baseRate, lo, hi);
+        }
+        return ("KEEP_UNPROVED", $"ci95.lo {lo:F4} <= base_rate {baseRate:F4}", hitRate, baseRate, lo, hi);
+    }
+
+    /// <summary>
+    /// <c>validation_status</c> as the blueprint (§4 VedAstro, "every prediction carries validation_status") wants it:
+    /// PROMOTED, PROMOTED_STILL_QUARANTINED (log says PROMOTE but the rule still lives only in the not-proved XML, so it
+    /// stays out of muhurta.find and keeps rule_status quarantined until a human moves it), or NOT_PROMOTED.
+    /// </summary>
+    public static string ValidationStatus(string promotionStatus, RuleStatus ruleStatus) => promotionStatus switch
+    {
+        PromotionLog.PromotedStatus => ruleStatus == RuleStatus.Quarantined ? "PROMOTED_STILL_QUARANTINED" : "PROMOTED",
+        _ => "NOT_PROMOTED",
+    };
 
     /// <summary>Wilson score interval, z = 1.959964 (95%). Returns (0,0) when n = 0.</summary>
     public static (double Lo, double Hi) Wilson95(int successes, int n)

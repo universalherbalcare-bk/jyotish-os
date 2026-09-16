@@ -6,10 +6,10 @@ Phase 3 of JYOTISH-OS. Binding contract: `docs/CONTRACT.md`; design: `docs/JYOTI
 services/vedastro-svc/
 ├── Library.Trimmed/      VedAstro.Library fork (MIT) — see "What is trimmed" below
 ├── VedAstroSvc/          ASP.NET Core minimal API, net10.0, binds http://127.0.0.1:7793
-├── VedAstroSvc.Tests/    xUnit (15 tests: catalog counts, quarantine, muhurta, validate, HTTP)
+├── VedAstroSvc.Tests/    xUnit (20 tests: catalog counts, quarantine, muhurta, validate, promotion log, HTTP)
 ├── vedastro-svc.slnx
 ├── run.sh                ./run.sh | ./run.sh --daemon | ./run.sh --stop
-└── data/                 (git-ignored) vedastro-datasets.sqlite, pid, log
+└── data/                 (git-ignored) vedastro-datasets.sqlite, rule-promotions.jsonl (append-only), pid, log
 ```
 
 ## Run
@@ -22,7 +22,8 @@ curl -s localhost:7793/v1/health
 `run.sh` exports `DOTNET_SYSTEM_NET_DISABLEIPV6=1` because on this host NuGet restore hangs in
 `SYN_SENT` on IPv6 to api.nuget.org (curl silently falls back to IPv4; .NET does not). Env knobs:
 `VEDASTRO_SVC_URL` (bind; default `http://127.0.0.1:7793`), `VEDASTRO_XML_DIR`, `VEDASTRO_DATASET_DIR`
-(default `<repo>/vendor/vedastro/HuggingFace`), `VEDASTRO_DATA_DIR` (SQLite cache, default `./data`).
+(default `<repo>/vendor/vedastro/HuggingFace`), `VEDASTRO_DATA_DIR` (SQLite cache, default `./data`),
+`VEDASTRO_PROMOTION_LOG` (promotion log path, default `<VEDASTRO_DATA_DIR>/rule-promotions.jsonl`).
 
 ## Endpoints (exactly CONTRACT.md)
 
@@ -31,7 +32,9 @@ curl -s localhost:7793/v1/health
 | `GET /v1/health` | — | `ok, rules_proved (1508), rules_quarantined (128), dataset_rows (15807)` + per-set counts, predicate coverage, XML/CSV SHA-256, ayanamsa=LAHIRI, true_nodes=true |
 | `GET /v1/rules?set=event\|horoscope&status=proved\|quarantined` | — | `{count, rules:[{id,name,description,tags,set,status,nature,has_predicate}]}` |
 | `POST /v1/muhurta/find` | `{activity, from_utc, to_utc, lat, lon, tz_offset_hours, step_minutes=60, include_quarantined=false, birth?}` | ranked `windows[]` each with `passed_rules[]`, `vetoed_by[]`, `fired_neutral[]` (+ `_quarantined` variants), `rules_unevaluable[]`, `rule_errors{}`, `complete`, `evidence` |
-| `POST /v1/rule/validate` | `{rule_id, dataset: marriage\|person, outcome_column, max_rows=300, offset=0}` | `n, fired, hits, hit_rate, base_rate, base_rate_full_dataset, ci95{lo,hi}, verdict PROMOTE\|KEEP_UNPROVED, verdict_reason, row_errors, evidence` |
+| `POST /v1/rule/validate` | `{rule_id, dataset: marriage\|person, outcome_column, max_rows=300, offset=0}` | `n, fired, hits, hit_rate, base_rate, base_rate_full_dataset, ci95{lo,hi}, verdict PROMOTE\|KEEP_UNPROVED, verdict_reason, validation_status, promotion_status, promotion_scope, promotion_entry_hash, row_errors, evidence` — and appends one row to the promotion log |
+| `GET /v1/rule/promotions?rule_id=` | — | `{count, path, entries[]}` — the hash chain, oldest first |
+| `GET /v1/rule/promotions/verify` | — | `{ok, entries, first_bad_index, head_hash, path, detail}` — re-hashes the whole chain from disk |
 
 Every error is `400 {error, detail}`; dataset failures are `503 dataset_unavailable`. Nothing returns prose.
 
@@ -68,6 +71,24 @@ Every error is `400 {error, detail}`; dataset failures are `503 dataset_unavaila
   `ci95` = Wilson score interval on `hits/fired`. **PROMOTE only if `fired ≥ 200` and `ci95.lo > base_rate`**,
   else `KEEP_UNPROVED`. The verdict is evidence for a human; the service never rewrites the XML.
 * ~300 rows ≈ 0.4 s (Moshier ephemeris, per-request cache). Max `max_rows` = 15807.
+
+### Promotion log (blueprint §6 "data integrity of rule promotions")
+* Every `rule.validate` verdict is appended as one JSON line to `data/rule-promotions.jsonl`
+  (`VEDASTRO_PROMOTION_LOG`): `{ts, rule_id, dataset, dataset_sha256, outcome_column, n, fired, hits, hit_rate,
+  base_rate, ci95:[lo,hi], verdict, prev_hash, entry_hash}` with
+  `entry_hash = sha256(prev_hash + canonical JSON of the row without entry_hash)` (canonical = System.Text.Json
+  compact, properties in that order; genesis `prev_hash` = 64 zeros). The file is only ever opened with
+  `FileMode.Append` and every write is fsync'd; there is no route or method that rewrites, truncates or deletes it
+  (`DELETE/PUT/POST /v1/rule/promotions` → 405). No row → no verdict: an unwritable or already-broken chain makes
+  `rule.validate` return `503 promotion_log_unavailable`, and a broken chain refuses boot.
+* `promotion_status` (`PROMOTED` iff the newest row for that rule says `PROMOTE`; `NOT_PROMOTED`; `NEVER_VALIDATED`)
+  is derived from the file on every `GET /v1/rules` / `rule.validate` — never from memory.
+* `validation_status` on `rule.validate`: `PROMOTED`, `PROMOTED_STILL_QUARANTINED` (log says PROMOTE but the rule
+  still lives only in the not-proved XML — it stays `status: quarantined`, excluded from `muhurta.find`, until a
+  human moves it), or `NOT_PROMOTED`. Promotion affects natal confidence reporting only (`promotion_scope`).
+* Editing or deleting an interior row breaks the chain (`verify` → `ok:false, first_bad_index`). Truncating the
+  tail is only detectable against an external anchor: record `head_hash` (from `verify` or `/v1/health`) in the
+  completion ledger / jyotish-mcp audit log when a promotion decision is taken.
 
 ## What is trimmed, and why
 

@@ -36,7 +36,8 @@ BirthInput above (1990-03-15 12:00 IST, New Delhi). Expected: Moon sidereal long
 - `GET  /v1/health` → `{ "ok": true, "rules_proved": n, "rules_quarantined": n, "dataset_rows": n }`
 - `GET  /v1/rules?set=event|horoscope&status=proved|quarantined`
 - `POST /v1/muhurta/find` `{ "activity": "<rule Name>", "from_utc", "to_utc", "lat", "lon", "tz_offset_hours", "step_minutes": 60 }` → ranked windows with `passed_rules[]`, `vetoed_by[]`
-- `POST /v1/rule/validate` `{ "rule_id", "dataset": "marriage|person", "outcome_column" }` → `{ n, hits, hit_rate, base_rate, ci95:[lo,hi], verdict: "PROMOTE"|"KEEP_UNPROVED" }`
+- `POST /v1/rule/validate` `{ "rule_id", "dataset": "marriage|person", "outcome_column" }` → `{ n, hits, hit_rate, base_rate, ci95:[lo,hi], verdict: "PROMOTE"|"KEEP_UNPROVED", validation_status: "PROMOTED"|"PROMOTED_STILL_QUARANTINED"|"NOT_PROMOTED", promotion_status, promotion_entry_hash }`. Every call appends one hash-chained row to the append-only promotion log (blueprint §6); no row → no verdict (503 `promotion_log_unavailable`).
+- `GET  /v1/rule/promotions?rule_id=` → `{ count, path, entries:[{ts, rule_id, dataset, dataset_sha256, outcome_column, n, fired, hits, hit_rate, base_rate, ci95:[lo,hi], verdict, prev_hash, entry_hash}] }`; `GET /v1/rule/promotions/verify` → `{ ok, entries, first_bad_index, head_hash }`. `GET /v1/rules` rows carry `promotion_status: PROMOTED|NOT_PROMOTED|NEVER_VALIDATED` derived from the log on every call. Promotion never changes `status` (proved/quarantined) or muhurta eligibility.
 
 ## jyotish-mcp tools (MCP `tools/list`)
 chart.compute · panchang.day · dasha.timeline · transit.window · muhurta.find · match.kuta · rectify.birth_time · rule.validate · engine.consensus · catalog.list

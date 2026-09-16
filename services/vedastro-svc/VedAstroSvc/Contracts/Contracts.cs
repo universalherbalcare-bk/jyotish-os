@@ -82,6 +82,10 @@ public sealed record RuleValidateResponse(
     [property: JsonPropertyName("ci95")] Ci95 Ci95,
     [property: JsonPropertyName("verdict")] string Verdict,
     [property: JsonPropertyName("verdict_reason")] string VerdictReason,
+    [property: JsonPropertyName("validation_status")] string ValidationStatus,
+    [property: JsonPropertyName("promotion_status")] string PromotionStatus,
+    [property: JsonPropertyName("promotion_scope")] string PromotionScope,
+    [property: JsonPropertyName("promotion_entry_hash")] string PromotionEntryHash,
     [property: JsonPropertyName("row_errors")] int RowErrors,
     [property: JsonPropertyName("elapsed_ms")] long ElapsedMs,
     [property: JsonPropertyName("evidence")] Evidence Evidence);

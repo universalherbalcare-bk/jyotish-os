@@ -36,14 +36,16 @@ var evidence = new Evidence(
     TrueNodes: true,
     PositionsRole: "rule-predicates-only; never surfaced as chart positions (blueprint §4 VedAstro)");
 var store = new DatasetStore(paths.DatasetDir, paths.DataDir);
+var promotions = new PromotionLog(paths.PromotionLogPath);
 var finder = new MuhurtaFinder(catalog, predicates, evidence);
-var validator = new RuleValidator(catalog, predicates, store, evidence);
+var validator = new RuleValidator(catalog, predicates, store, evidence, promotions);
 
 builder.Services.AddSingleton(paths);
 builder.Services.AddSingleton(predicates);
 builder.Services.AddSingleton(catalog);
 builder.Services.AddSingleton(evidence);
 builder.Services.AddSingleton(store);
+builder.Services.AddSingleton(promotions);
 builder.Services.AddSingleton(finder);
 builder.Services.AddSingleton(validator);
 
@@ -63,16 +65,26 @@ var log = app.Logger;
     log.LogInformation("golden self-test ok: Moon sidereal {Moon:F4} deg (Swati)", moon);
 }
 log.LogInformation("rules: proved={Proved} quarantined={Quarantined} xml={Xml}", catalog.CountProved, catalog.CountQuarantined, paths.XmlDir);
+{
+    // Boot guard: a tampered promotion log is a refused start, not a warning (blueprint §6 fail-closed).
+    var chain = promotions.Verify();
+    if (!chain.Ok)
+    {
+        throw new InvalidOperationException($"promotion log {chain.Path} is broken at index {chain.FirstBadIndex}: {chain.Detail}");
+    }
+    log.LogInformation("promotion log ok: {Entries} entries head={Head} path={Path}", chain.Entries, chain.HeadHash, chain.Path);
+}
 
 static IResult Bad(string detail) => Results.BadRequest(new ErrorResponse("bad_request", detail));
 
-app.MapGet("/v1/health", (RuleCatalog cat, DatasetStore ds, PredicateRegistry preds, ServicePaths p) =>
+app.MapGet("/v1/health", (RuleCatalog cat, DatasetStore ds, PredicateRegistry preds, ServicePaths p, PromotionLog plog) =>
 {
     string? datasetError = null;
     try { ds.EnsureLoaded(); } catch (Exception ex) { datasetError = ex.GetType().Name + ": " + ex.Message; }
+    var chain = plog.Verify();
     return Results.Ok(new
     {
-        ok = datasetError is null,
+        ok = datasetError is null && chain.Ok,
         rules_proved = cat.CountProved,
         rules_quarantined = cat.CountQuarantined,
         dataset_rows = ds.PersonRows,
@@ -97,6 +109,7 @@ app.MapGet("/v1/health", (RuleCatalog cat, DatasetStore ds, PredicateRegistry pr
             sqlite = ds.DbPath,
             error = datasetError,
         },
+        promotion_log = new { path = chain.Path, entries = chain.Entries, chain_ok = chain.Ok, first_bad_index = chain.FirstBadIndex, head_hash = chain.HeadHash },
         ayanamsa = "LAHIRI",
         ayanamsa_swiss_mode = Calculate.Ayanamsa,
         true_nodes = !Calculate.UseMeanRahuKetu,
@@ -106,7 +119,7 @@ app.MapGet("/v1/health", (RuleCatalog cat, DatasetStore ds, PredicateRegistry pr
     });
 });
 
-app.MapGet("/v1/rules", (RuleCatalog cat, string? set, string? status) =>
+app.MapGet("/v1/rules", (RuleCatalog cat, PromotionLog plog, string? set, string? status) =>
 {
     RuleSet? rs = null; RuleStatus? st = null;
     if (!string.IsNullOrEmpty(set))
@@ -117,6 +130,8 @@ app.MapGet("/v1/rules", (RuleCatalog cat, string? set, string? status) =>
     {
         if (status == "proved") { st = RuleStatus.Proved; } else if (status == "quarantined") { st = RuleStatus.Quarantined; } else { return Bad("status must be 'proved' or 'quarantined'"); }
     }
+    // promotion_status is derived from the on-disk log on every call — never cached in memory.
+    var promoted = plog.LatestStatusByRule();
     var rules = cat.Query(rs, st).Select(r => new
     {
         id = r.Id,
@@ -127,6 +142,7 @@ app.MapGet("/v1/rules", (RuleCatalog cat, string? set, string? status) =>
         status = r.Status == RuleStatus.Proved ? "proved" : "quarantined",
         nature = r.Nature,
         has_predicate = r.HasPredicate,
+        promotion_status = promoted.TryGetValue(r.Id, out var ps) ? ps : PromotionLog.NeverValidatedStatus,
     }).ToList();
     return Results.Ok(new { count = rules.Count, rules });
 });
@@ -155,14 +171,25 @@ app.MapPost("/v1/rule/validate", (RuleValidateRequest? req, RuleValidator v, Dat
         return Results.Ok(v.Run(req));
     }
     catch (ArgumentException ex) { return Bad(ex.Message); }
+    catch (PromotionLogException ex) { return Results.Json(new ErrorResponse("promotion_log_unavailable", ex.Message), statusCode: 503); }
 });
+
+// Read-only views of the promotion log. There is no route that writes, truncates or deletes it.
+app.MapGet("/v1/rule/promotions", (PromotionLog plog, string? rule_id) =>
+{
+    if (rule_id is not null && (rule_id.Length == 0 || rule_id.Length > 128)) { return Bad("rule_id must be 1-128 chars"); }
+    var entries = plog.ReadAll(rule_id);
+    return Results.Ok(new { count = entries.Count, path = plog.Path, rule_id, entries });
+});
+
+app.MapGet("/v1/rule/promotions/verify", (PromotionLog plog) => Results.Ok(plog.Verify()));
 
 app.Run();
 
 public partial class Program { }
 
-/// <summary>Resolves where the rule XML, the HuggingFace CSVs and the SQLite cache live.</summary>
-public sealed record ServicePaths(string XmlDir, string DatasetDir, string DataDir)
+/// <summary>Resolves where the rule XML, the HuggingFace CSVs, the SQLite cache and the promotion log live.</summary>
+public sealed record ServicePaths(string XmlDir, string DatasetDir, string DataDir, string PromotionLogPath)
 {
     public static ServicePaths Resolve()
     {
@@ -174,8 +201,10 @@ public sealed record ServicePaths(string XmlDir, string DatasetDir, string DataD
         var svcRoot = FindUp(baseDir, d => File.Exists(Path.Combine(d, "run.sh")) && Directory.Exists(Path.Combine(d, "VedAstroSvc")));
         var data = Environment.GetEnvironmentVariable("VEDASTRO_DATA_DIR")
                    ?? (svcRoot is null ? Path.Combine(baseDir, "data") : Path.Combine(svcRoot, "data"));
+        var promo = Environment.GetEnvironmentVariable("VEDASTRO_PROMOTION_LOG");
+        if (string.IsNullOrWhiteSpace(promo)) { promo = Path.Combine(data, "rule-promotions.jsonl"); }
         if (!Directory.Exists(xml)) { throw new DirectoryNotFoundException($"rule XML directory not found: {xml} (set VEDASTRO_XML_DIR)"); }
-        return new ServicePaths(Path.GetFullPath(xml), Path.GetFullPath(dataset), Path.GetFullPath(data));
+        return new ServicePaths(Path.GetFullPath(xml), Path.GetFullPath(dataset), Path.GetFullPath(data), Path.GetFullPath(promo));
     }
 
     private static string? FindUp(string start, Func<string, bool> pred)

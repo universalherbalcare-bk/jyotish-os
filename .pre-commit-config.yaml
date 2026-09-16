@@ -1,5 +1,5 @@
 # Local gates — every hook here also runs in CI (.github/workflows/ci.yml). vendor/ is upstream code and is excluded.
-exclude: ^(vendor/|kernels/|validation/.*\.txt$)
+exclude: ^(kernels/|validation/.*\.txt$)
 repos:
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.1
@@ -36,3 +36,4 @@ repos:
         entry: bash -c 'echo "vendor/ is upstream — patch at import time in services/, never here"; exit 1'
         language: system
         files: ^vendor/
+        exclude: ^vendor/(UPSTREAM-PINS\.txt|xalen\.Cargo\.lock|SOURCE-ARCHIVES\.sha256)$

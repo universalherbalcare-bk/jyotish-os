@@ -1,0 +1,39 @@
+# vendor/UPSTREAM-PINS.txt — upstream git commits that reproduce vendor/ byte-for-byte.
+# Consumed by scripts/vendor.sh --from-git (CI) — KEY=VALUE lines; '#' lines are comments.
+# Pinned 2026-09-17 by cloning each upstream and running `diff -rq` between the checkout and the vendored
+# tree (which was restored from the source zips listed in vendor/SOURCE-ARCHIVES.sha256). All three matched
+# the default-branch HEAD of that day exactly (0 differing paths) — no walk-back was needed.
+#
+# ---- XALEN ephemeris (whole repository)
+XALEN_REPO=https://github.com/vedika-io/xalen-ephemeris.git
+XALEN_COMMIT=cc6edbec1f748ebdc4950ae6198f575c5ada73fa
+XALEN_PATHS=/
+# diff -rq -x .git -x target -x node_modules <clone> vendor/xalen -> 0 differences apart from vendor/xalen/Cargo.lock,
+# which upstream .gitignore's (line 2) and which cargo generated locally. That lock is what every local test run and the
+# consensus corpus used, so it is pinned as vendor/xalen.Cargo.lock and installed by --from-git for a reproducible build.
+XALEN_MATCH=exact (main HEAD 2026-07-03T03:03:31+05:30 "feat(cloud): add xalen-cloud local-first interpretation shim (#39)")
+XALEN_SENTINEL=b8593e6a79011d0bcb1ab8b4ba3c9f2e4ae4e1305e124ef531d2472aad865dae  Cargo.toml
+XALEN_SENTINEL=c915c9e810b2a55dd4a0ee14bf39c9370829353112caa455ce211fc207d9cd7b  crates/xalen-vedic/src/lib.rs
+#
+# ---- PyJHora (subset: src/, pyproject.toml, requirements.txt, LICENSE, README.md — same subset the zip restore takes)
+PYJHORA_REPO=https://github.com/naturalstupid/pyjhora.git
+PYJHORA_COMMIT=48e57d29b47a3143519910a24866758116467485
+PYJHORA_PATHS=/src/ /pyproject.toml /requirements.txt /LICENSE /README.md
+# diff -rq -x __pycache__ -x *.egg-info -x .venv on src/ -> 0 differences; the 4 top-level files cmp identical.
+# The 106 Swiss ephemeris files (104 MB) live in-repo at src/jhora/data/ephe (not LFS) and restore with the checkout.
+PYJHORA_MATCH=exact (main HEAD 2026-08-06T17:52:43-05:00 "V4.9.3")
+PYJHORA_EPHE_DIR=src/jhora/data/ephe
+PYJHORA_EPHE_COUNT=106
+PYJHORA_SENTINEL=85b727fb0f4ce04527beee008322ea54608d48dcc0482e649e82b5cb6e0c9b8d  pyproject.toml
+PYJHORA_SENTINEL=0b7e416e3c1be9e6a0dd1d711dae7f7685793a0e7df13f76363a493dc27b6ea1  src/jhora/data/ephe/sepl_18.se1
+PYJHORA_SENTINEL=f9dc88c31499b161aafdd4ffe1664da259c064f16459a6fe66856496532954d5  src/jhora/panchanga/drik.py
+#
+# ---- VedAstro (subset: Library/, LibraryTests/, HuggingFace/, LICENSE.md — same subset the zip restore takes)
+VEDASTRO_REPO=https://github.com/VedAstro/VedAstro.git
+VEDASTRO_COMMIT=fcb4dede360372545eb244c53e9a80ec3510e194
+VEDASTRO_PATHS=/Library/ /LibraryTests/ /HuggingFace/ /LICENSE.md
+# diff -rq -x bin -x obj on each of the three directories -> 0 differences; LICENSE.md cmp identical.
+VEDASTRO_MATCH=exact (master HEAD 2026-08-13T23:17:19+08:00 "docs: fix README spelling and grammar")
+VEDASTRO_SENTINEL=38c16395a7fc6edca89fbc1e0be807e0e39960a4051e139c40b86e99859c154d  HuggingFace/PersonList-15k.csv
+VEDASTRO_SENTINEL=105ee6d0caeb0cb02057193cf68d74cef756e4d111dfdfd82c62db5a0c76b187  Library/Logic/Calculate/Core.cs
+VEDASTRO_SENTINEL=252f617919b72b825135fb43826f356b0b804b3124e01750187309125e9bd107  LICENSE.md
