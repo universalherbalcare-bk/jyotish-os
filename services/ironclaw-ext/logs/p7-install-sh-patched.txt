@@ -1,0 +1,32 @@
+[install] ironclaw 1.4.0 (/Users/brijesh/.local/bin/ironclaw-jyotish)
+[install] IRONCLAW_EGRESS_ALLOW_LOOPBACK=1 (patched binary: loopback 127.0.0.0/8 and ::1 only; other private ranges stay denied)
+[install] reborn_home=/Users/brijesh/.ironclaw/reborn profile=local-dev
+[install] already onboarded
+[install] provider already configured: anthropic / claude-sonnet-5 (left as is; change with 'ironclaw models set-provider')
+[install] persona already current
+[install] removed previous install
+[install] package copied to /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+[2m2026-09-16T19:02:21.617808Z[0m [34mDEBUG[0m [2mironclaw::runtime[0m[2m:[0m loaded boot config TOML [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/config.toml [3mapi_version[0m[2m=[0mSome("ironclaw.runtime/v1")
+[2m2026-09-16T19:02:21.617873Z[0m [34mDEBUG[0m [2mironclaw::reborn::cli::google_oauth[0m[2m:[0m Google OAuth backend disabled [3mstate[0m[2m=[0mUnconfigured
+[2m2026-09-16T19:02:21.618941Z[0m [34mDEBUG[0m [2mironclaw_composition::factory[0m[2m:[0m building Reborn composition facades [3mprofile[0m[2m=[0mlocal-dev [3mowner_id[0m[2m=[0mreborn-cli
+[2m2026-09-16T19:02:21.636508Z[0m [34mDEBUG[0m [2mironclaw_resources::filesystem_governor[0m[2m:[0m resource governor durable authority loaded [3melapsed_ms[0m[2m=[0m0
+[2m2026-09-16T19:02:21.657170Z[0m [34mDEBUG[0m [2mironclaw_composition::factory::auth_engine_assembly[0m[2m:[0m no OAuth callback base configured; auth engine not composed
+[2m2026-09-16T19:02:21.667826Z[0m [34mDEBUG[0m [2mironclaw_operator::llm_admin::nearai_mcp[0m[2m:[0m NEAR AI MCP bootstrap is not configured
+[2m2026-09-16T19:02:21.715974Z[0m [34mDEBUG[0m [2mironclaw::reborn::runtime[0m[2m:[0m reborn tool disclosure decorator wired [3mmode[0m[2m=[0mNamespaces
+[2m2026-09-16T19:02:21.715990Z[0m [34mDEBUG[0m [2mironclaw_turn_runner::runtime[0m[2m:[0m using standaloneelopment no-op instruction safety context; configure a real instruction safety scanner before product-live use
+[2m2026-09-16T19:02:21.718351Z[0m [34mDEBUG[0m [2mironclaw::reborn::channel_host[0m[2m:[0m active channel declares no verifiable ingress; nothing registered [3mextension_id[0m[2m=[0mweb-app
+[2m2026-09-16T19:02:21.718436Z[0m [34mDEBUG[0m [2mironclaw::reborn::channel_host[0m[2m:[0m active channel declares no verifiable ingress; nothing registered [3mextension_id[0m[2m=[0mweb-app
+[2m2026-09-16T19:02:21.724526Z[0m [34mDEBUG[0m [2mironclaw_extension_host::hosted_mcp_preparation[0m[2m:[0m hosted MCP opportunistic discovery failed; continuing with the static catalog [3mextension_id[0m[2m=[0m"jyotish" [3merror[0m[2m=[0minvalid binding request: hosted MCP discovery endpoint is invalid
+[2m2026-09-16T19:02:21.725901Z[0m [34mDEBUG[0m [2mironclaw_extension_host::hosted_mcp_preparation[0m[2m:[0m hosted MCP opportunistic discovery failed; continuing with the static catalog [3mextension_id[0m[2m=[0m"jyotish" [3merror[0m[2m=[0minvalid binding request: hosted MCP discovery endpoint is invalid
+[2m2026-09-16T19:02:21.726343Z[0m [34mDEBUG[0m [2mironclaw_composition::observability::budget_events[0m[2m:[0m budget event projection cancelled — exiting
+{"message":"Extension activation succeeded and its tools are now available. No additional authorization or configuration is needed, including for write-capable tools, unless a later tool call reports auth_required. Do not ask the user for a token, OAuth, authorization, or configuration after activated=true. These tools are now callable by exact name — invoke one directly with tool_call(name=\"<tool>\", arguments={ ... }), or tool_describe(name=\"<tool>\") first if you need its full schema. Do NOT call tool_search for these; you already have their names: jyotish.chart.compute, jyotish.panchang.day, jyotish.dasha.timeline, jyotish.transit.window, jyotish.muhurta.find, jyotish.match.kuta, jyotish.rectify.birth_time, jyotish.rule.validate, jyotish.engine.consensus, jyotish.catalog.list.","package_ref":{"id":"jyotish","kind":"extension"},"payload":{"installed":true,"kind":"extension_install","next_step":"Activation completed; model-visible extension tools are ready.","visible_capability_ids":["jyotish.chart.compute","jyotish.panchang.day","jyotish.dasha.timeline","jyotish.transit.window","jyotish.muhurta.find","jyotish.match.kuta","jyotish.rectify.birth_time","jyotish.rule.validate","jyotish.engine.consensus","jyotish.catalog.list"]},"phase":"active"}
+[install] jyotish-mcp health OK over TLS at https://127.0.0.1:7791/health (CA bundle: /Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem)
+[install] the IronClaw process must trust the local CA:  export SSL_CERT_FILE=/Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem
+[install]   (rustls-native-certs REPLACES the platform store with that file, which is why the bundle also
+[install]    carries the macOS system roots; for the launchd service put the same variable under
+[install]    EnvironmentVariables in ~/Library/LaunchAgents/com.ironclaw.reborn.plist)
+[install] and must opt in to loopback egress:   export IRONCLAW_EGRESS_ALLOW_LOOPBACK=1
+[install]   run the agent with:  IRONCLAW_EGRESS_ALLOW_LOOPBACK=1 SSL_CERT_FILE=/Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem /Users/brijesh/.local/bin/ironclaw-jyotish run|repl|serve
+[install]   rollback: rm /Users/brijesh/.local/bin/ironclaw-jyotish (the Homebrew ironclaw 1.4.0 is untouched; without the flag the patched
+[install]   binary behaves exactly like upstream)
+[install] done

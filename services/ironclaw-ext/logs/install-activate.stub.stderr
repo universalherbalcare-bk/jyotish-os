@@ -1,0 +1,4 @@
+[stub] listening on http://127.0.0.1:11435 (model jyotish-stub, log /Users/brijesh/Projects/jyotish-os/services/ironclaw-ext/tools/../logs/install-activate.stub.jsonl)
+[stub] "GET /api/tags HTTP/1.1" 200 -
+[stub] "POST /api/chat HTTP/1.1" 200 -
+[stub] "POST /api/chat HTTP/1.1" 200 -

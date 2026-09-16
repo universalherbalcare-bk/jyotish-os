@@ -1,0 +1,352 @@
+# ironclaw-1.4.0-allow-loopback-egress.patch
+#
+# Target : nearai/ironclaw tag ironclaw-v1.4.0 (4cb47cfaf3fbacd3a2f575a8da654a6542d5fdfe) — the
+#          exact source the Homebrew formula builds (brew info: versions.stable 1.4.0, url
+#          .../archive/refs/tags/ironclaw-v1.4.0.tar.gz).
+# Why    : Jyotish-OS's MCP server is bound to https://127.0.0.1:7791 by contract
+#          (docs/CONTRACT.md "Ports (loopback only)"). IronClaw 1.4.0 refuses that in two
+#          places, both by design (SSRF/private-network guard):
+#            1. crates/substrates/ironclaw_network — the single enforcement point of
+#               `NetworkPolicy.deny_private_ip_ranges` for host-mediated egress (hosted-MCP
+#               tool calls + discovery, builtin.http). Every policy producer hard-codes it to
+#               true for networked capabilities (capability_surface.rs:225,
+#               hosted_mcp_manifest.rs:180, mcp.rs:196, builtin_capability_policy.rs:536,
+#               product_capability.rs:251, ironclaw_auth http.rs:137).
+#            2. crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs — the
+#               endpoint admission for `builtin.extension_register_hosted_mcp` rejects
+#               `localhost` and every IP literal outright. This is the ONLY route by which
+#               a user-supplied hosted MCP server becomes callable in 1.4.0: a package
+#               installed from the filesystem catalog (`ironclaw extension install`) is
+#               ManifestSource::InstalledLocal, which `hosted_http_mcp_url`
+#               (ironclaw_extension_registry/src/hosted_mcp_discovery.rs:83) never treats as
+#               a hosted-MCP provider, so its pinned tools keep an empty allow-list
+#               (v3.rs:621) and fail the ApplyNetworkPolicy obligation with `network_denied`
+#               before any socket is opened — for public and private endpoints alike.
+# Change : one opt-in environment variable, IRONCLAW_EGRESS_ALLOW_LOOPBACK=1 (also
+#          true/yes/on), read once per process (ironclaw_network::loopback_egress_allowed).
+#          When set: (a) an IP in 127.0.0.0/8 or exactly ::1 is no longer a denied private
+#          target for deny_private_ip_ranges; (b) hosted-MCP admission accepts an endpoint
+#          whose host is `localhost`, 127.0.0.0/8 or ::1. 10/8, 172.16/12, 192.168/16,
+#          169.254/16, 100.64/10, 0/8, fc00::/7, fe80::/10, documentation/multicast ranges,
+#          IPv4-mapped IPv6 forms (incl. ::ffff:127.0.0.1) and every other IP literal stay
+#          denied exactly as before, in both places. Unset (or any other value): behaviour
+#          byte-identical to upstream. The allow-list match, https-only scheme, port match,
+#          egress-byte caps and TLS trust (SSL_CERT_FILE) are untouched. A one-time
+#          tracing::warn! announces the exemption at first policy evaluation.
+# Tests  : ironclaw_network policy.rs `loopback_exemption_tests` (flag parsing off-by-default
+#          and strict; everything non-public denied without the flag; only loopback exempt
+#          with it) and ironclaw_extension_host hosted_mcp_admission.rs
+#          `loopback_opt_in_admits_only_loopback_endpoints` (loopback admitted only with the
+#          flag; other private/public literals and http:// rejected either way). Upstream's
+#          `canonical_endpoint_rejects_credential_and_private_literal_forms` still passes.
+# Apply  : git -C vendor/ironclaw-fork apply ../../patches/ironclaw-1.4.0-allow-loopback-egress.patch
+# Build  : cargo build --release -p ironclaw   (package `ironclaw`, dir crates/app/ironclaw_cli)
+# Revert : rm ~/.local/bin/ironclaw-jyotish — the Homebrew binary is never modified.
+#
+diff --git a/crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs b/crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs
+index 5fc79e0..898fbaf 100644
+--- a/crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs
++++ b/crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs
+@@ -14,6 +14,16 @@ pub struct CanonicalHostedMcpEndpoint(String);
+ 
+ impl CanonicalHostedMcpEndpoint {
+     pub fn parse(input: &HostedMcpEndpoint) -> Result<Self, HostedMcpAdmissionError> {
++        Self::parse_with(input, ironclaw_network::loopback_egress_allowed())
++    }
++
++    /// `allow_loopback` (Jyotish-OS local patch, `IRONCLAW_EGRESS_ALLOW_LOOPBACK`)
++    /// admits `localhost`, `127.0.0.0/8` and `::1` endpoints; every other IP
++    /// literal stays rejected, and with `false` the behaviour is upstream's.
++    fn parse_with(
++        input: &HostedMcpEndpoint,
++        allow_loopback: bool,
++    ) -> Result<Self, HostedMcpAdmissionError> {
+         let url = url::Url::parse(input.as_str())
+             .map_err(|_| HostedMcpAdmissionError::InvalidEndpoint)?;
+         if url.scheme() != "https"
+@@ -27,12 +37,15 @@ impl CanonicalHostedMcpEndpoint {
+         let host = url
+             .host_str()
+             .ok_or(HostedMcpAdmissionError::InvalidEndpoint)?;
+-        if host.eq_ignore_ascii_case("localhost")
+-            || matches!(
+-                url.host(),
+-                Some(url::Host::Ipv4(_)) | Some(url::Host::Ipv6(_))
+-            )
+-        {
++        let host_local_name = host.eq_ignore_ascii_case("localhost");
++        let host_ip_literal = matches!(
++            url.host(),
++            Some(url::Host::Ipv4(_)) | Some(url::Host::Ipv6(_))
++        );
++        let host_loopback = host_local_name
++            || matches!(url.host(), Some(url::Host::Ipv4(ip)) if ip.is_loopback())
++            || matches!(url.host(), Some(url::Host::Ipv6(ip)) if ip.is_loopback());
++        if (host_local_name || host_ip_literal) && !(allow_loopback && host_loopback) {
+             return Err(HostedMcpAdmissionError::InvalidEndpoint);
+         }
+         // Denylist, not allowlist: query parameters are load-bearing identity
+@@ -126,6 +139,45 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn loopback_opt_in_admits_only_loopback_endpoints() {
++        for endpoint in [
++            "https://127.0.0.1:7791/mcp",
++            "https://127.0.0.2/mcp",
++            "https://[::1]:7791/mcp",
++            "https://localhost:7791/mcp",
++        ] {
++            let input = HostedMcpEndpoint::new(endpoint).expect("wire endpoint");
++            assert!(
++                CanonicalHostedMcpEndpoint::parse_with(&input, true).is_ok(),
++                "{endpoint} must be admitted with the loopback opt-in"
++            );
++            assert_eq!(
++                CanonicalHostedMcpEndpoint::parse_with(&input, false),
++                Err(HostedMcpAdmissionError::InvalidEndpoint),
++                "{endpoint} must stay rejected without the opt-in"
++            );
++        }
++        for endpoint in [
++            "https://10.0.0.5:7791/mcp",
++            "https://192.168.1.10/mcp",
++            "https://172.16.0.1/mcp",
++            "https://169.254.1.1/mcp",
++            "https://[fc00::1]/mcp",
++            "https://[fe80::1]/mcp",
++            "https://[::ffff:127.0.0.1]/mcp",
++            "https://8.8.8.8/mcp",
++            "http://127.0.0.1:7791/mcp",
++        ] {
++            let input = HostedMcpEndpoint::new(endpoint).expect("wire endpoint");
++            assert_eq!(
++                CanonicalHostedMcpEndpoint::parse_with(&input, true),
++                Err(HostedMcpAdmissionError::InvalidEndpoint),
++                "{endpoint} must stay rejected even with the loopback opt-in"
++            );
++        }
++    }
++
+     #[test]
+     fn canonical_endpoint_keeps_query_identity_and_normalizes_path() {
+         let input = HostedMcpEndpoint::new("https://MCP.example.test/a/../rpc?b=2&a=1")
+diff --git a/crates/substrates/ironclaw_network/src/lib.rs b/crates/substrates/ironclaw_network/src/lib.rs
+index 7675d71..c56eb7b 100644
+--- a/crates/substrates/ironclaw_network/src/lib.rs
++++ b/crates/substrates/ironclaw_network/src/lib.rs
+@@ -20,8 +20,8 @@ mod url_target;
+ pub use egress::{NetworkHttpEgress, NetworkHttpTransport, PolicyNetworkHttpEgress};
+ pub use error::NetworkHttpError;
+ pub use policy::{
+-    NetworkPolicyError, StaticNetworkPolicyEnforcer, parse_egress_limit, parse_host_pattern,
+-    target_matches_pattern,
++    EGRESS_ALLOW_LOOPBACK_ENV, NetworkPolicyError, StaticNetworkPolicyEnforcer,
++    loopback_egress_allowed, parse_egress_limit, parse_host_pattern, target_matches_pattern,
+ };
+ pub use resolver::NetworkResolver;
+ #[cfg(any(debug_assertions, feature = "test-support"))]
+diff --git a/crates/substrates/ironclaw_network/src/policy.rs b/crates/substrates/ironclaw_network/src/policy.rs
+index 3e6f7b4..006e976 100644
+--- a/crates/substrates/ironclaw_network/src/policy.rs
++++ b/crates/substrates/ironclaw_network/src/policy.rs
+@@ -1,4 +1,4 @@
+-use std::net::IpAddr;
++use std::{ffi::OsStr, net::IpAddr, sync::OnceLock};
+ 
+ use ironclaw_host_api::{
+     action::{NetworkPolicy, NetworkTarget, NetworkTargetPattern},
+@@ -217,7 +217,7 @@ fn authorize_static_policy(
+ 
+     if policy.deny_private_ip_ranges
+         && let Ok(ip) = request.target.host.parse::<IpAddr>()
+-        && is_private_or_loopback_ip(ip)
++        && is_denied_private_ip(ip)
+     {
+         return Err(NetworkPolicyError::PrivateTargetDenied {
+             scope: Box::new(request.scope),
+@@ -246,7 +246,7 @@ pub(crate) fn network_policy_allows(policy: &NetworkPolicy, target: &NetworkTarg
+     }
+     if policy.deny_private_ip_ranges
+         && let Ok(ip) = target.host.parse::<IpAddr>()
+-        && is_private_or_loopback_ip(ip)
++        && is_denied_private_ip(ip)
+     {
+         return false;
+     }
+@@ -287,6 +287,63 @@ fn host_matches_pattern(host: &str, pattern: &str) -> bool {
+     }
+ }
+ 
++/// Opt-in loopback exemption for `deny_private_ip_ranges` (Jyotish-OS local patch).
++///
++/// When this environment variable is set to `1`/`true`/`yes`/`on`, an IP in
++/// `127.0.0.0/8` or exactly `::1` is NOT treated as a denied private target,
++/// so a host-mediated request (hosted-MCP, `builtin.http`) may reach a server
++/// bound to the local machine. Every other non-public range — `10/8`,
++/// `172.16/12`, `192.168/16`, `169.254/16`, `100.64/10`, `0/8`, `fc00::/7`,
++/// `fe80::/10`, documentation and multicast ranges, and IPv4-mapped IPv6
++/// forms (`::ffff:a.b.c.d`, including `::ffff:127.0.0.1`) — stays denied
++/// exactly as before. When the variable is unset or carries any other value
++/// the behaviour is byte-identical to upstream. The value is read once per
++/// process.
++pub const EGRESS_ALLOW_LOOPBACK_ENV: &str = "IRONCLAW_EGRESS_ALLOW_LOOPBACK";
++
++/// Whether [`EGRESS_ALLOW_LOOPBACK_ENV`] opted this process in to loopback
++/// egress. Read once; shared by the policy predicates here and by hosted-MCP
++/// endpoint admission (`ironclaw_extension_host::hosted_mcp_admission`).
++pub fn loopback_egress_allowed() -> bool {
++    static FLAG: OnceLock<bool> = OnceLock::new();
++    *FLAG.get_or_init(|| {
++        let enabled =
++            loopback_egress_flag_enabled(std::env::var_os(EGRESS_ALLOW_LOOPBACK_ENV).as_deref());
++        if enabled {
++            tracing::warn!(
++                env = EGRESS_ALLOW_LOOPBACK_ENV,
++                "network policy: loopback (127.0.0.0/8, ::1) exempted from deny_private_ip_ranges"
++            );
++        }
++        enabled
++    })
++}
++
++pub(crate) fn loopback_egress_flag_enabled(value: Option<&OsStr>) -> bool {
++    value
++        .and_then(OsStr::to_str)
++        .map(|raw| raw.trim().to_ascii_lowercase())
++        .is_some_and(|raw| matches!(raw.as_str(), "1" | "true" | "yes" | "on"))
++}
++
++/// `true` when `ip` must be refused under `deny_private_ip_ranges`.
++pub(crate) fn is_denied_private_ip(ip: IpAddr) -> bool {
++    is_denied_private_ip_with(ip, loopback_egress_allowed())
++}
++
++pub(crate) fn is_denied_private_ip_with(ip: IpAddr, allow_loopback: bool) -> bool {
++    is_private_or_loopback_ip(ip) && !(allow_loopback && is_exempt_loopback_ip(ip))
++}
++
++/// Exactly `127.0.0.0/8` or `::1`. IPv4-mapped IPv6 loopback is deliberately
++/// not exempted.
++fn is_exempt_loopback_ip(ip: IpAddr) -> bool {
++    match ip {
++        IpAddr::V4(ip) => ip.is_loopback(),
++        IpAddr::V6(ip) => ip.is_loopback(),
++    }
++}
++
+ pub(crate) fn is_private_or_loopback_ip(ip: IpAddr) -> bool {
+     match ip {
+         IpAddr::V4(ip) => {
+@@ -322,3 +379,87 @@ fn is_documentation_v6(ip: std::net::Ipv6Addr) -> bool {
+     let segments = ip.segments();
+     segments[0] == 0x2001 && segments[1] == 0x0db8
+ }
++
++#[cfg(test)]
++mod loopback_exemption_tests {
++    use std::{ffi::OsStr, net::IpAddr};
++
++    use super::{is_denied_private_ip_with, loopback_egress_flag_enabled};
++
++    fn ip(s: &str) -> IpAddr {
++        s.parse().unwrap()
++    }
++
++    const LOOPBACK: [&str; 4] = ["127.0.0.1", "127.0.0.2", "127.255.255.254", "::1"];
++    const NON_LOOPBACK_PRIVATE: [&str; 13] = [
++        "10.0.0.5",
++        "172.16.0.1",
++        "172.31.255.255",
++        "192.168.1.1",
++        "169.254.1.1",
++        "100.64.0.1",
++        "0.0.0.0",
++        "192.0.2.1",
++        "fc00::1",
++        "fe80::1",
++        "::",
++        "::ffff:10.0.0.1",
++        "::ffff:127.0.0.1",
++    ];
++    const PUBLIC: [&str; 3] = ["8.8.8.8", "1.1.1.1", "2606:4700::1111"];
++
++    #[test]
++    fn flag_parsing_is_strict_and_off_by_default() {
++        assert!(!loopback_egress_flag_enabled(None));
++        for raw in ["", "0", "false", "no", "off", "2", "loopback"] {
++            assert!(
++                !loopback_egress_flag_enabled(Some(OsStr::new(raw))),
++                "{raw:?}"
++            );
++        }
++        for raw in ["1", "true", "TRUE", "yes", "on", " 1 "] {
++            assert!(
++                loopback_egress_flag_enabled(Some(OsStr::new(raw))),
++                "{raw:?}"
++            );
++        }
++    }
++
++    #[test]
++    fn without_flag_everything_non_public_is_denied() {
++        for host in LOOPBACK.iter().chain(NON_LOOPBACK_PRIVATE.iter()) {
++            assert!(
++                is_denied_private_ip_with(ip(host), false),
++                "{host} must be denied"
++            );
++        }
++        for host in PUBLIC {
++            assert!(
++                !is_denied_private_ip_with(ip(host), false),
++                "{host} must be allowed"
++            );
++        }
++    }
++
++    #[test]
++    fn with_flag_only_loopback_is_exempt() {
++        for host in LOOPBACK {
++            assert!(
++                !is_denied_private_ip_with(ip(host), true),
++                "{host} must be allowed"
++            );
++        }
++        for host in NON_LOOPBACK_PRIVATE {
++            assert!(
++                is_denied_private_ip_with(ip(host), true),
++                "{host} must stay denied"
++            );
++        }
++        for host in PUBLIC {
++            assert!(
++                !is_denied_private_ip_with(ip(host), true),
++                "{host} must be allowed"
++            );
++        }
++    }
++}
+diff --git a/crates/substrates/ironclaw_network/src/resolver.rs b/crates/substrates/ironclaw_network/src/resolver.rs
+index 5caa687..26bdd7a 100644
+--- a/crates/substrates/ironclaw_network/src/resolver.rs
++++ b/crates/substrates/ironclaw_network/src/resolver.rs
+@@ -2,7 +2,7 @@ use std::net::{IpAddr, ToSocketAddrs};
+ 
+ use ironclaw_host_api::action::{NetworkPolicy, NetworkTarget};
+ 
+-use crate::{error::NetworkHttpError, policy::is_private_or_loopback_ip, url_target::default_port};
++use crate::{error::NetworkHttpError, policy::is_denied_private_ip, url_target::default_port};
+ 
+ pub trait NetworkResolver: Send + Sync {
+     fn resolve_ips(&self, host: &str, port: u16) -> Result<Vec<IpAddr>, NetworkHttpError>;
+@@ -55,8 +55,7 @@ where
+             response_bytes: 0,
+         });
+     }
+-    if policy.deny_private_ip_ranges && resolved_ips.iter().copied().any(is_private_or_loopback_ip)
+-    {
++    if policy.deny_private_ip_ranges && resolved_ips.iter().copied().any(is_denied_private_ip) {
+         return Err(NetworkHttpError::PolicyDenied {
+             reason: "network target resolves to a private or host-local IP".to_string(),
+             request_bytes,

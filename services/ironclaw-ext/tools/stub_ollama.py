@@ -35,7 +35,62 @@ MODEL = "jyotish-stub"
 TARGET_TOOL_SUBSTR = "catalog"
 TARGET_TOOL_NAME = "jyotish__catalog__list"
 HTTP_PROBE_URL = None
+TOOL_ARGS = "{}"  # JSON string handed to tool_call(arguments=...); see --tool-args
+SCRIPT = None  # --script: ordered list of {"tool": name, "arguments": {...}} issued one per turn
 LOG_PATH = None
+
+
+def _json_path(obj, path: str):
+    """Resolve 'a.b.c' inside a JSON value (dicts only). None when absent."""
+    cur = obj
+    for key in path.split("."):
+        if isinstance(cur, dict) and key in cur:
+            cur = cur[key]
+        else:
+            return None
+    return cur
+
+
+def _substitute(value, prev):
+    """Replace "$prev.<path>" strings with the value at <path> in the previous tool result."""
+    if isinstance(value, str) and value.startswith("$prev."):
+        return _json_path(prev, value[len("$prev.") :])
+    if isinstance(value, dict):
+        return {k: _substitute(v, prev) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_substitute(v, prev) for v in value]
+    return value
+
+
+def plan_script_reply(results):
+    """Scripted mode: step i is issued after i tool results are in the transcript."""
+    n = len(results)
+    if n >= len(SCRIPT):
+        return {
+            "content": "Script done. Last tool result: " + results[-1][:4000],
+            "tool_calls": None,
+        }
+    prev = None
+    if results:
+        try:
+            prev = json.loads(results[-1])
+        except ValueError:
+            prev = None
+        if (
+            prev is not None
+            and isinstance(prev, dict)
+            and prev.get("status") == "error"
+        ):
+            return {
+                "content": f"Script aborted, step {n} failed: {results[-1][:4000]}",
+                "tool_calls": None,
+            }
+    step = SCRIPT[n]
+    args = _substitute(step.get("arguments", {}), prev)
+    return {
+        "content": "",
+        "tool_calls": [{"function": {"name": step["tool"], "arguments": args}}],
+    }
 
 
 def log(kind: str, payload) -> None:
@@ -96,6 +151,8 @@ def plan_reply(req: dict) -> dict:
         if isinstance(fn, dict) and fn.get("name"):
             names.append(fn["name"])
     results = _tool_result_texts(messages)
+    if SCRIPT is not None:
+        return plan_script_reply(results)
     candidates = [TARGET_TOOL_NAME, TARGET_TOOL_NAME.replace("__", ".")]
     if results:
         last = results[-1]
@@ -128,12 +185,12 @@ def plan_reply(req: dict) -> dict:
                     {
                         "function": {
                             "name": "tool_call",
-                            "arguments": {"name": nxt, "arguments": "{}"},
+                            "arguments": {"name": nxt, "arguments": TOOL_ARGS},
                         }
                     }
                 ],
             }
-        return {"content": "The tool returned: " + last[:900], "tool_calls": None}
+        return {"content": "The tool returned: " + last[:4000], "tool_calls": None}
     if HTTP_PROBE_URL and "builtin__http" in names:
         return {
             "content": "",
@@ -153,7 +210,7 @@ def plan_reply(req: dict) -> dict:
                 {
                     "function": {
                         "name": "tool_call",
-                        "arguments": {"name": candidates[0], "arguments": "{}"},
+                        "arguments": {"name": candidates[0], "arguments": TOOL_ARGS},
                     }
                 }
             ],
@@ -162,7 +219,9 @@ def plan_reply(req: dict) -> dict:
     if direct:
         return {
             "content": "",
-            "tool_calls": [{"function": {"name": direct, "arguments": {}}}],
+            "tool_calls": [
+                {"function": {"name": direct, "arguments": json.loads(TOOL_ARGS)}}
+            ],
         }
     return {
         "content": f"No tool containing '{TARGET_TOOL_SUBSTR}' and no tool_call dispatcher was offered; "
@@ -265,12 +324,29 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    global LOG_PATH, TARGET_TOOL_SUBSTR, TARGET_TOOL_NAME, HTTP_PROBE_URL
+    global \
+        LOG_PATH, \
+        TARGET_TOOL_SUBSTR, \
+        TARGET_TOOL_NAME, \
+        HTTP_PROBE_URL, \
+        TOOL_ARGS, \
+        SCRIPT
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=11435)
     ap.add_argument("--log", default=None)
     ap.add_argument("--tool", default=TARGET_TOOL_SUBSTR)
     ap.add_argument("--tool-name", default=TARGET_TOOL_NAME)
+    ap.add_argument(
+        "--tool-args",
+        default=TOOL_ARGS,
+        help="JSON object string passed as tool_call(arguments=...) (default {})",
+    )
+    ap.add_argument(
+        "--script",
+        default=None,
+        help='JSON list of {"tool": <visible tool name>, "arguments": {...}} issued one per turn; '
+        '"$prev.<json.path>" in an argument is replaced from the previous tool result',
+    )
     ap.add_argument(
         "--http-probe",
         default=None,
@@ -281,6 +357,13 @@ def main() -> None:
     TARGET_TOOL_SUBSTR = a.tool
     TARGET_TOOL_NAME = a.tool_name
     HTTP_PROBE_URL = a.http_probe
+    json.loads(a.tool_args)  # fail fast on malformed JSON
+    TOOL_ARGS = a.tool_args
+    if a.script is not None:
+        SCRIPT = json.loads(a.script)
+        assert isinstance(SCRIPT, list) and all("tool" in st for st in SCRIPT), (
+            "--script: list of {tool, arguments}"
+        )
     srv = ThreadingHTTPServer(("127.0.0.1", a.port), Handler)
     sys.stderr.write(
         f"[stub] listening on http://127.0.0.1:{a.port} (model {MODEL}, log {LOG_PATH})\n"

@@ -4,6 +4,10 @@
 #   ./install.sh            # install everything the binary allows; report what it could not
 #   ./install.sh --dry-run  # print the plan only
 #   ./install.sh --remove   # remove the extension package + persona (keeps IronClaw config)
+#   ./install.sh --register # Phase 7: register jyotish-mcp as a hosted MCP server through
+#                           # IronClaw's own builtin.extension_register_hosted_mcp (needs the
+#                           # patched ~/.local/bin/ironclaw-jyotish; drives one agent turn with
+#                           # tools/stub_ollama.py, no real model, provider restored afterwards)
 #
 # What it does, in order (each step is skipped if already done):
 #   1. verifies `ironclaw` (>= 1.4.0); if the provider it would set is ollama, that Ollama is up
@@ -37,9 +41,26 @@ log()  { printf '[install] %s\n' "$*"; }
 fail() { printf '[install] ERROR: %s\n' "$*" >&2; exit 1; }
 run()  { if [[ "$MODE" == "--dry-run" ]]; then printf '[dry-run] %s\n' "$*"; else "$@"; fi; }
 
-command -v ironclaw >/dev/null 2>&1 || fail "ironclaw not on PATH. Install: brew install ironclaw"
+# Phase 7: prefer the locally built, loopback-patched binary when it exists (README.md
+# "Phase 7"); the Homebrew binary is untouched and remains the fallback. Every `ironclaw`
+# invocation below goes through this function so both binaries share ~/.ironclaw/reborn.
+IRONCLAW_BIN="${IRONCLAW_BIN:-$HOME/.local/bin/ironclaw-jyotish}"
+if [[ ! -x "$IRONCLAW_BIN" ]]; then
+  command -v ironclaw >/dev/null 2>&1 || fail "ironclaw not on PATH. Install: brew install ironclaw"
+  IRONCLAW_BIN="$(command -v ironclaw)"
+fi
+ironclaw() { "$IRONCLAW_BIN" "$@"; }
 IC_VERSION="$(ironclaw --version | awk '{print $2}')"
-log "ironclaw $IC_VERSION"
+log "ironclaw $IC_VERSION ($IRONCLAW_BIN)"
+if [[ "$IRONCLAW_BIN" == "$HOME/.local/bin/ironclaw-jyotish" ]]; then
+  # Opt-in loopback egress (patches/ironclaw-1.4.0-allow-loopback-egress.patch). Exported
+  # here so the lifecycle commands below and any process this script spawns carry it;
+  # the owner's shell still needs the `export` line printed at the end.
+  export IRONCLAW_EGRESS_ALLOW_LOOPBACK=1
+  log "IRONCLAW_EGRESS_ALLOW_LOOPBACK=1 (patched binary: loopback 127.0.0.0/8 and ::1 only; other private ranges stay denied)"
+else
+  log "WARNING: unpatched binary; jyotish.* tool calls will be refused with network_denied (README.md 'Phase 7')"
+fi
 
 # Resolve home/profile from the binary itself, never from assumptions.
 PATHS="$(ironclaw config path)"
@@ -58,6 +79,30 @@ if [[ "$MODE" == "--remove" ]]; then
   run rm -rf "$EXT_DIR"
   if [[ -f "$PROMPT_FILE.orig" ]]; then run cp "$PROMPT_FILE.orig" "$PROMPT_FILE"; fi
   log "removed extension package and restored the original system prompt"
+  exit 0
+fi
+
+# Phase 7 --register: the filesystem package below is ManifestSource::InstalledLocal, which
+# IronClaw 1.4.0 never treats as a hosted-MCP provider (its pinned tools carry an empty
+# egress allow-list and every call fails with network_denied). The callable extension is the
+# one registered through builtin.extension_register_hosted_mcp (ManifestSource::UserRegistered):
+# registration -> install -> live tools/list discovery over loopback TLS -> ten
+# mcp-jyotish-local.* tools. README.md "Phase 7".
+if [[ "$MODE" == "--register" ]]; then
+  [[ "$IRONCLAW_BIN" == "$HOME/.local/bin/ironclaw-jyotish" ]] || fail "--register needs the patched binary at ~/.local/bin/ironclaw-jyotish (README.md 'Phase 7')"
+  curl -fsS --max-time 3 --cacert "$CA_BUNDLE" "$MCP_HEALTH" >/dev/null 2>&1 || fail "jyotish-mcp is not answering over TLS at $MCP_HEALTH; start it first"
+  if ironclaw extension search jyotish-local 2>/dev/null | grep -q 'capability: mcp-jyotish-local.catalog.list'; then
+    log "mcp-jyotish-local already registered and installed (10 tools); nothing to do"
+    exit 0
+  fi
+  SCRIPT='[{"tool":"builtin__extension_register_hosted_mcp","arguments":{"desired_id":"jyotish-local","desired_name":"Jyotish-OS (local jyotish-mcp)","endpoint":"https://127.0.0.1:7791/mcp","auth_type":"no_auth"}}]'
+  IRONCLAW_BIN="$IRONCLAW_BIN" "$HERE/tools/p7_tool_call.sh" install-register 1 script "$SCRIPT" | grep -v '^\[p7\] capability' || true
+  IRONCLAW_BIN="$IRONCLAW_BIN" "$HERE/tools/p7_tool_call.sh" install-activate 1 script '[{"tool":"builtin__extension_install","arguments":{"extension_id":"mcp-jyotish-local"}}]' | grep -v '^\[p7\] capability' || true
+  if ironclaw extension search jyotish-local 2>/dev/null | grep -q 'capability: mcp-jyotish-local.catalog.list'; then
+    log "mcp-jyotish-local registered, installed and active (tools discovered live from jyotish-mcp)"
+  else
+    fail "registration/activation did not produce mcp-jyotish-local.* tools; see logs/install-register.turn.txt and logs/install-activate.turn.txt"
+  fi
   exit 0
 fi
 
@@ -151,6 +196,20 @@ log "the IronClaw process must trust the local CA:  export SSL_CERT_FILE=$CA_BUN
 log "  (rustls-native-certs REPLACES the platform store with that file, which is why the bundle also"
 log "   carries the macOS system roots; for the launchd service put the same variable under"
 log "   EnvironmentVariables in ~/Library/LaunchAgents/com.ironclaw.reborn.plist)"
-log "KNOWN LIMIT: IronClaw 1.4.0 refuses loopback egress for hosted-MCP tool calls (network_denied);"
-log "   see README.md 'What was observed'"
+if [[ "$IRONCLAW_BIN" == "$HOME/.local/bin/ironclaw-jyotish" ]]; then
+  if ironclaw extension search jyotish-local 2>/dev/null | grep -q 'capability: mcp-jyotish-local.catalog.list'; then
+    log "callable extension: mcp-jyotish-local (registered hosted MCP, 10 tools discovered live)"
+  else
+    log "NEXT STEP: ./install.sh --register   (registers https://127.0.0.1:7791/mcp through IronClaw's"
+    log "   builtin.extension_register_hosted_mcp; the 'jyotish' package above is persona/schemas only —"
+    log "   its pinned tools are never callable on 1.4.0, README.md 'Phase 7')"
+  fi
+  log "and must opt in to loopback egress:   export IRONCLAW_EGRESS_ALLOW_LOOPBACK=1"
+  log "  run the agent with:  IRONCLAW_EGRESS_ALLOW_LOOPBACK=1 SSL_CERT_FILE=$CA_BUNDLE $IRONCLAW_BIN run|repl|serve"
+  log "  rollback: rm $IRONCLAW_BIN (the Homebrew ironclaw 1.4.0 is untouched; without the flag the patched"
+  log "  binary behaves exactly like upstream)"
+else
+  log "KNOWN LIMIT: unpatched IronClaw 1.4.0 refuses loopback egress for hosted-MCP tool calls (network_denied);"
+  log "   build the patched binary per README.md 'Phase 7' (patches/ironclaw-1.4.0-allow-loopback-egress.patch)"
+fi
 log "done"

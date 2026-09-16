@@ -1,0 +1,656 @@
+   Compiling ironclaw_network v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_network)
+    Finished `test` profile [unoptimized] target(s) in 1.44s
+     Running unittests src/lib.rs (target/debug/deps/ironclaw_network-565539b73929ea57)
+
+running 24 tests
+test policy::loopback_exemption_tests::without_flag_everything_non_public_is_denied ... ok
+test policy::loopback_exemption_tests::with_flag_only_loopback_is_exempt ... ok
+test policy::loopback_exemption_tests::flag_parsing_is_strict_and_off_by_default ... ok
+test transport::tests::effective_request_timeout_clamps_requested_timeout_to_transport_default ... ok
+test test_rewrite::tests::parse_rejects_non_loopback_targets ... ok
+test test_rewrite::tests::parse_rejects_malformed_entries ... ok
+test test_rewrite::tests::parse_accepts_multi_entry_loopback_maps ... ok
+test test_rewrite::tests::default_policy_http_egress_builds_without_the_env_var ... ok
+test test_rewrite::tests::a_set_rewrite_map_activates_only_in_debug_and_is_refused_in_release ... ok
+test transport::tests::take_request_url_relative_error_does_not_include_source_url ... ok
+test types::tests::network_http_request_scrubs_url_with_empty_headers ... ok
+test types::tests::network_transport_request_scrubs_url_and_header_values ... ok
+test types::tests::network_http_request_scrubs_url_and_header_values ... ok
+test url_target::tests::percent_decode_url_component_lossy_decodes_encoded_component ... ok
+test url_target::tests::percent_decode_url_component_lossy_borrows_unencoded_component ... ok
+test test_rewrite::tests::unset_env_value_is_a_pure_passthrough ... ok
+test url_target::tests::rfc3986_unreserved_segment_accepts_unreserved_path_parts ... ok
+test url_target::tests::rfc3986_unreserved_segment_rejects_empty_dot_segments_and_reserved_chars ... ok
+test transport::tests::take_request_url_scrubs_only_source_carrier_copy ... ok
+test transport::tests::take_request_url_error_does_not_include_source_url ... ok
+test test_rewrite::tests::active_map_rewrites_mapped_hosts_and_passes_others_untouched ... ok
+test transport::tests::apply_request_headers_zeroizes_source_carrier_copy_after_reqwest_build ... ok
+test test_rewrite::tests::rewrite_over_real_transport_lands_on_the_loopback_server ... ok
+test transport::tests::reqwest_transport_caches_clients_by_resolution_key ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/boundary_contract.rs (target/debug/deps/boundary_contract-4a609530040bfcdc)
+
+running 1 test
+test network_crate_does_not_depend_on_workflow_runtime_secret_or_observability_crates ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/network_http_egress_contract.rs (target/debug/deps/network_http_egress_contract-cf812869e4204864)
+
+running 17 tests
+test http_egress_rejects_caller_provided_host_header_before_transport ... ok
+test http_egress_counts_url_and_headers_in_policy_egress_estimate_before_transport ... ok
+test http_egress_rejects_userinfo_url_before_transport ... ok
+test http_egress_denies_private_resolved_host_before_transport ... ok
+test http_egress_authorizes_default_https_port_and_pins_resolved_ip ... ok
+test http_egress_forwards_sensitive_headers_in_zeroizing_transport_carrier ... ok
+test http_egress_forwards_timeout_to_transport ... ok
+test http_egress_follows_allowlisted_redirect_and_strips_credentials ... ok
+test http_egress_bounds_redirect_hops ... ok
+test http_egress_maps_panicking_resolver_to_transport_error ... ok
+test http_egress_concurrent_requests_do_not_serialize_on_transport ... ok
+test http_egress_denies_redirect_to_host_outside_policy ... ok
+test reqwest_transport_forwards_all_headers_to_http_client ... ok
+test reqwest_transport_uses_all_resolved_addresses_for_connection_fallback ... ok
+test reqwest_transport_clamps_oversized_explicit_response_limit_to_safe_default ... ok
+test reqwest_transport_enforces_streaming_response_limit_separately_from_request_bytes ... ok
+test reqwest_transport_clamps_unspecified_response_limit_to_safe_default ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/network_policy_contract.rs (target/debug/deps/network_policy_contract-22defef1d24a29af)
+
+running 17 tests
+test network_target_matching_supports_any_host_wildcard ... ok
+test network_policy_is_fail_closed_without_allowed_targets ... ok
+test network_policy_supports_any_host_wildcard_with_private_ip_guard ... ok
+test network_policy_denies_non_public_literal_ips_allowed_by_host_contract ... ok
+test network_policy_denies_scheme_host_port_and_egress_mismatches ... ok
+test network_target_matching_supports_one_label_wildcard_hosts_only ... ok
+test network_policy_denies_ipv4_mapped_private_ipv6_literals ... ok
+test network_policy_allows_exact_scoped_target_without_executing_io ... ok
+test network_policy_supports_one_label_wildcard_hosts_only ... ok
+test parse_host_pattern_accepts_pattern_at_exactly_253_bytes ... ok
+test network_policy_requires_egress_estimate_when_limit_is_configured ... ok
+test parse_host_pattern_accepts_plain_and_wildcard_hostnames ... ok
+test parse_host_pattern_rejects_empty_and_bare_wildcard ... ok
+test parse_host_pattern_rejects_malformed_hostnames ... ok
+test parse_host_pattern_trims_surrounding_whitespace ... ok
+test parse_host_pattern_rejects_patterns_over_253_bytes ... ok
+test network_target_for_url_normalizes_default_ports ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests ironclaw_network
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+rc_network=0
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling memchr v2.8.3
+   Compiling libc v0.2.189
+   Compiling foldhash v0.2.0
+   Compiling version_check v0.9.5
+   Compiling allocator-api2 v0.2.21
+   Compiling equivalent v1.0.2
+   Compiling bitflags v2.13.1
+   Compiling parking_lot_core v0.9.12
+   Compiling scopeguard v1.2.0
+   Compiling log v0.4.33
+   Compiling rand_core v0.10.1
+   Compiling lock_api v0.4.14
+   Compiling zerocopy v0.8.56
+   Compiling futures-sink v0.3.34
+   Compiling futures-macro v0.3.34
+   Compiling slab v0.4.12
+   Compiling futures-io v0.3.34
+   Compiling futures-channel v0.3.34
+   Compiling errno v0.3.14
+   Compiling getrandom v0.4.3
+   Compiling fnv v1.0.7
+   Compiling tracing-core v0.1.36
+   Compiling cmov v0.5.4
+   Compiling serde_json v1.0.151
+   Compiling generic-array v0.14.7
+   Compiling regex-syntax v0.8.11
+   Compiling ctutils v0.4.2
+   Compiling anyhow v1.0.104
+   Compiling tracing v0.1.44
+   Compiling signal-hook-registry v1.4.8
+   Compiling num-traits v0.2.19
+   Compiling aho-corasick v1.1.5
+   Compiling zeroize_derive v1.5.0
+   Compiling futures-task v0.3.34
+   Compiling lazy_static v1.5.0
+   Compiling tinyvec_macros v0.1.1
+   Compiling futures-util v0.3.34
+   Compiling fallible-iterator v0.2.0
+   Compiling chacha20 v0.10.2
+   Compiling byteorder v1.5.0
+   Compiling unicode-bidi v0.3.18
+   Compiling unicode-properties v0.1.4
+   Compiling hashbrown v0.17.1
+   Compiling getrandom v0.3.4
+   Compiling siphasher v1.0.3
+   Compiling bytes v1.12.1
+   Compiling smallvec v1.15.2
+   Compiling indexmap v2.14.0
+   Compiling parking_lot v0.12.5
+   Compiling zeroize v1.9.0
+   Compiling tokio v1.53.1
+   Compiling httpdate v1.0.3
+   Compiling jobserver v0.1.35
+   Compiling getrandom v0.2.17
+   Compiling cc v1.4.2
+   Compiling tinyvec v1.12.0
+   Compiling hashbrown v0.16.1
+   Compiling crypto-common v0.2.2
+   Compiling cmake v0.1.58
+   Compiling rand v0.10.2
+   Compiling ring v0.17.14
+   Compiling digest v0.11.3
+   Compiling ahash v0.8.12
+   Compiling unicode-normalization v0.1.25
+   Compiling http v0.2.12
+   Compiling ppv-lite86 v0.2.21
+   Compiling crypto-common v0.1.7
+   Compiling stringprep v0.1.5
+   Compiling mime v0.3.17
+   Compiling icu_normalizer v2.2.0
+   Compiling either v1.17.0
+   Compiling http-body v0.4.6
+   Compiling sha2 v0.11.0
+   Compiling md-5 v0.11.0
+   Compiling idna_adapter v1.2.2
+   Compiling rand_core v0.6.4
+   Compiling pin-project-internal v1.1.13
+   Compiling idna v1.1.0
+   Compiling glob v0.3.4
+   Compiling rand_chacha v0.3.1
+   Compiling hmac v0.13.0
+   Compiling uuid v1.24.0
+   Compiling rustversion v1.0.23
+   Compiling ref-cast v1.0.26
+   Compiling minimal-lexical v0.2.1
+   Compiling rand v0.8.7
+   Compiling nom v7.1.3
+   Compiling pin-project v1.1.13
+   Compiling num-integer v0.1.47
+   Compiling chrono v0.4.45
+   Compiling num-bigint v0.4.8
+   Compiling ref-cast-impl v1.0.26
+   Compiling cpufeatures v0.2.17
+   Compiling postgres-protocol v0.6.12
+   Compiling uncased v0.9.10
+   Compiling indexmap v1.9.3
+   Compiling unicode-general-category v1.1.0
+   Compiling postgres-types v0.2.14
+   Compiling clang-sys v1.9.1
+   Compiling rustls-pki-types v1.15.1
+   Compiling block-padding v0.3.3
+   Compiling regex-automata v0.4.18
+   Compiling rustix v0.38.44
+   Compiling tokio-util v0.7.19
+   Compiling prettyplease v0.2.37
+   Compiling bit-vec v0.8.0
+   Compiling hashbrown v0.12.3
+   Compiling bit-set v0.8.0
+   Compiling inout v0.1.4
+   Compiling num-rational v0.4.2
+   Compiling num-iter v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling borrow-or-share v0.2.4
+   Compiling axum-core v0.3.4
+   Compiling num v0.4.3
+   Compiling libloading v0.8.9
+   Compiling micromap v0.3.0
+   Compiling home v0.5.12
+   Compiling subtle v2.6.1
+   Compiling bindgen v0.66.1
+   Compiling regex v1.13.1
+   Compiling rust_decimal v1.42.1
+   Compiling fraction v0.15.4
+   Compiling phf_shared v0.11.3
+   Compiling cexpr v0.6.0
+   Compiling core-foundation v0.9.4
+   Compiling async-stream-impl v0.3.6
+   Compiling peeking_take_while v0.1.2
+   Compiling rustc-hash v1.1.0
+   Compiling lazycell v1.3.0
+   Compiling vsimd v0.8.0
+   Compiling bytecount v0.6.9
+   Compiling shlex v1.3.0
+   Compiling outref v0.5.2
+   Compiling num-cmp v0.1.0
+   Compiling async-stream v0.3.6
+   Compiling axum v0.6.20
+   Compiling uuid-simd v0.8.0
+   Compiling itertools v0.12.1
+   Compiling email_address v0.2.9
+   Compiling data-encoding v2.11.1
+   Compiling phf_generator v0.11.3
+   Compiling prost-derive v0.12.6
+   Compiling fancy-regex v0.18.0
+   Compiling jsonschema-regex v0.46.10
+   Compiling matchit v0.7.3
+   Compiling sync_wrapper v0.1.2
+   Compiling bitflags v1.3.2
+   Compiling security-framework-sys v2.17.0
+   Compiling base64 v0.21.7
+   Compiling rustls v0.22.4
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling pkg-config v0.3.33
+   Compiling zerocopy-derive v0.7.35
+   Compiling phf_codegen v0.11.3
+   Compiling futures-executor v0.3.34
+   Compiling prost v0.12.6
+   Compiling which v4.4.2
+   Compiling zerocopy v0.7.35
+   Compiling objc2-core-foundation v0.3.2
+   Compiling thiserror v1.0.69
+   Compiling fluent-uri v0.4.1
+   Compiling http-range-header v0.3.1
+   Compiling objc2-system-configuration v0.3.2
+   Compiling futures v0.3.34
+   Compiling libsql-sqlite3-parser v0.13.0
+   Compiling referencing v0.46.10
+   Compiling thiserror-impl v1.0.69
+   Compiling jsonschema v0.46.10
+   Compiling url v2.5.8
+   Compiling phf_shared v0.13.1
+   Compiling fallible-iterator v0.3.0
+   Compiling phf v0.13.1
+   Compiling cipher v0.4.4
+   Compiling h2 v0.3.27
+   Compiling socket2 v0.5.10
+   Compiling bincode v1.3.3
+   Compiling urlencoding v2.1.3
+   Compiling tower v0.4.13
+   Compiling hashbrown v0.14.5
+   Compiling aes v0.8.4
+   Compiling cbc v0.1.2
+   Compiling ironclaw_host_api v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_host_api)
+   Compiling tokio-io-timeout v1.2.1
+   Compiling blake3 v1.8.6
+   Compiling hashlink v0.8.4
+   Compiling libsql-hrana v0.9.30
+   Compiling phf_macros v0.11.3
+   Compiling rustls-webpki v0.102.8
+   Compiling tokio-stream v0.1.19
+   Compiling crc32fast v1.5.0
+   Compiling hyper v0.14.32
+   Compiling constant_time_eq v0.4.2
+   Compiling arrayref v0.3.9
+   Compiling phf v0.11.3
+   Compiling security-framework v2.11.1
+   Compiling rustls-pemfile v2.2.0
+   Compiling webpki-roots v1.0.9
+   Compiling num_cpus v1.17.0
+   Compiling tokio-rustls v0.25.0
+   Compiling webpki-roots v0.26.11
+   Compiling rustls-native-certs v0.7.3
+   Compiling tower-http v0.4.4
+   Compiling whoami v2.1.3
+   Compiling block-buffer v0.10.4
+   Compiling hyper-timeout v0.4.1
+   Compiling libm v0.2.16
+   Compiling digest v0.10.7
+   Compiling hyper-rustls v0.25.0
+   Compiling tokio-postgres v0.7.18
+   Compiling ironclaw_safety v0.2.2 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_safety)
+   Compiling deadpool-runtime v0.1.4
+   Compiling deadpool v0.12.3
+   Compiling libsql-ffi v0.9.30
+   Compiling deadpool-runtime v0.3.1
+   Compiling fs_extra v1.3.0
+   Compiling dunce v1.0.5
+   Compiling aws-lc-sys v0.44.0
+   Compiling deadpool v0.13.0
+   Compiling hex v0.4.3
+   Compiling deadpool-postgres v0.14.1
+   Compiling sha2 v0.10.9
+   Compiling mio v1.2.2
+   Compiling socket2 v0.6.5
+   Compiling http v1.5.0
+   Compiling phf_shared v0.12.1
+   Compiling bumpalo v3.20.3
+   Compiling chrono-tz v0.10.4
+   Compiling tonic v0.11.0
+   Compiling semver v1.0.28
+   Compiling phf v0.12.1
+   Compiling ironclaw_observability v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_observability)
+   Compiling encoding_rs v0.8.35
+   Compiling aws-lc-rs v1.18.0
+   Compiling secrecy v0.10.3
+   Compiling http-body v1.1.0
+   Compiling rustix v1.1.4
+   Compiling untrusted v0.7.1
+   Compiling wasmtime-internal-core v47.0.3
+   Compiling heck v0.5.0
+   Compiling system-configuration-sys v0.6.0
+   Compiling tonic-web v0.11.0
+   Compiling h2 v0.4.16
+   Compiling security-framework v3.7.0
+   Compiling fastrand v2.5.0
+   Compiling rustls v0.23.43
+   Compiling cranelift-srcgen v0.134.3
+   Compiling cranelift-assembler-x64-meta v0.134.3
+   Compiling hyper v1.11.0
+   Compiling http-body-util v0.1.4
+   Compiling rustc-hash v2.1.3
+   Compiling libsql-rusqlite v0.9.30
+   Compiling ironclaw_extension_contracts v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_extension_contracts)
+   Compiling pulley-macros v47.0.3
+   Compiling target-lexicon v0.13.5
+   Compiling simd-adler32 v0.3.10
+   Compiling cranelift-bitset v0.134.3
+   Compiling option-ext v0.2.0
+   Compiling leb128fmt v0.1.0
+   Compiling dirs-sys v0.5.0
+   Compiling cranelift-entity v0.134.3
+   Compiling libsql-sys v0.9.30
+   Compiling wasmparser v0.252.0
+   Compiling tower v0.5.3
+   Compiling serde_urlencoded v0.7.1
+   Compiling libsql_replication v0.9.30
+   Compiling gimli v0.33.0
+   Compiling cobs v0.3.0
+   Compiling block-padding v0.4.2
+   Compiling system-configuration v0.7.0
+   Compiling wasmtime-internal-versioned-export-macros v47.0.3
+   Compiling hyper-util v0.1.20
+   Compiling base64 v0.23.1
+   Compiling adler2 v2.0.1
+   Compiling unicase v2.9.0
+   Compiling cranelift-isle v0.134.3
+   Compiling mime_guess v2.0.5
+   Compiling miniz_oxide v0.8.9
+   Compiling pulley-interpreter v47.0.3
+   Compiling libsql v0.9.30
+   Compiling inout v0.2.2
+   Compiling postcard v1.1.3
+   Compiling cranelift-bforest v0.134.3
+   Compiling dirs v6.0.0
+   Compiling rustls-native-certs v0.8.4
+   Compiling rust_decimal_macros v1.40.0
+   Compiling cranelift-codegen-shared v0.134.3
+   Compiling zlib-rs v0.6.7
+   Compiling object v0.39.1
+   Compiling winnow v1.0.4
+   Compiling ironclaw_common v0.4.2 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_common)
+   Compiling cranelift-assembler-x64 v0.134.3
+   Compiling cranelift-codegen-meta v0.134.3
+   Compiling rustc_version v0.4.1
+   Compiling crossbeam-utils v0.8.22
+   Compiling toml_parser v1.1.3+spec-1.1.0
+   Compiling toml_writer v1.1.2+spec-1.1.0
+   Compiling cpp_demangle v0.5.1
+   Compiling wasm-encoder v0.252.0
+   Compiling cipher v0.5.2
+   Compiling tower-http v0.6.11
+   Compiling zstd-sys v2.0.16+zstd.1.5.7
+   Compiling serde_spanned v1.1.1
+   Compiling wasmtime-internal-component-util v47.0.3
+   Compiling arbitrary v1.4.2
+   Compiling termcolor v1.4.1
+   Compiling wasmprinter v0.252.0
+   Compiling cranelift-codegen v0.134.3
+   Compiling cranelift-control v0.134.3
+   Compiling regalloc2 v0.15.2
+   Compiling ironclaw_libsql_runtime v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_libsql_runtime)
+   Compiling flate2 v1.1.9
+   Compiling ironclaw_filesystem v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_filesystem)
+   Compiling ironclaw_event_log v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/events/ironclaw_event_log)
+   Compiling nom v8.0.0
+   Compiling num-conv v0.2.2
+   Compiling time-core v0.1.9
+   Compiling crossbeam-epoch v0.9.20
+   Compiling cpubits v0.1.1
+   Compiling rustc-demangle v0.1.28
+   Compiling rangemap v1.7.1
+   Compiling winnow v0.7.15
+   Compiling wasmtime-environ v47.0.3
+   Compiling time-macros v0.2.32
+   Compiling tempfile v3.27.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling deranged v0.5.8
+   Compiling zstd-safe v7.2.4
+   Compiling crossbeam-deque v0.8.7
+   Compiling powerfmt v0.2.0
+   Compiling id-arena v2.3.0
+   Compiling schemars_derive v1.2.2
+   Compiling time v0.3.55
+   Compiling wasm-encoder v0.256.0
+   Compiling pom v1.1.0
+   Compiling rayon-core v1.13.0
+   Compiling dyn-clone v1.0.20
+   Compiling wasmtime-internal-unwinder v47.0.3
+   Compiling unicode-width v0.2.2
+   Compiling wast v256.0.0
+   Compiling schemars v1.2.2
+   Compiling aes v0.9.2
+   Compiling wasmtime-internal-jit-debug v47.0.3
+   Compiling wasmtime-internal-fiber v47.0.3
+   Compiling zopfli v0.8.3
+   Compiling md-5 v0.10.6
+   Compiling ecb v0.1.2
+   Compiling tracing-futures v0.2.5
+   Compiling nanoid v0.4.0
+   Compiling eventsource-stream v0.2.3
+   Compiling ordered-float v5.3.0
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling proc-macro2-diagnostics v0.10.1
+   Compiling dirs-sys-next v0.1.2
+   Compiling fixedbitset v0.4.2
+   Compiling io-lifetimes v3.0.1
+   Compiling typed-path v0.12.3
+   Compiling weezl v0.1.12
+   Compiling futures-timer v3.0.4
+   Compiling wasmtime-internal-cranelift v47.0.3
+   Compiling ttf-parser v0.25.1
+   Compiling wasmtime-internal-cache v47.0.3
+   Compiling as-any v0.3.2
+   Compiling io-lifetimes v2.0.4
+   Compiling wasmtime-internal-component-macro v47.0.3
+   Compiling wit-parser v0.252.0
+   Compiling wat v1.256.0
+   Compiling zip v8.6.0
+   Compiling lopdf v0.42.0
+   Compiling petgraph v0.6.5
+   Compiling zstd v0.13.3
+   Compiling wasmtime-internal-wit-bindgen v47.0.3
+   Compiling directories-next v2.0.0
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling itertools v0.14.0
+   Compiling adobe-cmap-parser v0.4.1
+   Compiling type1-encoding-parser v0.1.1
+   Compiling pathfinder_simd v0.5.6
+   Compiling ironclaw_product_contracts v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_product_contracts)
+   Compiling wasmtime v47.0.3
+   Compiling euclid v0.20.14
+   Compiling debugid v0.8.0
+   Compiling universal-hash v0.6.1
+   Compiling cpufeatures v0.3.0
+   Compiling open v5.4.1
+   Compiling unsafe-libyaml-norway v0.2.15
+   Compiling yansi v1.0.1
+   Compiling postscript v0.14.1
+   Compiling io-extras v0.19.0
+   Compiling cff-parser v0.2.0
+   Compiling pdf-extract v0.12.0
+   Compiling polyval v0.7.3
+   Compiling fxprof-processed-profile v0.8.1
+   Compiling rayon v1.12.0
+   Compiling wasm-compose v0.252.0
+   Compiling addr2line v0.26.1
+   Compiling wasmtime-internal-jit-icache-coherence v47.0.3
+   Compiling unicode-joining-type v1.0.0
+   Compiling heck v0.4.1
+   Compiling static_assertions v1.1.0
+   Compiling cap-primitives v4.0.2
+   Compiling mach2 v0.6.0
+   Compiling unicode-canonical-combining-class v1.0.0
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling alloc-stdlib v0.2.4
+   Compiling ouroboros_macro v0.18.5
+   Compiling fs-set-times v0.20.3
+   Compiling ironclaw_extractors v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_extractors)
+   Compiling ghash v0.6.0
+   Compiling ctr v0.10.1
+   Compiling aead v0.6.1
+   Compiling toml_datetime v1.1.1+spec-1.1.0
+   Compiling der_derive v0.7.3
+   Compiling enumflags2_derive v0.7.12
+   Compiling fs2 v0.4.3
+   Compiling cap-std v4.0.2
+   Compiling aliasable v0.1.3
+   Compiling ambient-authority v0.0.2
+   Compiling const-oid v0.9.6
+   Compiling ryu-js v0.2.2
+   Compiling flagset v0.4.7
+   Compiling maybe-owned v0.3.4
+   Compiling serde_jcs v0.2.0
+   Compiling enumflags2 v0.7.12
+   Compiling ouroboros v0.18.5
+   Compiling cranelift-frontend v0.134.3
+   Compiling cranelift-native v0.134.3
+   Compiling der v0.7.10
+   Compiling aes-gcm v0.11.0
+   Compiling pathfinder_geometry v0.5.1
+   Compiling brotli-decompressor v5.0.3
+   Compiling ecb v0.2.0
+   Compiling cbc v0.2.1
+   Compiling curve25519-dalek v4.1.3
+   Compiling hkdf v0.13.0
+   Compiling pem v3.0.6
+   Compiling ucd-trie v0.1.7
+   Compiling weezl v0.2.1
+   Compiling signature v2.2.0
+   Compiling glyph-names v0.2.0
+   Compiling cap-fs-ext v4.0.2
+   Compiling ironclaw_secrets v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_secrets)
+   Compiling lopdf v0.44.0
+   Compiling allsorts-azul v0.17.2
+   Compiling spki v0.7.3
+   Compiling ironclaw_loop_contracts v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_loop_contracts)
+   Compiling ironclaw_resources v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_resources)
+   Compiling toml v1.1.4+spec-1.1.0
+   Compiling strum_macros v0.28.0
+   Compiling ironclaw_trust v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_trust)
+   Compiling ulid v3.0.0
+   Compiling serde_with v3.22.0
+   Compiling form_urlencoded v1.2.2
+   Compiling serde_repr v0.1.21
+   Compiling ironclaw_authorization v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_authorization)
+   Compiling ironclaw_processes v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_processes)
+   Compiling strum v0.28.0
+   Compiling bollard-stubs v1.47.1-rc.27.3.1
+   Compiling x509-cert v0.2.5
+   Compiling ed25519 v2.2.3
+   Compiling serde_norway v0.9.42
+   Compiling simple_asn1 v0.6.4
+   Compiling yasna v0.6.0
+   Compiling cron v0.17.0
+   Compiling ironclaw_event_projections v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/events/ironclaw_event_projections)
+   Compiling hyperlocal v0.9.1
+   Compiling xattr v1.6.1
+   Compiling ironclaw_runtime_policy v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_runtime_policy)
+   Compiling referencing v0.49.9
+   Compiling jsonschema-value v0.49.9
+   Compiling fancy-regex v0.19.0
+   Compiling jsonschema-regex v0.49.9
+   Compiling quick-xml v0.41.0
+   Compiling filetime v0.2.29
+   Compiling unsafe-libyaml v0.2.11
+   Compiling tar v0.4.46
+   Compiling printpdf v0.12.5
+   Compiling jsonschema v0.49.9
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling ironclaw_approvals v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_approvals)
+   Compiling ironclaw_skills v0.3.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_skills)
+   Compiling ironclaw_triggers v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_triggers)
+   Compiling rcgen v0.14.9
+   Compiling ed25519-dalek v2.2.0
+   Compiling ironclaw_turns v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_turns)
+   Compiling bollard v0.18.1
+   Compiling ironclaw_extension_registry v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/ironclaw_extension_registry)
+   Compiling ironclaw_auth v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_auth)
+   Compiling ironclaw_wasm_limiter v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/lanes/ironclaw_wasm_limiter)
+   Compiling wasmtime-wasi-io v47.0.3
+   Compiling ironclaw_memory v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_memory)
+   Compiling wasmtime-wasi v47.0.3
+   Compiling rand_core v0.9.5
+   Compiling ironclaw_prompt_envelope v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/contracts/ironclaw_prompt_envelope)
+   Compiling similar v3.1.2
+   Compiling ironclaw_memory_native v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/packages/memory-native)
+   Compiling ironclaw_mcp v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/lanes/ironclaw_mcp)
+   Compiling dashmap v6.2.1
+   Compiling axum-core v0.5.6
+   Compiling lru v0.18.2
+   Compiling serde_path_to_error v0.1.20
+   Compiling ironclaw_capabilities v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_capabilities)
+   Compiling wait-timeout v0.2.1
+   Compiling quick-error v1.2.3
+   Compiling matchit v0.8.4
+   Compiling rusty-fork v0.3.1
+   Compiling ironclaw_hooks v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/loop/ironclaw_hooks)
+   Compiling rand v0.9.5
+   Compiling axum v0.8.9
+   Compiling ironclaw_documents v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_documents)
+   Compiling rand_xorshift v0.4.0
+   Compiling rand_chacha v0.9.0
+   Compiling ironclaw_conversations v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_conversations)
+   Compiling ironclaw_identity v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_identity)
+   Compiling ironclaw_extension_support v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/ironclaw_extension_support)
+   Compiling toml_edit v0.25.13+spec-1.1.0
+   Compiling ironclaw_notifications v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_notifications)
+   Compiling fs4 v1.1.0
+   Compiling sharded-slab v0.1.7
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling nu-ansi-term v0.50.3
+   Compiling unarray v0.1.4
+   Compiling ironclaw_config v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/app/ironclaw_config)
+   Compiling ironclaw_host_ingress v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/product/ironclaw_host_ingress)
+   Compiling proptest v1.11.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling ironclaw_wasm v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/lanes/ironclaw_wasm)
+   Compiling ironclaw_extension_host v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/ironclaw_extension_host)
+   Compiling rustls-webpki v0.103.14
+   Compiling jsonwebtoken v11.0.0
+   Compiling tokio-rustls v0.26.4
+   Compiling rustls-platform-verifier v0.7.0
+   Compiling hyper-rustls v0.27.9
+   Compiling tokio-postgres-rustls v0.14.0
+   Compiling ironclaw_event_store v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/events/ironclaw_event_store)
+   Compiling reqwest v0.13.4
+   Compiling reqwest v0.12.28
+   Compiling ironclaw_network v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_network)
+   Compiling rig-core v0.36.0
+   Compiling ironclaw_sandbox v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/lanes/ironclaw_sandbox)
+   Compiling ironclaw_llm v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_llm)
+   Compiling ironclaw_threads v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_threads)
+   Compiling ironclaw_trace_commons v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_trace_commons)
+   Compiling ironclaw_attachments v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_attachments)
+   Compiling ironclaw_outbound v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/domains/ironclaw_outbound)
+   Compiling ironclaw_slack_extension v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/packages/slack)
+   Compiling ironclaw_host_runtime v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_host_runtime)
+   Compiling ironclaw_event_streams v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/events/ironclaw_event_streams)
+   Compiling ironclaw_loop_host v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/loop/ironclaw_loop_host)
+   Compiling ironclaw_assistant v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/product/ironclaw_assistant)
+    Finished `test` profile [unoptimized] target(s) in 2m 28s
+     Running unittests src/lib.rs (target/debug/deps/ironclaw_extension_host-fe2e82af6ac6884d)
+
+running 3 tests
+test hosted_mcp_admission::tests::canonical_endpoint_rejects_credential_and_private_literal_forms ... ok
+test hosted_mcp_admission::tests::loopback_opt_in_admits_only_loopback_endpoints ... ok
+test hosted_mcp_admission::tests::canonical_endpoint_keeps_query_identity_and_normalizes_path ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 486 filtered out; finished in 0.00s
+
+rc_admission=0

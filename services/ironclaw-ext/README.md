@@ -1,4 +1,4 @@
-# services/ironclaw-ext — Phase 5/6: IronClaw agent layer for Jyotish-OS
+# services/ironclaw-ext — Phase 5/6/7: IronClaw agent layer for Jyotish-OS
 
 Everything here was produced against the **installed binary `ironclaw 1.4.0`** (Homebrew
 bottle, 2026-09-16), not against the 1.3.0 docs tree. Where the binary and the docs differ,
@@ -17,7 +17,9 @@ the binary wins and the difference is called out. Raw command output for every c
 | `config/activities.json` | activities for the weekly muhurta scan | written |
 | `install.sh` | idempotent installer: onboard -> provider (only if unset) -> persona -> remove-old -> package -> `extension install` -> TLS health probe | executed twice, active both times (`logs/p6-install-sh-run.txt`) |
 | `check.sh` + `tools/gen_schemas.py` | static gate: manifest/schemas/routines/persona consistency with `docs/CONTRACT.md` | executed, passes |
-| `tools/stub_ollama.py` | deterministic Ollama-shaped stub LLM (loopback) that issues one `tool_call` — used to drive IronClaw's dispatcher without a real model | executed (`logs/p6-run-attempt3*.txt`) |
+| `tools/stub_ollama.py` | deterministic Ollama-shaped stub LLM (loopback) that issues one `tool_call` (or a `--script` of them, `--tool-args` JSON) — used to drive IronClaw's dispatcher without a real model | executed (`logs/p6-run-attempt3*.txt`, `logs/p7-*`) |
+| `tools/p7_tool_call.sh` | Phase-7 proof runner: one stub-driven agent turn per call, captures turn/transcript/server.log/audit slices, restores the provider | executed (`logs/p7-*`) |
+| `../../patches/ironclaw-1.4.0-allow-loopback-egress.patch` | the IronClaw source patch (loopback-only opt-in, 4 files); built into `~/.local/bin/ironclaw-jyotish` | **built, tested, installed** |
 | `logs/` | verbatim outputs (no secrets present; checked) | — |
 
 ## TLS on loopback (Phase 6) — what now works
@@ -109,6 +111,118 @@ here: IronClaw was not patched and jyotish-mcp was not bound to a non-loopback a
   too in 1.3.0; likely the same denial). Unverified.
 - (d) Keep IronClaw for chat/routines; call jyotish-mcp from a first-party tool executor in a
   fork — same build cost as (a).
+
+## Phase 7 — a real `jyotish.*` tool call through IronClaw (EXECUTED, 2026-09-16/17)
+
+**Result: `catalog.list` and `chart.compute` (GOLDEN birth) complete end to end through a
+patched, opt-in IronClaw 1.4.0 build over loopback TLS.** `chart.compute` returned
+`evidence.consensus_status: "PASS"` and Moon in **Swati** (193.2923° sidereal); jyotish-mcp
+logged the TLS handshake and the audit entry for every call. Without the opt-in flag the same
+binary denies the call exactly as upstream does.
+
+### What was actually blocking (the Phase-6 diagnosis was incomplete)
+
+Reading the 1.4.0 source (`vendor/ironclaw-fork`, tag `ironclaw-v1.4.0`, commit `4cb47cf`) shows
+three gates in front of a loopback MCP server, not one:
+
+| # | gate | where | effect on Phase 6 |
+|---|---|---|---|
+| 1 | A package installed from the filesystem catalog is `ManifestSource::InstalledLocal`; `hosted_http_mcp_url` only accepts `HostBundled \| UserRegistered`, so the `jyotish` package is **never a hosted-MCP provider**: discovery is skipped ("hosted MCP discovery endpoint is invalid"), its pinned `[[tools]]` keep an empty egress allow-list (`v3.rs:621`), and every call fails the `ApplyNetworkPolicy` obligation with **`network_denied`** before any socket is opened. This is independent of loopback — a public endpoint fails the same way. | `crates/extensions/ironclaw_extension_registry/src/hosted_mcp_discovery.rs:83`, `capability_surface.rs:210-230`, `obligations/handler.rs:1038` | the `network_denied` seen in P6; the grant printed in the P6 debug log already said `allowed_targets: [], deny_private_ip_ranges: false` |
+| 2 | The route 1.4.0 intends for a user-supplied server, `builtin.extension_register_hosted_mcp` (`ManifestSource::UserRegistered`), rejects `localhost` and **every IP literal** at admission. | `crates/extensions/ironclaw_extension_host/src/hosted_mcp_admission.rs` | not reached in P6 |
+| 3 | `deny_private_ip_ranges: true` on every networked policy (discovery, tool call, `builtin.http`), enforced once in `ironclaw_network` (literal IPs in `policy.rs`, resolved IPs in `resolver.rs`). | `crates/substrates/ironclaw_network/src/{policy,resolver}.rs` | the `policy_denied` seen for `builtin.http` in P6 |
+
+Gate 1 has no opt-in and is not about private networks, so it is left alone: the callable
+extension is the **registered** one. Gates 2 and 3 are the SSRF guard; the patch adds one
+loopback-only opt-in to both.
+
+### The patch (`patches/ironclaw-1.4.0-allow-loopback-egress.patch`, 4 files, +206/-14)
+
+- `IRONCLAW_EGRESS_ALLOW_LOOPBACK=1` (also `true|yes|on`), read once per process
+  (`ironclaw_network::loopback_egress_allowed`, `OnceLock`). Unset or any other value:
+  behaviour byte-identical to upstream.
+- With the flag: an IP in `127.0.0.0/8` or exactly `::1` is not a denied private target
+  (`is_denied_private_ip`, used by the two `policy.rs` checks and the resolver), and hosted-MCP
+  admission accepts `localhost` / `127.0.0.0/8` / `::1` endpoints. `10/8`, `172.16/12`,
+  `192.168/16`, `169.254/16`, `100.64/10`, `0/8`, `fc00::/7`, `fe80::/10`, documentation and
+  multicast ranges, IPv4-mapped IPv6 (`::ffff:127.0.0.1` included) and every other IP literal
+  stay denied in both places. Allow-list, https-only scheme, port match, egress caps and TLS
+  trust are untouched. A one-time `tracing::warn!` announces the exemption.
+- Unit tests: `policy::loopback_exemption_tests` (3) and
+  `hosted_mcp_admission::tests::loopback_opt_in_admits_only_loopback_endpoints`; upstream's
+  `canonical_endpoint_rejects_credential_and_private_literal_forms` still passes.
+
+### Build and install (EXECUTED)
+
+```bash
+git clone --depth 1 --branch ironclaw-v1.4.0 https://github.com/nearai/ironclaw vendor/ironclaw-fork   # 9 s; same tag the brew formula builds
+git -C vendor/ironclaw-fork apply ../../patches/ironclaw-1.4.0-allow-loopback-egress.patch
+cd vendor/ironclaw-fork
+cargo test -p ironclaw_network                      # 24+1+17+17 passed, rc=0   (logs/p7-cargo-test-ironclaw_network.txt)
+cargo test -p ironclaw_extension_host               # 489+9+7+2 passed, rc=0   (logs/p7-cargo-test-extension-host.txt)
+cargo build --release -p ironclaw                   # 7 m 46 s cold, 2 m 26 s incremental (logs/p7-cargo-build-release*.txt)
+cp target/release/ironclaw ~/.local/bin/ironclaw-jyotish
+~/.local/bin/ironclaw-jyotish --version             # ironclaw 1.4.0 (same string as brew; only this binary contains IRONCLAW_EGRESS_ALLOW_LOOPBACK)
+```
+Toolchain: `rust-toolchain.toml` pins 1.98.0 (rustup installed it; 1.97 was already present).
+The Homebrew binary (`/opt/homebrew/bin/ironclaw`, sha256 `9c6d0785…`) is untouched.
+**Rollback: `rm ~/.local/bin/ironclaw-jyotish`.**
+
+### Register the loopback server (EXECUTED, `./install.sh --register`)
+
+```bash
+cd services/ironclaw-ext && ./install.sh              # package + persona as before; now uses ironclaw-jyotish and exports the flag
+./install.sh --register                              # builtin.extension_register_hosted_mcp -> builtin.extension_install
+```
+`--register` drives one stub-LLM turn per step (`tools/p7_tool_call.sh` + `tools/stub_ollama.py
+--script`), then restores the owner's provider (anthropic / claude-sonnet-5). Observed:
+`"Hosted MCP registration accepted." package_ref.id = mcp-jyotish-local` →
+`"Extension activation succeeded"`, `phase: active`, ten `mcp-jyotish-local.*` tools discovered
+live from jyotish-mcp's `tools/list` (server.log: `tls handshake … TLS13_AES_256_GCM_SHA384` —
+rustls, distinct from curl's ChaCha20 line). Verified idempotent and from scratch
+(`extension remove mcp-jyotish-local` → 0 tools → `--register` → 10 tools). The old `jyotish`
+package stays installed for the persona/prompts; its `jyotish.*` tools are not callable on
+1.4.0 (gate 1).
+
+The grant IronClaw 1.4.0 issues for the registered tools, printed by the patched binary:
+`NetworkPolicy { allowed_targets: [NetworkTargetPattern { scheme: Some(Https), host_pattern:
+"127.0.0.1", port: Some(7791) }], deny_private_ip_ranges: true, max_egress_bytes: None }` —
+the full guard is still on; only the loopback carve-out lets it through.
+
+### Evidence (all `logs/p7-*`; `<label>.turn.txt` = IronClaw debug output, `.stub.jsonl` = the model transcript, `.server.log` / `.audit.jsonl` = lines jyotish-mcp appended during that turn)
+
+| run | flag | result | jyotish-mcp side |
+|---|---|---|---|
+| `p7-catalog-flag1` — `tool_call(mcp-jyotish-local__catalog__list, {})` | 1 | `status: success`, 5524 B, payload has `house_systems: {enabled, served_by_chart_compute}` and the ten contract tools; turn rc=0 in 0.4 s | `{"msg":"tls handshake","protocol":"TLSv1_3","cipher":"TLS13_AES_256_GCM_SHA384","ts":"2026-09-16T19:12:09.567Z"}` · `{"tool":"catalog.list","status":"ok","ms":0,"ts":"2026-09-16T19:12:09.568Z"}` |
+| `p7-chart-flag1` — `chart.compute` GOLDEN `{"utc":"1990-03-15T06:30:00Z","lat":28.6139,"lon":77.2090,"tz_offset_hours":5.5}`, D1 | 1 | `status: success`, 20414 B; `evidence.consensus_status: "PASS"`, `engine: xalen-de440`; Moon `sidereal_lon_deg 193.2923317968096`, `nakshatra: "Swati"`, pada 2, rashi Tula | handshake `19:12:32.579Z` · `{"tool":"chart.compute","status":"ok","ms":15,"ts":"2026-09-16T19:12:32.595Z"}` |
+| `p7-catalog-flag0` — same call, **flag unset** | 0 | `"provider message: MCP client error: policy_denied"`, `failure_kind: client`; no `exempted` warn line | **nothing** — no handshake, no audit line (denied before connect, as upstream) |
+| `p7-http-192168-flag1` — `builtin.http GET https://192.168.1.1/` | 1 | `failure_kind: policy_denied`, "the tool call was denied by policy" | nothing |
+| `p7-register-10005-flag1` — register `https://10.0.0.5:7791/mcp` | 1 | `hosted MCP extension name is unavailable` = `hosted MCP registration rejected: invalid endpoint error=InvalidEndpoint` (debug log) | nothing |
+| `p7-http-loopback-flag1` — `builtin.http GET https://127.0.0.1:7791/health` | 1 | HTTP 200, the health JSON (`golden.moon_nakshatra: "Swati"`) | handshake |
+| `p7-package-tool-flag1` — the filesystem package's `jyotish__catalog__list` | 1 | still `network_denied` (`capability invocation failed capability_id=jyotish.catalog.list error_kind="network_denied"`) — gate 1: not a loopback problem, its grant has no egress targets | nothing |
+
+Note the two different denial vocabularies: `network_denied` is the empty-allow-list
+*obligation* failure (gate 1); the private-IP check surfaces as `policy_denied` (gates 2/3).
+
+### Running the agent with the patch
+
+```bash
+export IRONCLAW_EGRESS_ALLOW_LOOPBACK=1
+export SSL_CERT_FILE=/Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem
+~/.local/bin/ironclaw-jyotish repl        # or run -m "..." / serve; tools are mcp-jyotish-local.* (model spelling mcp-jyotish-local__catalog__list)
+```
+For the launchd service put both variables under `EnvironmentVariables` in the plist and point
+`ProgramArguments` at `~/.local/bin/ironclaw-jyotish`.
+
+### Not covered / honest limits
+
+- No real model turn (no `ANTHROPIC_API_KEY` entered, per brief); every turn above is the stub
+  harness issuing the exact `tool_call` a model would issue. The dispatcher → egress → TLS →
+  jyotish-mcp → result path is the part that was in question and is now EXECUTED.
+- The patch is a local fork; `brew upgrade ironclaw` will not carry it. Re-apply on the new tag
+  (`git apply --check` first) and rebuild.
+- IPv4-mapped loopback (`::ffff:127.0.0.1`) is deliberately still denied.
+- `--register` uses the stub-LLM harness because 1.4.0 exposes hosted-MCP registration only as
+  an agent tool / WebUI command, not as a CLI subcommand.
 
 ## Model: Anthropic Claude (set, key not entered)
 
@@ -216,8 +330,10 @@ ironclaw models set-provider anthropic --model claude-sonnet-5 && ironclaw model
 
 ## What is NOT yet activated (honest list)
 
-1. **A `jyotish.*` tool call completing through IronClaw** — refused by IronClaw 1.4.0's
-   `deny_private_ip_ranges` egress policy (both `127.0.0.1` and `localhost`); needs option (a)/(c)/(d).
+1. ~~A `jyotish.*` tool call completing through IronClaw~~ — **done in Phase 7** with the
+   patched `~/.local/bin/ironclaw-jyotish` + `IRONCLAW_EGRESS_ALLOW_LOOPBACK=1` and the
+   registered `mcp-jyotish-local` extension (see "Phase 7"). The unpatched Homebrew binary still
+   refuses it.
 2. **A Claude agent turn** — provider set to `anthropic` / `claude-sonnet-5`, key not entered (owner: "Activate Claude").
 3. Routines — none created; needs a live agent turn (`routines/README.md`).
 4. Identity memory docs — not written to memory; the persona *is* installed as the system prompt file.

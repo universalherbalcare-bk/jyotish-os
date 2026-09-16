@@ -1,0 +1,16 @@
+start 2026-09-17T00:38:36
+   Compiling ironclaw_network v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/substrates/ironclaw_network)
+   Compiling ironclaw_sandbox v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/lanes/ironclaw_sandbox)
+   Compiling ironclaw_host_runtime v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/kernel/ironclaw_host_runtime)
+   Compiling ironclaw_loop_host v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/loop/ironclaw_loop_host)
+   Compiling ironclaw_assistant v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/product/ironclaw_assistant)
+   Compiling ironclaw_extension_host v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/ironclaw_extension_host)
+   Compiling ironclaw_turn_runner v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/loop/ironclaw_turn_runner)
+   Compiling ironclaw_openai_compat v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/product/ironclaw_openai_compat)
+   Compiling ironclaw_extension_manager v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/extensions/ironclaw_extension_manager)
+   Compiling ironclaw_webui v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/product/ironclaw_webui)
+   Compiling ironclaw_composition v0.1.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/app/ironclaw_composition)
+   Compiling ironclaw v1.4.0 (/Users/brijesh/Projects/jyotish-os/vendor/ironclaw-fork/crates/app/ironclaw_cli)
+    Finished `release` profile [optimized] target(s) in 2m 26s
+rc=0
+end 2026-09-17T00:41:03
