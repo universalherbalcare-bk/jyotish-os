@@ -20,7 +20,25 @@ jobs:
         run: |
           mkdir -p kernels && curl -L -o kernels/de440s.bsp https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp
           shasum -a 256 -c kernels/de440s.sha256
-      - run: cd services/jyotish-mcp && cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
+      # In-process integration tests boot plain HTTP on a random loopback port; JYOTISH_TLS=off
+      # documents that (the binary defaults to TLS on).
+      - run: cd services/jyotish-mcp && cargo fmt --check && cargo clippy --all-targets -- -D warnings && JYOTISH_TLS=off cargo test
+      - name: TLS smoke (Phase 6) — locally issued cert, SAN IP:127.0.0.1, key 0600, curl over https
+        run: |
+          set -euo pipefail
+          scripts/gen-cert.sh
+          cd services/jyotish-mcp && cargo build --release && cd ../..
+          services/jyotish-mcp/target/release/jyotish-mcp > /tmp/jyotish-mcp-tls.log 2>&1 &
+          for i in $(seq 1 30); do sleep 1; curl -sf --cacert certs/jyotish-ca.crt https://127.0.0.1:7791/health >/dev/null && break; done
+          curl -sf --cacert certs/jyotish-ca.crt https://127.0.0.1:7791/health | head -c 200; echo
+          curl -sf --cacert certs/jyotish-ca.crt -X POST https://127.0.0.1:7791/mcp -H 'content-type: application/json' \
+            -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | grep -q '"catalog.list"'
+          grep -q '"msg":"tls handshake"' /tmp/jyotish-mcp-tls.log
+          # boot guard must refuse a world-readable key (exit 2)
+          kill %1; wait %1 || true
+          chmod 644 certs/jyotish-mcp.key
+          set +e; JYOTISH_BIND=127.0.0.1:17791 services/jyotish-mcp/target/release/jyotish-mcp >/dev/null 2>&1; rc=$?; set -e
+          test "$rc" -eq 2
       - run: cd vendor/xalen && cargo test --workspace --exclude xalen-python --exclude xalen-node
   jhora-svc:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@
 ## Ports (loopback only)
 | Service | Bind | Purpose |
 |---|---|---|
-| jyotish-mcp | 127.0.0.1:7791 | MCP JSON-RPC 2.0 at `POST /mcp`; `GET /health` |
+| jyotish-mcp | 127.0.0.1:7791 | MCP JSON-RPC 2.0 at `POST /mcp`; `GET /health`. **HTTPS** (Phase 6): locally issued cert from `scripts/gen-cert.sh`, SAN `IP:127.0.0.1, DNS:localhost`; `JYOTISH_TLS=off` for plain HTTP (tests) |
 | jhora-svc | 127.0.0.1:7792 | PyJHora sidecar, JSON REST |
 | vedastro-svc | 127.0.0.1:7793 | VedAstro rule/dataset sidecar, JSON REST |
 

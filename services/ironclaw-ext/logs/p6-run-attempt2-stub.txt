@@ -1,0 +1,7 @@
+[2m2026-09-16T17:10:31.692785Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+[2m2026-09-16T17:10:31.932781Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+ironclaw: runtime started
+  profile     : local-dev
+  reborn_home : /Users/brijesh/.ironclaw/reborn
+
+No tool containing 'catalog' was offered; visible tools: builtin__apply_patch, builtin__extension_install, builtin__extension_register_hosted_mcp, builtin__extension_remove, builtin__extension_search, builtin__glob, builtin__grep, builtin__http, builtin__list_dir, builtin__outbound_deliver, builtin__outbound_delivery_targets_list, builtin__read_file, builtin__result_read, builtin__shell, builtin__skill_list, builtin__time, builtin__trigger_create, builtin__trigger_list, builtin__write_file, ironclaw__memory__read, ironclaw__memory__search, ironclaw__memory__tree, ironclaw__memory__write, tool_search, tool_describe, tool_call

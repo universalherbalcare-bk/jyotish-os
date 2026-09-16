@@ -1,6 +1,6 @@
 # jyotish-mcp
 
-JYOTISH-OS L4 server: **MCP JSON-RPC 2.0 over HTTP**, with the XALEN ephemeris
+JYOTISH-OS L4 server: **MCP JSON-RPC 2.0 over HTTPS (loopback, locally issued certificate)**, with the XALEN ephemeris
 crates linked natively (by path from `vendor/xalen`) and the **JPL DE440** kernel
 mandatory at boot. PyJHora (`jhora-svc`, :7792) and VedAstro (`vedastro-svc`, :7793)
 are proxied, never linked. Binding contract: `docs/CONTRACT.md`.
@@ -14,9 +14,10 @@ shasum -a 256 kernels/de440s.bsp > kernels/de440s.sha256
 
 cd services/jyotish-mcp
 cargo build --release
-cd ../..                                   # run from the repo root (default kernel path is ./kernels)
+cd ../..                                   # run from the repo root (default kernel + certs paths are relative)
+scripts/gen-cert.sh                        # once: certs/jyotish-ca.{crt,key} + certs/jyotish-mcp.{crt,key} (gitignored)
 nohup services/jyotish-mcp/target/release/jyotish-mcp > audit/server.log 2>&1 &
-curl -s localhost:7791/health
+curl -s --cacert certs/jyotish-ca.crt https://127.0.0.1:7791/health
 ```
 
 Boot guard (any failure aborts with a non-zero exit and a JSON fatal line):
@@ -26,6 +27,28 @@ Boot guard (any failure aborts with a non-zero exit and a JSON fatal line):
 3. The GOLDEN chart (1990-03-15T06:30:00Z, New Delhi) must put the Moon in Swati
    (sidereal Lahiri longitude in [186.6667, 200.0)) (exit 3).
 4. Bind and sidecar URLs must be loopback (exit 2).
+5. TLS (unless `JYOTISH_TLS=off`): the private key must be mode `0600` (any group/other bit
+   refuses) and the leaf certificate's SAN must contain `IP:127.0.0.1` — checked with webpki's
+   own name matching, i.e. the rule a rustls client applies (exit 2). `JYOTISH_TLS` must be
+   `on|off` (exit 2 otherwise). Port already in use or other socket errors are exit 4.
+
+## TLS (Phase 6)
+
+IronClaw 1.4.0 types a hosted-MCP endpoint as https-only, so the listener is HTTPS by default:
+`axum-server` + `rustls` (aws-lc-rs provider), TLS 1.2/1.3, the certificate chain and key from
+`JYOTISH_TLS_CERT` / `JYOTISH_TLS_KEY`. Every completed handshake leaves one structured line
+on stderr (`"msg":"tls handshake"` with peer, protocol, cipher, SNI); failed handshakes are
+logged as `warn` (`UnknownCA` is what a client without the local CA produces). The CA is
+trusted **per process** (`curl --cacert`, `SSL_CERT_FILE` for IronClaw via
+`scripts/make-ca-bundle.sh`); nothing is added to the macOS keychain.
+
+`scripts/gen-cert.sh` (idempotent, openssl only): EC P-256 local CA (`CN=jyotish-os local CA`,
+10 years, key 0600) and a server leaf signed by it (`CN=jyotish-mcp`, SAN `IP:127.0.0.1,
+DNS:localhost`, 825 days, key 0600); prints SHA-256 fingerprints. `--force` regenerates.
+
+The in-process integration tests still boot plain HTTP on a random loopback port through
+`jyotish_mcp::serve`; the TLS path is `jyotish_mcp::serve_tls`, used by the binary and
+exercised by the CI "TLS smoke" step (build, gen-cert, curl over https, boot-guard exit code).
 
 ## Environment
 
@@ -39,10 +62,15 @@ Boot guard (any failure aborts with a non-zero exit and a JSON fatal line):
 | `JYOTISH_AUDIT` | `./audit/jyotish-mcp.jsonl` | Append-only audit log (tool, request hash, ms, status; no payloads) |
 | `JYOTISH_CACHE_CAP` | `4096` | Max entries in the content-addressed cache |
 | `JYOTISH_SIDECAR_TIMEOUT_MS` | `5000` | Per-request sidecar timeout |
+| `JYOTISH_TLS` | `on` | `off` serves plain HTTP (tests / local debugging only) |
+| `JYOTISH_TLS_CERT` | `./certs/jyotish-mcp.crt` | PEM certificate chain (leaf first) |
+| `JYOTISH_TLS_KEY` | `./certs/jyotish-mcp.key` | PEM private key (PKCS#8 / SEC1 / PKCS#1); must be mode 0600 |
 
 No secrets are read or stored.
 
 ## Endpoints
+
+All endpoints are served over HTTPS on 127.0.0.1:7791 (plain HTTP with `JYOTISH_TLS=off`).
 
 * `GET /health` — kernel id/sha, coverage, golden self-test result, sidecar liveness, tool list.
 * `POST /mcp` — MCP 2025-06-18 JSON-RPC: `initialize`, `ping`, `tools/list`, `tools/call`.
@@ -78,6 +106,7 @@ A down sidecar yields `SIDECAR_UNAVAILABLE` (structured, `isError: true`); nothi
 * Every instant is checked against the kernel's own coverage window (JD 2396752.5–2506352.5,
   with a 5-day margin) → `KERNEL_COVERAGE` error; XALEN's silent VSOP87 fallback is unreachable.
 * Loopback-only bind and sidecar URLs, validated at boot.
+* TLS boot guard: key mode 0600 and SAN `IP:127.0.0.1`, or the process refuses to start (exit 2).
 * Content-addressed cache keyed by `sha256(tool ‖ canonical JSON ‖ kernel sha256)`.
 * Append-only JSONL audit; request payloads (birth data) never logged.
 
@@ -99,7 +128,7 @@ A down sidecar yields `SIDECAR_UNAVAILABLE` (structured, `isError: true`); nothi
 
 ```bash
 cd services/jyotish-mcp
-cargo test                      # unit (boundary math, mapping, cache, config, catalog) + in-process integration
+JYOTISH_TLS=off cargo test      # unit (boundary math, mapping, cache, config, catalog, tls guards) + in-process integration (plain HTTP)
 cargo clippy --all-targets -- -D warnings
 cargo build --release
 ```

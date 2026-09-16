@@ -19,3 +19,5 @@ obj/
 audit/
 validation/consensus-corpus.csv
 validation/consensus/target/
+# local TLS material (scripts/gen-cert.sh); never committed
+certs/

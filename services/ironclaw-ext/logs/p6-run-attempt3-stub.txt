@@ -1,0 +1,7 @@
+[2m2026-09-16T17:11:42.609947Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+[2m2026-09-16T17:11:42.821316Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+ironclaw: runtime started
+  profile     : local-dev
+  reborn_home : /Users/brijesh/.ironclaw/reborn
+
+The tool returned: {"detail":{"detail":"The capability runtime did not provide additional diagnostic detail.","failure_kind":"network_denied","kind":"generic_failure"},"recovery":{"recovery_hint":"revise_approach","same_call_retry":"forbidden"},"schema_version":1,"status":"error","summary":"Capability failed with network_denied.","trust":"untrusted_tool_output"}

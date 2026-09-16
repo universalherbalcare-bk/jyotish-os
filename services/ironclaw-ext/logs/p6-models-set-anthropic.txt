@@ -1,0 +1,23 @@
+Provider set to `anthropic`, model set to `claude-sonnet-5`
+Saved to /Users/brijesh/.ironclaw/reborn/config.toml
+Note: `anthropic` requires credentials. Set ANTHROPIC_API_KEY before running with this provider.
+v1_state: not-used
+IronClaw Reborn model status
+config_file: /Users/brijesh/.ironclaw/reborn/config.toml
+providers_file: /Users/brijesh/.ironclaw/reborn/providers.json
+default.provider: anthropic
+default.provider_known: yes
+default.model: claude-sonnet-5
+default.api_key_env: ANTHROPIC_API_KEY
+v1_state: not-used
+Provider: anthropic
+Description: Anthropic Claude models (direct API)
+Default model: claude-sonnet-4-20250514
+Active: yes
+Protocol: anthropic
+Model env: ANTHROPIC_MODEL
+API key env: ANTHROPIC_API_KEY (required)
+Credential kind: api_key
+Can list models: true
+Provider catalog: /Users/brijesh/.ironclaw/reborn/providers.json
+v1_state: not-used

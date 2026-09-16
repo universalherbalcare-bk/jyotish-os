@@ -1,0 +1,16 @@
+[install] ironclaw 1.4.0
+[install] reborn_home=/Users/brijesh/.ironclaw/reborn profile=local-dev
+[install] already onboarded
+[install] provider already configured: anthropic / claude-sonnet-5 (left as is; change with 'ironclaw models set-provider')
+[install] persona already current
+[install] removed previous install
+[install] package copied to /Users/brijesh/.ironclaw/reborn/local-dev/system/extensions/jyotish
+{"message":"Extension activation succeeded and its tools are now available. No additional authorization or configuration is needed, including for write-capable tools, unless a later tool call reports auth_required. Do not ask the user for a token, OAuth, authorization, or configuration after activated=true. These tools are now callable by exact name — invoke one directly with tool_call(name=\"<tool>\", arguments={ ... }), or tool_describe(name=\"<tool>\") first if you need its full schema. Do NOT call tool_search for these; you already have their names: jyotish.chart.compute, jyotish.panchang.day, jyotish.dasha.timeline, jyotish.transit.window, jyotish.muhurta.find, jyotish.match.kuta, jyotish.rectify.birth_time, jyotish.rule.validate, jyotish.engine.consensus, jyotish.catalog.list.","package_ref":{"id":"jyotish","kind":"extension"},"payload":{"installed":true,"kind":"extension_install","next_step":"Activation completed; model-visible extension tools are ready.","visible_capability_ids":["jyotish.chart.compute","jyotish.panchang.day","jyotish.dasha.timeline","jyotish.transit.window","jyotish.muhurta.find","jyotish.match.kuta","jyotish.rectify.birth_time","jyotish.rule.validate","jyotish.engine.consensus","jyotish.catalog.list"]},"phase":"active"}
+[install] jyotish-mcp health OK over TLS at https://127.0.0.1:7791/health (CA bundle: /Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem)
+[install] the IronClaw process must trust the local CA:  export SSL_CERT_FILE=/Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem
+[install]   (rustls-native-certs REPLACES the platform store with that file, which is why the bundle also
+[install]    carries the macOS system roots; for the launchd service put the same variable under
+[install]    EnvironmentVariables in ~/Library/LaunchAgents/com.ironclaw.reborn.plist)
+[install] KNOWN LIMIT: IronClaw 1.4.0 refuses loopback egress for hosted-MCP tool calls (network_denied);
+[install]    see README.md 'What was observed'
+[install] done

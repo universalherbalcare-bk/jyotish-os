@@ -1,5 +1,5 @@
 # JYOTISH-OS — session state
 Objective: build all 5 blueprint phases and run real tests (2026-09-16).
-Decisions: project at ~/Projects/jyotish-os (own git repo); vendor/ gitignored + restorable via scripts/vendor.sh; contract in docs/CONTRACT.md.
-Phase status: P1 ✅ · P2 ✅ · P3 ✅ · P4 ✅ (corpus PASS) · P5 ◐ (blocked: IronClaw https-only) · Verifier: CONDITIONALLY READY (docs/COMPLETION-LEDGER.md)
-Next: owner decisions — (1) IronClaw endpoint option a/c/d + smaller local model; (2) §2 ops hardening; (3) create git remote → CI + branch protection.
+Decisions: project at ~/Projects/jyotish-os (own git repo); vendor/ gitignored + restorable via scripts/vendor.sh; contract in docs/CONTRACT.md; jyotish-mcp serves HTTPS on loopback (Phase 6: scripts/gen-cert.sh + scripts/make-ca-bundle.sh, certs/ gitignored, JYOTISH_TLS=off for tests).
+Phase status: P1 ✅ · P2 ✅ · P3 ✅ · P4 ✅ (corpus PASS) · P5/P6 ◐ — https loopback endpoint + cert trust SOLVED and verified (extension active, 10 tools; TLS handshakes logged); IronClaw 1.4.0 still refuses the loopback tool call at egress (`network_denied`, `deny_private_ip_ranges: true`, both 127.0.0.1 and localhost, also builtin.http) → owner option a/c/d in services/ironclaw-ext/README.md; provider set to anthropic / claude-sonnet-5, key NOT entered (owner: `ironclaw config set anthropic.api_key`) · Verifier: CONDITIONALLY READY (docs/COMPLETION-LEDGER.md)
+Next: owner decisions — (1) IronClaw egress: patch (a) / WASM (c) / first-party executor (d); (2) `ironclaw config set anthropic.api_key` then a real Claude turn; (3) §2 ops hardening; (4) create git remote → CI + branch protection (CI now has a TLS smoke step). Phase-6 changes are uncommitted (no commit by instruction).

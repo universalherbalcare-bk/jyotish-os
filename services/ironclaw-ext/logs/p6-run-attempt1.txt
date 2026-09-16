@@ -1,0 +1,13 @@
+[2m2026-09-16T16:59:07.590273Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+[2m2026-09-16T16:59:07.852506Z[0m [32m INFO[0m [2mironclaw_llm::registry[0m[2m:[0m Loaded user provider definitions [3mcount[0m[2m=[0m1 [3mpath[0m[2m=[0m/Users/brijesh/.ironclaw/reborn/providers.json
+ironclaw: runtime started
+  profile     : local-dev
+  reborn_home : /Users/brijesh/.ironclaw/reborn
+
+[2m2026-09-16T16:59:07.981650Z[0m [33m WARN[0m [1mprocess[0m[1m{[0m[3mprocess_id[0m[2m=[0mdac8cb39-6259-44f8-9a94-d2fa9d8ddb22 [3mprocess_kind[0m[2m=[0mAgentTurn[1m}[0m[2m:[0m [2mironclaw_loop_host::model_gateway[0m[2m:[0m reborn model provider error mapped to safe summary [3mcomponent[0m[2m=[0m"model_provider" [3moperation[0m[2m=[0m"complete" [3merror[0m[2m=[0mProvider ollama rejected the request: HttpError: Invalid status code 400 Bad Request with message: {"error":"registry.ollama.ai/library/qwen2.5vl:7b does not support tools"}
+[2m2026-09-16T16:59:07.982489Z[0m [33m WARN[0m [1mprocess[0m[1m{[0m[3mprocess_id[0m[2m=[0mdac8cb39-6259-44f8-9a94-d2fa9d8ddb22 [3mprocess_kind[0m[2m=[0mAgentTurn[1m}[0m[2m:[0m [2mironclaw_turn_runner::planned_driver[0m[2m:[0m planned driver executor returned sanitized error [3merror[0m[2m=[0mHostUnavailableWithDiagnostics { stage: Model, kind: InvalidInvocation, safe_summary: LoopSafeSummary("model provider rejected the request"), reason_kind: None, detail: Some("Provider ollama rejected the request: HttpError: Invalid status code 400 Bad Request with message: {\"error\":\"registry.ollama.ai/library/qwen2.5vl:7b does not support tools\"}") }
+[2m2026-09-16T16:59:07.982524Z[0m [33m WARN[0m [1mprocess[0m[1m{[0m[3mprocess_id[0m[2m=[0mdac8cb39-6259-44f8-9a94-d2fa9d8ddb22 [3mprocess_kind[0m[2m=[0mAgentTurn[1m}[0m[2m:[0m [2mironclaw_turn_runner::planned_driver[0m[2m:[0m planned driver host stage unavailable [3mstage[0m[2m=[0mModel [3mkind[0m[2m=[0mInvalidInvocation [3mreason_kind[0m[2m=[0mNone [3msafe_summary[0m[2m=[0mmodel provider rejected the request
+Error: reborn run did not produce an assistant reply
+The agent runtime reported an internal error before producing a reply.
+failure_category=driver_failed
+status=Failed; run_id=dac8cb39-6259-44f8-9a94-d2fa9d8ddb22

@@ -7,12 +7,15 @@
 # first boot, and a successful `tools/list` discovery replaces them with the
 # live catalog (tool ids become `jyotish.<mcp tool name>`).
 #
-# KNOWN LIMIT (verified against ironclaw 1.4.0, see ../README.md):
-# IronClaw types `[mcp].server` as an HttpsEndpoint and its hosted-MCP egress
-# policy denies private/loopback IPs, so the contract URL below is rejected at
-# manifest parse time ("must use the https scheme"). The URL is kept exactly as
-# the contract specifies; do not "fix" it here — the fix belongs in IronClaw or
-# in an https+public-host front for jyotish-mcp (see README "Blocker").
+# TRANSPORT (Phase 6, verified against ironclaw 1.4.0 — see ../README.md):
+# IronClaw types `[mcp].server` as an https-only endpoint, so jyotish-mcp serves
+# HTTPS on 127.0.0.1:7791 with a locally issued certificate (scripts/gen-cert.sh)
+# and the IronClaw process trusts it via SSL_CERT_FILE=certs/ironclaw-ca-bundle.pem.
+# This manifest installs and activates with all ten tools model-visible.
+# KNOWN LIMIT: IronClaw 1.4.0's hosted-MCP egress policy still has
+# deny_private_ip_ranges=true with no override, so a tool call to this loopback
+# URL is refused *before* any TCP connection (`network_denied`, observed
+# 2026-09-16 with both 127.0.0.1 and localhost). Do not bind non-loopback.
 
 schema_version = "reborn.extension_manifest.v3"
 id = "jyotish"
@@ -26,7 +29,7 @@ trust = "third_party"
 # routines (daily brief, weekly muhurta, nightly consensus). Both are gated
 # behind an explicit grant. product (management surface) never calls tools.
 origin_gate_matrix = { loop_run = "gated_unless_granted", product = "forbidden", automation = "gated_unless_granted" }
-server = "http://127.0.0.1:7791/mcp"
+server = "https://127.0.0.1:7791/mcp"
 namespace = "jyotish"
 max_tools = 16
 default_permission = "allow"

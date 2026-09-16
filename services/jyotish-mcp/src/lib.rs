@@ -5,7 +5,8 @@
 //! 2. Verify `kernels/de440s.bsp` against the pinned SHA-256, parse it, confirm
 //!    DE440 provenance, build the almanac.
 //! 3. Compute the GOLDEN chart (docs/CONTRACT.md) and assert Moon ∈ Swati.
-//! 4. Open the append-only audit log and serve MCP over HTTP.
+//! 4. Open the append-only audit log and serve MCP over HTTPS (loopback,
+//!    locally issued certificate; `JYOTISH_TLS=off` for plain HTTP).
 
 pub mod audit;
 pub mod cache;
@@ -13,6 +14,7 @@ pub mod config;
 pub mod engine;
 pub mod mcp;
 pub mod sidecar;
+pub mod tls;
 pub mod tools;
 pub mod types;
 
@@ -36,7 +38,7 @@ pub struct AppState {
     pub config: Config,
 }
 
-fn log(level: &str, msg: &str, extra: serde_json::Value) {
+pub(crate) fn log(level: &str, msg: &str, extra: serde_json::Value) {
     let mut v = serde_json::json!({
         "ts": chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
         "level": level,
@@ -118,6 +120,48 @@ pub async fn serve(
         "info",
         "listening",
         serde_json::json!({ "addr": addr.to_string() }),
+    );
+    Ok((addr, handle))
+}
+
+/// Bind and serve over TLS. Same loopback-only rule as [`serve`]; the TLS
+/// boot checks (key mode 0600, SAN covers 127.0.0.1) run inside
+/// [`tls::load`] before the socket is opened, so a bad certificate never
+/// leaves a half-open listener behind.
+pub async fn serve_tls(
+    state: Arc<AppState>,
+    bind: SocketAddr,
+    paths: &tls::TlsPaths,
+) -> Result<(SocketAddr, tokio::task::JoinHandle<()>), Box<dyn std::error::Error + Send + Sync>> {
+    if !bind.ip().is_loopback() {
+        return Err(format!("refusing to bind non-loopback address {bind}").into());
+    }
+    let rustls_config = tls::load(paths).await?;
+    let fingerprint = tls::cert_fingerprint_sha256(&paths.cert)?;
+    let listener = tokio::net::TcpListener::bind(bind).await?;
+    let addr = listener.local_addr()?;
+    let std_listener = listener.into_std()?;
+    let app = router(state);
+    let server =
+        axum_server::from_tcp(std_listener)?.acceptor(tls::LoggingAcceptor::new(rustls_config));
+    let handle = tokio::spawn(async move {
+        if let Err(e) = server.serve(app.into_make_service()).await {
+            log(
+                "error",
+                "server exited",
+                serde_json::json!({ "error": e.to_string() }),
+            );
+        }
+    });
+    log(
+        "info",
+        "listening",
+        serde_json::json!({
+            "addr": addr.to_string(),
+            "tls": true,
+            "cert": paths.cert.display().to_string(),
+            "cert_sha256": fingerprint,
+        }),
     );
     Ok((addr, handle))
 }
