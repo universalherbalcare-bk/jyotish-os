@@ -87,6 +87,57 @@ def test_non_loopback_client_rejected(app_ctx):
     assert r.json()["error"] == "loopback_only"
 
 
+def test_trusted_cidrs_parse_and_match():
+    """JHORA_SVC_TRUSTED_CIDRS (deploy/compose.yaml): loopback always, trusted subnet only when set."""
+    import ipaddress
+
+    import app as app_module
+
+    assert app_module.parse_trusted_cidrs(None) == ()
+    assert app_module.parse_trusted_cidrs("") == ()
+    nets = app_module.parse_trusted_cidrs(" 172.28.0.0/24 , fd00:1::/64 ")
+    assert nets == (
+        ipaddress.ip_network("172.28.0.0/24"),
+        ipaddress.ip_network("fd00:1::/64"),
+    )
+    with pytest.raises(ValueError):
+        app_module.parse_trusted_cidrs("172.28.0.1/24")  # host bits set
+    with pytest.raises(ValueError):
+        app_module.parse_trusted_cidrs("not-a-cidr")
+    with pytest.raises(ValueError):
+        app_module.parse_trusted_cidrs("8.8.8.0/24")  # global network refused
+    # default (native): loopback only
+    assert app_module.client_allowed("127.0.0.1", ())
+    assert app_module.client_allowed("::1", ())
+    assert app_module.client_allowed("testclient", ())
+    assert not app_module.client_allowed("172.28.0.5", ())
+    assert not app_module.client_allowed(None, ())
+    # compose: the sidecar subnet only
+    assert app_module.client_allowed("172.28.0.5", nets)
+    assert not app_module.client_allowed("172.28.1.5", nets)
+    assert not app_module.client_allowed("10.0.0.5", nets)
+    assert not app_module.client_allowed("jhora-svc", nets)
+
+
+def test_trusted_cidr_client_accepted_when_configured(app_ctx, monkeypatch):
+    import ipaddress
+
+    import httpx
+
+    import app as app_module
+
+    app, loop = app_ctx
+    monkeypatch.setattr(
+        app_module, "TRUSTED_CIDRS", (ipaddress.ip_network("172.28.0.0/24"),)
+    )
+    for host, expected in (("172.28.0.9", 200), ("172.28.1.9", 403), ("10.0.0.5", 403)):
+        transport = httpx.ASGITransport(app=app, client=(host, 12345))
+        ac = httpx.AsyncClient(transport=transport, base_url="http://testserver")
+        r = loop.run_until_complete(ac.get("/v1/health"))
+        loop.run_until_complete(ac.aclose())
+        assert r.status_code == expected, (host, r.text)
+
+
 # ------------------------------------------------------------------ positions
 
 

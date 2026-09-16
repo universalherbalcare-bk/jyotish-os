@@ -101,9 +101,10 @@ pub async fn serve(
     state: Arc<AppState>,
     bind: SocketAddr,
 ) -> Result<(SocketAddr, tokio::task::JoinHandle<()>), Box<dyn std::error::Error + Send + Sync>> {
-    if !bind.ip().is_loopback() {
-        return Err(format!("refusing to bind non-loopback address {bind}").into());
-    }
+    // Same rule as Config::from_env (config::validate_bind): loopback, or the unspecified
+    // address only under JYOTISH_DEPLOYMENT=compose. Re-checked here so a caller that
+    // builds a Config by hand cannot bypass it.
+    config::validate_bind(bind, state.config.deployment)?;
     let listener = tokio::net::TcpListener::bind(bind).await?;
     let addr = listener.local_addr()?;
     let app = router(state);
@@ -124,7 +125,7 @@ pub async fn serve(
     Ok((addr, handle))
 }
 
-/// Bind and serve over TLS. Same loopback-only rule as [`serve`]; the TLS
+/// Bind and serve over TLS. Same bind rule as [`serve`]; the TLS
 /// boot checks (key mode 0600, SAN covers 127.0.0.1) run inside
 /// [`tls::load`] before the socket is opened, so a bad certificate never
 /// leaves a half-open listener behind.
@@ -133,9 +134,10 @@ pub async fn serve_tls(
     bind: SocketAddr,
     paths: &tls::TlsPaths,
 ) -> Result<(SocketAddr, tokio::task::JoinHandle<()>), Box<dyn std::error::Error + Send + Sync>> {
-    if !bind.ip().is_loopback() {
-        return Err(format!("refusing to bind non-loopback address {bind}").into());
-    }
+    // Same rule as Config::from_env (config::validate_bind): loopback, or the unspecified
+    // address only under JYOTISH_DEPLOYMENT=compose. Re-checked here so a caller that
+    // builds a Config by hand cannot bypass it.
+    config::validate_bind(bind, state.config.deployment)?;
     let rustls_config = tls::load(paths).await?;
     let fingerprint = tls::cert_fingerprint_sha256(&paths.cert)?;
     let listener = tokio::net::TcpListener::bind(bind).await?;

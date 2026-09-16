@@ -13,6 +13,7 @@ mod rng;
 mod stats;
 
 use chrono::{Duration, NaiveDate};
+use jyotish_mcp::config::{Deployment, validate_sidecar_url};
 use jyotish_mcp::engine::{BodyId, Engine, Instant, NODE_SOURCE_DE440};
 use jyotish_mcp::tools::consensus::{
     ASC_TOL_DEG, AYANAMSA_TOL_ARCSEC, NODE_TOL_ANALYTIC_ARCSEC, NODE_TOL_ARCSEC, TimeScaleEra,
@@ -117,11 +118,18 @@ fn parse_args() -> Args {
     if a.n == 0 || a.concurrency == 0 || a.year_from > a.year_to {
         usage();
     }
-    let host_ok = a.jhora_url.starts_with("http://127.0.0.1")
-        || a.jhora_url.starts_with("http://localhost")
-        || a.jhora_url.starts_with("http://[::1]");
-    if !host_ok {
-        eprintln!("refusing non-loopback jhora-svc URL {:?}", a.jhora_url);
+    // Same rule as the server (jyotish_mcp::config): loopback always; the compose
+    // service name `jhora-svc` only when JYOTISH_DEPLOYMENT=compose (deploy/compose.yaml,
+    // `docker compose --profile corpus run consensus-corpus`). Anything else is refused.
+    let mode = match Deployment::from_env() {
+        Ok(m) => m,
+        Err(e) => {
+            eprintln!("{e}");
+            std::process::exit(64);
+        }
+    };
+    if let Err(e) = validate_sidecar_url("JHORA_URL", &a.jhora_url, mode) {
+        eprintln!("refusing jhora-svc URL {:?}: {e}", a.jhora_url);
         std::process::exit(64);
     }
     a

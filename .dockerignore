@@ -1,0 +1,25 @@
+# Build context for deploy/compose.yaml (context = repo root). Whitelist: only what the three
+# Dockerfiles COPY. Everything else (10 GB ironclaw fork, 1.8 GB xalen target/, venvs, bin/obj,
+# certs, kernels, audit) never leaves the host as build context.
+*
+!services/jhora-svc/**
+!services/vedastro-svc/**
+!services/jyotish-mcp/**
+!validation/consensus/**
+!vendor/pyjhora/src/**
+!vendor/xalen/Cargo.toml
+!vendor/xalen/Cargo.lock
+!vendor/xalen/crates/**
+!vendor/xalen/validation/**
+# re-exclude build products and local state inside the whitelisted trees
+**/target/
+**/.venv/
+**/bin/
+**/obj/
+**/__pycache__/
+**/*.pyc
+**/*.log
+**/data/vedastro-svc.*
+**/data/*.sqlite*
+vendor/pyjhora/src/jhora/tests/
+vendor/pyjhora/src/jhora/ui/

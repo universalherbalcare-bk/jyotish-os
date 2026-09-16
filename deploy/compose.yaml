@@ -1,0 +1,191 @@
+# JYOTISH-OS production topology (Phase 8) — blueprint §2 hard rule 2 implemented without sudo:
+# sidecars run as separate non-root uids (10002 jhora, 10003 vedastro) inside their own containers,
+# on an `internal: true` network that has no route off the host, supervised by the Docker daemon
+# (restart: unless-stopped). jyotish-mcp (uid 10001) is the only service on the `edge` network and
+# the only one with a published port — 127.0.0.1:7791, TLS, the same certs/ as the native build.
+#
+#   scripts/prod-up.sh      build + up + wait for health   (stops the native servers first)
+#   scripts/prod-status.sh  status table
+#   scripts/prod-down.sh    stop
+#   docker compose -f deploy/compose.yaml --profile corpus run --rm consensus-corpus   # corpus inside the network
+#
+# Hard-wired names: container_name is fixed so `docker kill jhora-svc` / `docker exec vedastro-svc ...`
+# work verbatim; the compose service names are also the DNS names jyotish-mcp's boot guard accepts
+# (JYOTISH_DEPLOYMENT=compose, services/jyotish-mcp/src/config.rs).
+
+name: jyotish-os
+
+x-hardening: &hardening
+  read_only: true
+  cap_drop: [ALL]
+  security_opt:
+    - no-new-privileges:true
+  restart: unless-stopped
+  init: true
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "5"
+
+networks:
+  # Sidecar plane: no external route (internal: true). Fixed subnet so jhora-svc's trusted-client
+  # CIDR is deterministic.
+  sidecars:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+  # Edge plane: only jyotish-mcp; exists solely so its loopback port can be published.
+  edge:
+    ipam:
+      config:
+        - subnet: 172.28.1.0/24
+
+volumes:
+  # vedastro-svc SQLite dataset cache (rebuilt from the CSVs when their sha256 changes)
+  vedastro-data: {}
+
+services:
+  jhora-svc:
+    <<: *hardening
+    build:
+      context: ..
+      dockerfile: services/jhora-svc/Dockerfile
+    image: jyotish-os/jhora-svc:local
+    container_name: jhora-svc
+    hostname: jhora-svc
+    user: "10002:10002"
+    networks: [sidecars]
+    environment:
+      JHORA_SVC_LOG_LEVEL: INFO
+      # only jyotish-mcp (same internal subnet) may call; loopback stays accepted for the healthcheck
+      JHORA_SVC_TRUSTED_CIDRS: 172.28.0.0/24
+      JHORA_SVC_WORKERS: "4"
+    volumes:
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 67108864
+          mode: 01777
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request; r=urllib.request.urlopen('http://127.0.0.1:7792/v1/health', timeout=4); sys.exit(0 if r.status==200 and b'\"ok\":true' in r.read() else 1)"]
+      interval: 10s
+      timeout: 5s
+      start_period: 180s
+      retries: 3
+
+  vedastro-svc:
+    <<: *hardening
+    build:
+      context: ..
+      dockerfile: services/vedastro-svc/Dockerfile
+    image: jyotish-os/vedastro-svc:local
+    container_name: vedastro-svc
+    hostname: vedastro-svc
+    user: "10003:10003"
+    networks: [sidecars]
+    environment:
+      DOTNET_SYSTEM_NET_DISABLEIPV6: "1"
+      VEDASTRO_SVC_URL: http://0.0.0.0:7793
+      VEDASTRO_XML_DIR: /app/XMLData
+      VEDASTRO_DATASET_DIR: /datasets
+      VEDASTRO_DATA_DIR: /data
+    volumes:
+      - ../vendor/vedastro/HuggingFace:/datasets:ro
+      - vedastro-data:/data
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 134217728
+          mode: 01777
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:7793/v1/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+  jyotish-mcp:
+    <<: *hardening
+    build:
+      context: ..
+      dockerfile: services/jyotish-mcp/Dockerfile
+      target: mcp
+    image: jyotish-os/jyotish-mcp:local
+    container_name: jyotish-mcp
+    hostname: jyotish-mcp
+    user: "10001:10001"
+    networks: [sidecars, edge]
+    ports:
+      # the contract port; loopback on the host only (docs/CONTRACT.md)
+      - "127.0.0.1:7791:7791"
+    environment:
+      JYOTISH_DEPLOYMENT: compose
+      JYOTISH_BIND: 0.0.0.0:7791
+      JYOTISH_KERNEL: /kernels/de440s.bsp
+      JYOTISH_KERNEL_SHA256: /kernels/de440s.sha256
+      JHORA_URL: http://jhora-svc:7792
+      VEDASTRO_URL: http://vedastro-svc:7793
+      JYOTISH_AUDIT: /audit/jyotish-mcp.jsonl
+      JYOTISH_TLS: "on"
+      JYOTISH_TLS_CERT: /certs/jyotish-mcp.crt
+      JYOTISH_TLS_KEY: /certs/jyotish-mcp.key
+    volumes:
+      - ../kernels:/kernels:ro
+      - ../certs:/certs:ro
+      # append-only audit log; the host path audit/jyotish-mcp.jsonl keeps working
+      - ../audit:/audit
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 16777216
+          mode: 01777
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    depends_on:
+      jhora-svc:
+        condition: service_healthy
+      vedastro-svc:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "--cacert", "/certs/jyotish-ca.crt", "https://127.0.0.1:7791/health"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+  # On-demand corpus runner (profile `corpus`): runs INSIDE the sidecar network against jhora-svc,
+  # so no port of jhora-svc is ever published. Writes CSV + summary to ../validation on the host.
+  consensus-corpus:
+    build:
+      context: ..
+      dockerfile: services/jyotish-mcp/Dockerfile
+      target: consensus
+    image: jyotish-os/consensus-corpus:local
+    profiles: [corpus]
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    networks: [sidecars]
+    environment:
+      JYOTISH_DEPLOYMENT: compose
+    volumes:
+      - ../kernels:/kernels:ro
+      - ../validation:/out
+    depends_on:
+      jhora-svc:
+        condition: service_healthy
+    restart: "no"

@@ -472,6 +472,7 @@ pub async fn health(State(state): State<Arc<AppState>>) -> Response {
             "kernel_coverage_jd": state.engine.coverage_jd,
             "ayanamsa": AYANAMSA_NAME,
             "nodes": "TRUE",
+            "deployment": state.config.deployment.as_str(),
             "golden": state.golden,
             "sidecars": { "jhora": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Jhora), "up": jhora_up }, "vedastro": { "url": state.sidecars.base_url(crate::sidecar::Sidecar::Vedastro), "up": vedastro_up } },
             "cache_entries": state.cache.len(),

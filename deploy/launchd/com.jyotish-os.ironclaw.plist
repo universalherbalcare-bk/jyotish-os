@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  JYOTISH-OS Phase 8: user-level launchd supervision for the patched IronClaw build
+  (~/.local/bin/ironclaw-jyotish, patches/ironclaw-1.4.0-allow-loopback-egress.patch). No sudo.
+
+  install:   cp deploy/launchd/com.jyotish-os.ironclaw.plist ~/Library/LaunchAgents/
+             launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jyotish-os.ironclaw.plist
+  status:    launchctl print gui/$(id -u)/com.jyotish-os.ironclaw | grep -E 'state|pid'
+  remove:    launchctl bootout gui/$(id -u)/com.jyotish-os.ironclaw
+
+  `ironclaw service install` (1.4.0) writes com.ironclaw.reborn.plist for the CURRENT binary but has no
+  way to pass environment variables; the loopback opt-in and the CA bundle are env vars, hence this unit.
+  Both variables are public (a flag and a bundle of public certificates); no secret lives in this file.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.jyotish-os.ironclaw</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/brijesh/.local/bin/ironclaw-jyotish</string>
+    <string>serve</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>IRONCLAW_EGRESS_ALLOW_LOOPBACK</key>
+    <string>1</string>
+    <key>SSL_CERT_FILE</key>
+    <string>/Users/brijesh/Projects/jyotish-os/certs/ironclaw-ca-bundle.pem</string>
+    <key>HOME</key>
+    <string>/Users/brijesh</string>
+    <key>PATH</key>
+    <string>/Users/brijesh/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/brijesh/Projects/jyotish-os</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>5</integer>
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>StandardOutPath</key>
+  <string>/Users/brijesh/Library/Logs/jyotish-os/ironclaw.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/brijesh/Library/Logs/jyotish-os/ironclaw.stderr.log</string>
+</dict>
+</plist>

@@ -10,6 +10,7 @@ also bootstraps PyJHora (patched, no network) but only to validate catalog ids; 
 
 from __future__ import annotations
 
+import ipaddress
 import json
 import logging
 import os
@@ -31,6 +32,50 @@ BIND_PORT = 7792
 LOOPBACK = {"127.0.0.1", "::1", "testclient"}
 
 log = logging.getLogger("jhora_svc")
+
+
+def parse_trusted_cidrs(
+    raw: str | None,
+) -> tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]:
+    """Parse JHORA_SVC_TRUSTED_CIDRS (comma-separated, e.g. "172.28.0.0/24").
+
+    Empty/unset -> () = loopback clients only (the native contract). Under deploy/compose.yaml the
+    only other client is jyotish-mcp on the `internal: true` sidecar network, so the compose file
+    passes that network's subnet. Anything unparsable, or a public/global network, raises so the
+    service refuses to start rather than silently widening its client set.
+    """
+    nets: list[ipaddress.IPv4Network | ipaddress.IPv6Network] = []
+    for item in (raw or "").split(","):
+        item = item.strip()
+        if not item:
+            continue
+        net = ipaddress.ip_network(
+            item, strict=True
+        )  # ValueError on garbage / host bits set
+        if net.is_global:
+            raise ValueError(
+                f"JHORA_SVC_TRUSTED_CIDRS entry {item!r} is a global network; refused"
+            )
+        nets.append(net)
+    return tuple(nets)
+
+
+def client_allowed(
+    host: str | None, trusted: tuple[ipaddress.IPv4Network | ipaddress.IPv6Network, ...]
+) -> bool:
+    """Loopback (or the ASGI test client) always; otherwise only inside a trusted CIDR."""
+    if host in LOOPBACK:
+        return True
+    if host is None or not trusted:
+        return False
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return any(ip in net for net in trusted)
+
+
+TRUSTED_CIDRS = parse_trusted_cidrs(os.environ.get("JHORA_SVC_TRUSTED_CIDRS"))
 
 
 class _JsonFormatter(logging.Formatter):
@@ -114,7 +159,7 @@ app = FastAPI(
 @app.middleware("http")
 async def loopback_only(request: Request, call_next):
     host = request.client.host if request.client else None
-    if host not in LOOPBACK:
+    if not client_allowed(host, TRUSTED_CIDRS):
         return JSONResponse(
             status_code=403, content={"error": "loopback_only", "detail": host}
         )

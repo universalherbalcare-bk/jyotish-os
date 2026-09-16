@@ -49,6 +49,14 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Phase 8: when jyotish-mcp runs as the compose container (deploy/compose.yaml) its stderr is the
+# docker json-file log, not audit/server.log. P7_DOCKER_SERVICE=jyotish-mcp (auto-detected when that
+# container is running) makes the <label>.server.log slice come from `docker compose logs --since`.
+DOCKER_SVC="${P7_DOCKER_SERVICE:-}"
+if [[ -z "$DOCKER_SVC" ]] && docker compose -f "$ROOT/deploy/compose.yaml" ps -q jyotish-mcp 2>/dev/null | grep -q .; then
+  DOCKER_SVC="jyotish-mcp"
+fi
+
 # baseline offsets so we only keep lines produced during this turn
 S0=$(wc -l < "$SERVER_LOG" 2>/dev/null || echo 0)
 A0=$(wc -l < "$AUDIT" 2>/dev/null || echo 0)
@@ -68,7 +76,7 @@ if [[ -n "$PROBE" ]]; then MSG="Fetch $PROBE with the http tool and report the s
 elif [[ "$TOOL" == "script" ]]; then MSG="Run the scripted tool steps and report the last result verbatim."
 else MSG="Call the $TOOL tool with arguments $ARGS and report the result verbatim."; fi
 
-log "bin=$BIN ($("$BIN" --version)) flag=$FLAG tool=${PROBE:-$TOOL}"
+log "bin=$BIN ($("$BIN" --version)) flag=$FLAG tool=${PROBE:-$TOOL} server-log-source=${DOCKER_SVC:-audit/server.log}"
 START_TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 set +e
 if [[ "$FLAG" == "1" ]]; then
@@ -83,7 +91,11 @@ set -e
 END_TS="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 printf '\n[p7] run rc=%s start=%s end=%s\n' "$RC" "$START_TS" "$END_TS" >> "$LOGS/$LABEL.turn.txt"
 
-tail -n +"$((S0+1))" "$SERVER_LOG" 2>/dev/null > "$LOGS/$LABEL.server.log" || true
+if [[ -n "$DOCKER_SVC" ]]; then
+  docker compose -f "$ROOT/deploy/compose.yaml" logs --no-log-prefix --since "$START_TS" "$DOCKER_SVC" 2>/dev/null > "$LOGS/$LABEL.server.log" || true
+else
+  tail -n +"$((S0+1))" "$SERVER_LOG" 2>/dev/null > "$LOGS/$LABEL.server.log" || true
+fi
 tail -n +"$((A0+1))" "$AUDIT" 2>/dev/null > "$LOGS/$LABEL.audit.jsonl" || true
 
 log "rc=$RC ; reply:"

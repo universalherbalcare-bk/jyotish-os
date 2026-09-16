@@ -28,6 +28,7 @@ async fn boot_test_server_with(jhora_url: &str) -> (String, Arc<jyotish_mcp::App
         std::process::id()
     ));
     let config = Config {
+        deployment: jyotish_mcp::config::Deployment::Native,
         bind: "127.0.0.1:0".parse().unwrap(),
         kernel_path: root.join("kernels/de440s.bsp"),
         kernel_sha_path: root.join("kernels/de440s.sha256"),
