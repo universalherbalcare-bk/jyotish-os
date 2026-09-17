@@ -9,6 +9,8 @@
   status:    launchctl print gui/$(id -u)/com.jyotish-os.ironclaw | grep -E 'state|pid'
   remove:    launchctl bootout gui/$(id -u)/com.jyotish-os.ironclaw
 
+  The ProgramArguments run scripts/ironclaw-serve.sh, which boots the configured provider and falls
+  back to the keyless local provider if no API key is stored yet (no crash loop).
   `ironclaw service install` (1.4.0) writes com.ironclaw.reborn.plist for the CURRENT binary but has no
   way to pass environment variables; the loopback opt-in and the CA bundle are env vars, hence this unit.
   Both variables are public (a flag and a bundle of public certificates); no secret lives in this file.
@@ -19,8 +21,8 @@
   <string>com.jyotish-os.ironclaw</string>
   <key>ProgramArguments</key>
   <array>
-    <string>/Users/brijesh/.local/bin/ironclaw-jyotish</string>
-    <string>serve</string>
+    <string>/bin/bash</string>
+    <string>/Users/brijesh/Projects/jyotish-os/scripts/ironclaw-serve.sh</string>
   </array>
   <key>EnvironmentVariables</key>
   <dict>

@@ -1,9 +1,23 @@
 {
-  "$comment": "Nightly engine.consensus on the GOLDEN chart with alert on FAIL. Delivered two ways: (a) HEARTBEAT.md (identity/HEARTBEAT.md, read by the heartbeat system) and (b) this cron trigger, for installs where the heartbeat interval is not nightly. Keep one of the two active to avoid double runs.",
+  "$comment": "builtin__trigger_create payload for IronClaw 1.4.0 (execution_contract schema, verified against the binary on 2026-09-17). Deferred tools return their schema on first call — call trigger_create twice if the first reply carries a 'note' asking to call again.",
   "name": "jyotish-nightly-consensus",
-  "schedule_kind": "cron",
-  "schedule_expression": "30 2 * * *",
-  "schedule_timezone": "Asia/Kolkata",
-  "delivery_target": null,
-  "prompt": "You are running the Jyotish-OS nightly engine consensus check. Call jyotish.engine.consensus exactly once with {\"birth\": {\"utc\": \"1990-03-15T06:30:00Z\", \"lat\": 28.6139, \"lon\": 77.2090, \"tz_offset_hours\": 5.5}} (the GOLDEN chart from docs/CONTRACT.md). If the overall status is PASS and every per-body delta is within the contract tolerance (Sun/Mercury-Saturn 1.0 arcsec, Moon 1.5, Uranus/Neptune 3.0, ayanamsa 1.0, Ascendant 0.01 deg, True Node 5.0), write one line to memory at jyotish/consensus/<YYYY-MM-DD>.md and reply with the single word PASS. If the status is FAIL, any delta is out of tolerance, or the tool returns an error, write the complete raw result to jyotish/consensus/<YYYY-MM-DD>.md and reply with a message starting with 'jyotish consensus FAIL' followed by the raw deltas or error text; this reply must be delivered to the user. Do not call any other jyotish tool in this run."
+  "schedule": {
+    "kind": "cron",
+    "expression": "30 2 * * *",
+    "timezone": "Asia/Kolkata"
+  },
+  "execution_contract": {
+    "version": 1,
+    "goal": "Run the Jyotish-OS nightly engine consensus check: call mcp-jyotish-local__engine__consensus exactly once with {\"birth\": {\"utc\": \"1990-03-15T06:30:00Z\", \"lat\": 28.6139, \"lon\": 77.2090, \"tz_offset_hours\": 5.5}} (the GOLDEN chart from docs/CONTRACT.md). If consensus_status is PASS reply with the single word PASS. If it is FAIL, SIDECAR_UNAVAILABLE, or any error, reply with a message starting 'jyotish consensus FAIL' followed by the raw per-body deltas or error text.",
+    "success_criteria": [
+      "engine.consensus was called exactly once",
+      "The reply is PASS, or starts with 'jyotish consensus FAIL' and includes the raw deltas/error"
+    ],
+    "output_instructions": "Either the single word PASS or 'jyotish consensus FAIL: ...' with raw tool output.",
+    "no_result_text": "jyotish consensus FAIL: engine.consensus returned no result.",
+    "policy": {
+      "required_skills": null,
+      "result_delivery": "suppress_when_nothing_to_report"
+    }
+  }
 }

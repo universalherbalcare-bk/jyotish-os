@@ -1,9 +1,23 @@
 {
-  "$comment": "Weekly Monday 06:00 local muhurta scan over config/activities.json (enabled entries only).",
+  "$comment": "builtin__trigger_create payload for IronClaw 1.4.0 (execution_contract schema, verified against the binary on 2026-09-17). Deferred tools return their schema on first call — call trigger_create twice if the first reply carries a 'note' asking to call again.",
   "name": "jyotish-weekly-muhurta",
-  "schedule_kind": "cron",
-  "schedule_expression": "0 6 * * 1",
-  "schedule_timezone": "Asia/Kolkata",
-  "delivery_target": null,
-  "prompt": "You are running the Jyotish-OS weekly muhurta scan. Read the activity list from memory path jyotish/activities.json (a copy of services/ironclaw-ext/config/activities.json); if it is missing, use exactly one activity: GoodLunarDayForTravel at lat 28.6139, lon 77.2090, tz_offset_hours 5.5, step_minutes 60. For each enabled activity call jyotish.muhurta.find with from_utc = now and to_utc = now + 7 days at the configured location and step. Report at most the top 3 windows per activity with local start/end (state the UTC offset used), and for each window list the passed_rules and vetoed_by rule ids verbatim so a human astrologer can audit it. Include evidence.consensus_status per call. If a call errors, report the exact error and continue with the next activity. Never claim certainty. Write the report to memory at jyotish/muhurta/<YYYY-WW>.md and return it as the reply."
+  "schedule": {
+    "kind": "cron",
+    "expression": "0 6 * * 1",
+    "timezone": "Asia/Kolkata"
+  },
+  "execution_contract": {
+    "version": 1,
+    "goal": "Scan the coming 7 days for muhurta windows for each activity listed in the user's config/activities.json (default: GoodLunarDayForTravel) at the primary chart's location by calling mcp-jyotish-local__muhurta__find with from_utc=now, to_utc=now+7d, step_minutes=60 for each activity. Rank the top 3 windows per activity and include the passed_rules and vetoed_by trails verbatim.",
+    "success_criteria": [
+      "muhurta.find was called once per configured activity",
+      "Each activity lists up to 3 windows with start/end in local time and the rule trail"
+    ],
+    "output_instructions": "One section per activity: ranked windows with rule ids that passed and vetoed.",
+    "no_result_text": "No muhurta windows passed the rules this week for the configured activities.",
+    "policy": {
+      "required_skills": null,
+      "result_delivery": "deliver"
+    }
+  }
 }

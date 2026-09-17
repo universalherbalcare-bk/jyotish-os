@@ -1,7 +1,7 @@
 # JYOTISH-OS production topology (Phase 8) — blueprint §2 hard rule 2 implemented without sudo:
 # sidecars run as separate non-root uids (10002 jhora, 10003 vedastro) inside their own containers,
 # on an `internal: true` network that has no route off the host, supervised by the Docker daemon
-# (restart: unless-stopped). jyotish-mcp (uid 10001) is the only service on the `edge` network and
+# (restart: always). jyotish-mcp (uid 10001) is the only service on the `edge` network and
 # the only one with a published port — 127.0.0.1:7791, TLS, the same certs/ as the native build.
 #
 #   scripts/prod-up.sh      build + up + wait for health   (stops the native servers first)
@@ -20,7 +20,7 @@ x-hardening: &hardening
   cap_drop: [ALL]
   security_opt:
     - no-new-privileges:true
-  restart: unless-stopped
+  restart: always
   init: true
   logging:
     driver: json-file

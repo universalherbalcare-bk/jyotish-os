@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  JYOTISH-OS: bring the compose stack up at login and whenever this agent is (re)started.
+  Waits for the Docker daemon (Docker Desktop must be set to start at sign-in), then runs an
+  idempotent `docker compose up -d`. Together with `restart: always` on every service this covers
+  daemon restarts, Docker Desktop relaunches and reboots without sudo.
+  install: cp deploy/launchd/com.jyotish-os.stack.plist ~/Library/LaunchAgents/ && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jyotish-os.stack.plist
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.jyotish-os.stack</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/brijesh/Projects/jyotish-os/scripts/stack-ensure.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>HOME</key><string>/Users/brijesh</string>
+  </dict>
+  <key>WorkingDirectory</key><string>/Users/brijesh/Projects/jyotish-os</string>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>300</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>StandardOutPath</key><string>/Users/brijesh/Library/Logs/jyotish-os/stack.stdout.log</string>
+  <key>StandardErrorPath</key><string>/Users/brijesh/Library/Logs/jyotish-os/stack.stderr.log</string>
+</dict>
+</plist>
