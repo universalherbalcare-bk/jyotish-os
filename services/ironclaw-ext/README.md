@@ -350,3 +350,12 @@ and `certs/` are left as is.
 
 `strings "$(readlink -f "$(command -v ironclaw)")" | grep -n 'must use the https scheme\|SSL_CERT_FILE\|private or host-local IP\|deny_private_ip_ranges\|builtin.trigger_create'`
 (the full dump is 158k lines and is not kept in the repo).
+
+## Incident log
+- 2026-09-17 ~11:40Z: both user LaunchAgents (`com.jyotish-os.ironclaw`, `com.jyotish-os.stack`) were found absent from the
+  `gui/501` launchd domain ("Could not find service") roughly 20 minutes after being bootstrapped and observed running,
+  during a Docker Desktop quit/relaunch cycle. The unified log (`log show --last 90m`) contained no launchd entries for
+  either label, so the cause is UNKNOWN (not attributed). Re-bootstrapping both from `~/Library/LaunchAgents/` restored
+  them. Mitigation: `scripts/stack-ensure.sh` and `scripts/ironclaw-serve.sh` are idempotent, so
+  `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.jyotish-os.{stack,ironclaw}.plist` is always safe;
+  LaunchAgents in that folder are (re)loaded automatically at every login.
