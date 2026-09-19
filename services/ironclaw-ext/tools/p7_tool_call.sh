@@ -42,7 +42,9 @@ PREV_MODEL="$(ironclaw models status | awk -F': ' '/^default.model:/{print $2}')
 STUB_PID=""
 cleanup() {
   [[ -n "$STUB_PID" ]] && kill "$STUB_PID" 2>/dev/null || true
-  if [[ -n "$PREV_PROVIDER" && "$PREV_PROVIDER" != "ollama" ]]; then
+  # Always restore, including ollama/<real model>: leaving ollama/jyotish-stub configured would make
+  # the next `serve` boot point at a model that does not exist.
+  if [[ -n "$PREV_PROVIDER" && ( "$PREV_PROVIDER" != "ollama" || "$PREV_MODEL" != "jyotish-stub" ) ]]; then
     ironclaw models set-provider "$PREV_PROVIDER" --model "$PREV_MODEL" >/dev/null 2>&1 || true
   fi
   log "provider restored: $(ironclaw models status | awk -F': ' '/^default.provider:|^default.model:/{printf "%s ", $2}')"
