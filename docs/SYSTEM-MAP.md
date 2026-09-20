@@ -41,3 +41,11 @@ On recent macOS, user LaunchAgents in `~/Library/LaunchAgents` load at login onl
 - GitHub: `scripts/github-bootstrap.sh --confirm`
 - Docker Desktop → Settings → General → *Start Docker Desktop when you sign in* (user setting; needed for unattended reboots)
 
+
+## Compiled from other astrology sessions (added 2026-09-20)
+| Source | What it is | How it is wired | Evidence |
+|---|---|---|---|
+| `~/Projects/Vedic Astrology/kundali-webapp` (own git repo, 46 commits) | The earlier product: `kundali` engine package + FastAPI backend + Gujarati vanilla-JS UI; 22 engines; 6,908 backend + 216 frontend tests (per its README) | Started read-only by `scripts/kundali-up.sh` on 127.0.0.1:8000; never modified from this repo | Golden chart via `/api/chart`: Swiss Ephemeris, Lahiri 23.7202087°, true nodes, jd_ut identical to XALEN |
+| `~/Projects/Vedic Astrology/claude-skill` (= `~/.claude/skills/vedic-astrology-supreme-intelligence-engine`) | The chat-side skill: 25 Python engines (11,769 LOC), golden charts GC001/GC002, Gujarati-only answer rule | Not executed here; its engines are the same code the webapp's `engines/` folder owns | listed, not re-verified |
+| TrAgentic-Ai "Vedic time-of-day/lunar overlay" (trading project) | Astrology overlay embedded in a trading system | **Not pulled in** — belongs to a different project boundary; noted only | — |
+| `services/console` (new) | Live console on 127.0.0.1:7790: one birth → XALEN-DE440, PyJHora/Swiss, Kundali/Swiss side by side with arcsecond deltas, consensus, panchang ×2, Vimshottari, raw JSON | `scripts/jyotish-os console` | Golden run: 190 ms total, consensus PASS; Kundali +12.2″ on every body = mean- vs true-equinox ayanamsa convention (labelled) |
