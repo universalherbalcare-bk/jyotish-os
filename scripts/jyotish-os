@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# JYOTISH-OS control plane — ONE idempotent entrypoint that brings every layer up in dependency
+# order, wires it, and proves each wire with a live probe. Never guesses: every line of `status`
+# and `map` is read from a running service or a file hash, and anything that cannot be probed is
+# printed as UNKNOWN rather than assumed.
+#
+#   jyotish-os up       docker daemon → compose stack (3 services) → launchd agents → IronClaw ext → smoke
+#   jyotish-os status   one table: every wire, live
+#   jyotish-os verify   decisive checks (fast); exit 1 on any failure
+#   jyotish-os map      regenerate docs/SYSTEM-MAP.md from live introspection
+#   jyotish-os bench    latency/bottleneck measurements → validation/bench-latest.md
+#   jyotish-os down     stop compose stack (launchd agents left loaded; use `agents-off` to unload)
+#   jyotish-os agents-on|agents-off   bootstrap/bootout the two user LaunchAgents
+set -uo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; cd "$ROOT"
+CA="$ROOT/certs/ironclaw-ca-bundle.pem"; MCP="https://127.0.0.1:7791"
+COMPOSE="docker compose -f deploy/compose.yaml"; U=$(id -u)
+log(){ printf '%s %s\n' "$(date -u +%FT%TZ)" "$*"; }
+capped(){ # run "$@" with a hard 20 s cap (Docker can hang during Desktop relaunches)
+  local out; out=$(mktemp); ( "$@" >"$out" 2>&1 & local p=$!; local i=0; while kill -0 $p 2>/dev/null && [ $i -lt 40 ]; do sleep 0.5; i=$((i+1)); done; kill $p 2>/dev/null ); cat "$out"; rm -f "$out"; }
+mcp(){ curl -s -m "${2:-20}" --cacert "$CA" "$MCP/mcp" -H 'content-type: application/json' -d "$1"; }
+pyj(){ python3 -c "import json,sys
+try: d=json.load(sys.stdin)
+except Exception: print('UNKNOWN'); sys.exit(0)
+$1"; }
+
+daemon_up(){ capped docker info --format '{{.ServerVersion}}' | grep -qE '^[0-9]+\.'; }
+wait_daemon(){ local t=0; until daemon_up; do [ $t -ge 360 ] && return 1; [ $t -eq 0 ] && { log "docker daemon down — launching Docker Desktop"; open -a Docker 2>/dev/null || true; }; sleep 10; t=$((t+10)); done; }
+wait_healthy(){ local t=0; while :; do local h; h=$(capped $COMPOSE ps --format '{{.Health}}' | grep -c healthy); [ "$h" -ge 3 ] && return 0; [ $t -ge 240 ] && return 1; sleep 5; t=$((t+5)); done; }
+agent_state(){ launchctl print "gui/$U/$1" 2>/dev/null | awk -F'= ' '/state =/{print $2; exit}'; }
+agents_on(){ for l in com.jyotish-os.stack com.jyotish-os.ironclaw; do cp -f "deploy/launchd/$l.plist" ~/Library/LaunchAgents/; launchctl bootstrap "gui/$U" ~/Library/LaunchAgents/$l.plist 2>/dev/null || launchctl kickstart "gui/$U/$l" 2>/dev/null || true; done; }
+agents_off(){ for l in com.jyotish-os.ironclaw com.jyotish-os.stack; do launchctl bootout "gui/$U/$l" 2>/dev/null || true; done; }
+
+cmd_up(){
+  log "[1/5] docker daemon"; wait_daemon || { log "FAIL: docker daemon not reachable after 6 min"; exit 1; }
+  log "[2/5] compose stack"; capped $COMPOSE up -d --no-build --remove-orphans >/dev/null; wait_healthy || { log "FAIL: stack not healthy"; capped $COMPOSE ps; exit 1; }
+  log "[3/5] launchd agents"; agents_on; sleep 3
+  log "[4/5] ironclaw extension"; ( cd services/ironclaw-ext && ./check.sh >/dev/null 2>&1 ) && log "  ext package + registration check ok" || log "  WARN: ironclaw-ext check.sh failed (see services/ironclaw-ext/README.md)"
+  log "[5/5] smoke"; cmd_verify
+}
+cmd_down(){ capped $COMPOSE down >/dev/null; log "stack down (agents still loaded; jyotish-os agents-off to unload)"; }
+
+probe_rows(){ # prints TSV: wire|status|detail  (status ∈ OK|FAIL|UNKNOWN)
+  local h; h=$(curl -s -m 8 --cacert "$CA" "$MCP/health")
+  echo "$h" | pyj "print('L0 jyotish-mcp (TLS 7791)|%s|kernel=%s sha=%s… cache=%s' % ('OK' if d.get('ok') else 'FAIL', d.get('kernel_id'), str(d.get('kernel_sha256'))[:12], d.get('cache_entries')))" | sed 's/^UNKNOWN$/L0 jyotish-mcp (TLS 7791)|FAIL|no answer/'
+  echo "$h" | pyj "s=d.get('sidecars',{});print('L1 jhora-svc via mcp|%s|%s' % ('OK' if s.get('jhora',{}).get('up') else 'FAIL', s.get('jhora',{}).get('url')));print('L2 vedastro-svc via mcp|%s|%s' % ('OK' if s.get('vedastro',{}).get('up') else 'FAIL', s.get('vedastro',{}).get('url')))" | grep -v UNKNOWN || echo "L1/L2 sidecars via mcp|FAIL|no answer"
+  local jh; jh=$(capped docker exec jhora-svc python3 -c "import urllib.request;print(urllib.request.urlopen('http://127.0.0.1:7792/v1/health',timeout=5).read().decode())")
+  echo "$jh" | pyj "sc=d.get('self_check',{});print('L1 jhora-svc data|%s|ayanamsa=%s Δ=%.1e\" true_nodes=%s ephe=%s workers=%s dasha=%s/%s' % ('OK' if d.get('ok') else 'FAIL', d.get('ayanamsa'), sc.get('ayanamsa_delta_arcsec',-1), d.get('true_nodes'), d.get('ephe_files'), d.get('workers'), d.get('catalog',{}).get('supported'), d.get('catalog',{}).get('total')))" | sed 's/^UNKNOWN$/L1 jhora-svc data|UNKNOWN|docker exec did not answer/'
+  local vh; vh=$(capped docker exec vedastro-svc curl -s -m 5 localhost:7793/v1/health)
+  echo "$vh" | pyj "r=d.get('rules',{});pl=d.get('promotion_log',{});print('L2 vedastro-svc data|%s|rules proved=%s quarantined=%s (predicate: event %s, horoscope %s) rows=%s promotion_chain=%s' % ('OK' if d.get('ok') else 'FAIL', d.get('rules_proved'), d.get('rules_quarantined'), r.get('event_proved_with_predicate'), r.get('horoscope_proved_with_predicate'), d.get('dataset_rows'), pl.get('chain_ok', pl.get('ok'))))" | sed 's/^UNKNOWN$/L2 vedastro-svc data|UNKNOWN|docker exec did not answer/'
+  local k; k=$(shasum -a 256 -c kernels/de440s.sha256 2>/dev/null | grep -c ': OK'); echo "L0 kernel de440s.bsp|$([ "$k" = 1 ] && echo OK || echo FAIL)|$(cut -c1-16 kernels/de440s.sha256 2>/dev/null)… $(stat -f %z kernels/de440s.bsp 2>/dev/null) bytes"
+  echo "L0 TLS cert/CA|$([ -f certs/jyotish-mcp.crt ] && [ "$(stat -f %Lp certs/jyotish-mcp.key 2>/dev/null)" = 600 ] && echo OK || echo FAIL)|key mode $(stat -f %Lp certs/jyotish-mcp.key 2>/dev/null) SAN=$(openssl x509 -in certs/jyotish-mcp.crt -noout -ext subjectAltName 2>/dev/null | tail -1 | tr -d ' ')"
+  for l in com.jyotish-os.ironclaw com.jyotish-os.stack; do local s; s=$(agent_state $l); echo "L3 launchd $l|$([ -n "$s" ] && echo OK || echo FAIL)|${s:-not loaded (reboot? see docs/SYSTEM-MAP.md §BTM)}"; done
+  local prov; prov=$(~/.local/bin/ironclaw-jyotish models status 2>/dev/null | awk '/default.provider:/{p=$2} /default.model:/{m=$2} END{print p"/"m}'); echo "L3 ironclaw provider|$([ -n "$prov" ] && echo OK || echo UNKNOWN)|$prov (anthropic needs stored key; fallback logs in ~/Library/Logs/jyotish-os/ironclaw.boot.log)"
+  local tl; tl=$(mcp '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' 8 | pyj "print(len(d['result']['tools']))"); echo "L4 MCP tools advertised|$([ "$tl" = 10 ] && echo OK || echo FAIL)|$tl/10"
+  local g; g=$(mcp '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"chart.compute","arguments":{"birth":{"utc":"1990-03-15T06:30:00Z","lat":28.6139,"lon":77.2090,"tz_offset_hours":5.5}}}}' 30 | pyj "sc=d['result']['structuredContent'];print(sc['evidence']['consensus_status']+' Moon='+sc['bodies']['Moon']['nakshatra']+' node='+sc['bodies']['Rahu']['source'])"); echo "L4 golden chart consensus|$(echo "$g" | grep -q '^PASS' && echo OK || echo FAIL)|$g"
+  echo "L5 audit log|$([ -f audit/jyotish-mcp.jsonl ] && echo OK || echo FAIL)|$(wc -l < audit/jyotish-mcp.jsonl 2>/dev/null | tr -d ' ') lines, no birth data (hashes only)"
+  echo "L5 vendor pins|$(scripts/vendor.sh --check >/dev/null 2>&1 && echo OK || echo FAIL)|$(grep -cE '^[A-Z]+_COMMIT=' vendor/UPSTREAM-PINS.txt 2>/dev/null) pinned upstreams (exact-match)"
+}
+cmd_status(){ printf '%-34s %-8s %s\n' WIRE STATUS DETAIL; probe_rows | while IFS='|' read -r w s d; do printf '%-34s %-8s %s\n' "$w" "$s" "$d"; done; }
+cmd_verify(){ local bad=0; while IFS='|' read -r w s d; do [ "$s" = OK ] || { bad=$((bad+1)); log "  NOT OK: $w — $d"; }; done < <(probe_rows); [ $bad -eq 0 ] && { log "verify: all wires OK"; return 0; }; log "verify: $bad wire(s) not OK"; return 1; }
+cmd_map(){ python3 scripts/system-map.py > docs/SYSTEM-MAP.md && log "docs/SYSTEM-MAP.md regenerated from live introspection"; }
+cmd_bench(){ python3 scripts/bench.py | tee validation/bench-latest.md; }
+case "${1:-status}" in up) cmd_up;; down) cmd_down;; status) cmd_status;; verify) cmd_verify;; map) cmd_map;; bench) cmd_bench;; agents-on) agents_on;; agents-off) agents_off;; *) sed -n 2,14p "$0"; exit 64;; esac

@@ -26,11 +26,15 @@ for t in m["tools"]:
         assert set(bi) == {"utc","lat","lon","tz_offset_hours"}, set(bi)
 r = json.loads((root/"registry/jyotish.json").read_text())
 assert r["kind"]=="mcp_server" and r["url"]=="https://127.0.0.1:7791/mcp" and r["auth"]=="none"
+# IronClaw 1.4.0 trigger_create payload: schedule{kind,expression,timezone} + execution_contract v1
 for f in sorted((root/"routines").glob("*.json")):
     d = json.loads(f.read_text())
-    assert d["schedule_kind"]=="cron" and len(d["schedule_expression"].split())==5 and d["prompt"], f
-    assert "jyotish." in d["prompt"], f
-sched = {json.loads(f.read_text())["name"]: json.loads(f.read_text())["schedule_expression"] for f in (root/"routines").glob("*.json")}
+    sc, ec = d["schedule"], d["execution_contract"]
+    assert sc["kind"]=="cron" and len(sc["expression"].split())==5 and sc["timezone"], f
+    assert ec["version"]==1 and ec["goal"] and ec["success_criteria"] and ec["output_instructions"] and ec["no_result_text"], f
+    assert ec["policy"]["result_delivery"] in ("deliver","suppress_when_nothing_to_report") and "required_skills" in ec["policy"], f
+    assert "mcp-jyotish-local__" in ec["goal"], f
+sched = {json.loads(f.read_text())["name"]: json.loads(f.read_text())["schedule"]["expression"] for f in (root/"routines").glob("*.json")}
 assert sched["jyotish-daily-brief"]=="0 4 * * *" and sched["jyotish-weekly-muhurta"]=="0 6 * * 1", sched
 a = json.loads((root/"config/activities.json").read_text())
 assert a["activities"] and all("activity" in x for x in a["activities"])
