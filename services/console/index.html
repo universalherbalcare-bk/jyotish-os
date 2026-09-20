@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JYOTISH-OS console</title>
+<style>
+  :root { --bg:#f6f4ef; --fg:#1a1a1a; --mut:#6b6b6b; --card:#fff; --line:#ddd6c8; --ok:#1f7a3a; --bad:#b3261e; --warn:#8a6d00; --acc:#5a3fbf; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#141311; --fg:#ecebe6; --mut:#a09d94; --card:#1f1d1a; --line:#39362f; --ok:#5fcf7a; --bad:#ff6b61; --warn:#e6c04a; --acc:#b39cff; } }
+  :root[data-theme="dark"] { --bg:#141311; --fg:#ecebe6; --mut:#a09d94; --card:#1f1d1a; --line:#39362f; --ok:#5fcf7a; --bad:#ff6b61; --warn:#e6c04a; --acc:#b39cff; }
+  * { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; }
+  header { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; gap:16px; align-items:baseline; flex-wrap:wrap }
+  h1 { font-size:18px; margin:0 } .sub { color:var(--mut); font-size:13px }
+  main { padding:16px; max-width:1200px; margin:0 auto; display:grid; gap:14px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px }
+  .card h2 { font-size:14px; margin:0 0 10px; letter-spacing:.02em; text-transform:uppercase; color:var(--mut) }
+  form { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; align-items:end }
+  label { display:grid; gap:4px; font-size:12px; color:var(--mut) } input { padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; min-width:0 }
+  button { padding:10px 16px; border:0; border-radius:8px; background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer } button[disabled]{opacity:.5}
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600 } .ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)} .bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)} .warn{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
+  table { width:100%; border-collapse:collapse; font-size:13px } th,td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap } td.num, th.num { text-align:right; font-family:var(--mono) } .wrap { overflow:auto }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:14px }
+  pre { margin:0; font:12px/1.4 var(--mono); white-space:pre-wrap; word-break:break-word; max-height:340px; overflow:auto; background:var(--bg); padding:10px; border-radius:8px }
+  .kv { display:grid; grid-template-columns:max-content 1fr; gap:4px 12px; font-size:13px } .kv b { color:var(--mut); font-weight:500 }
+  .muted { color:var(--mut); font-size:12px } details summary { cursor:pointer; color:var(--mut); font-size:13px }
+</style>
+</head>
+<body>
+<header>
+  <h1>JYOTISH-OS console</h1>
+  <span class="sub">one birth → XALEN-DE440 · PyJHora/Swiss · Kundali/Swiss, side by side, live</span>
+  <span id="health" class="sub">checking backends…</span>
+</header>
+<main>
+  <section class="card">
+    <h2>Birth input</h2>
+    <form id="f">
+      <label>UTC instant <input name="utc" value="1990-03-15T06:30:00Z" required></label>
+      <label>Latitude <input name="lat" type="number" step="0.0001" value="28.6139" required></label>
+      <label>Longitude <input name="lon" type="number" step="0.0001" value="77.2090" required></label>
+      <label>TZ offset (h) <input name="tz" type="number" step="0.25" value="5.5" required></label>
+      <button id="run" type="submit">Run all engines</button>
+    </form>
+    <p class="muted">Default is the GOLDEN chart from docs/CONTRACT.md (1990-03-15 12:00 IST, New Delhi). Nothing is stored; every number is computed on Run.</p>
+  </section>
+
+  <section id="out" hidden>
+    <div class="grid2">
+      <div class="card"><h2>Consensus (XALEN-DE440 vs PyJHora/Swiss)</h2><div id="cons"></div></div>
+      <div class="card"><h2>Run summary</h2><div id="summary" class="kv"></div></div>
+    </div>
+    <div class="card"><h2>Positions — sidereal Lahiri, three engines</h2><div class="wrap"><table id="pos"></table></div>
+      <p class="muted" id="notes"></p></div>
+    <div class="grid2">
+      <div class="card"><h2>Panchang (jyotish-mcp)</h2><div id="pan" class="kv"></div></div>
+      <div class="card"><h2>Panchanga (kundali-webapp)</h2><div id="kpan" class="kv"></div></div>
+      <div class="card"><h2>Vimshottari (PyJHora via jyotish-mcp)</h2><div id="dasha"></div></div>
+      <div class="card"><h2>Kundali extras</h2><div id="kx"></div></div>
+    </div>
+    <div class="card"><details><summary>Raw JSON (everything the engines returned)</summary><pre id="raw"></pre></details></div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = (v,d=5) => (v==null||Number.isNaN(v)) ? '—' : Number(v).toFixed(d);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function health(){ try{ const h=await (await fetch('/api/health')).json();
+  const m=h.jyotish_mcp||{}, k=h.kundali_webapp||{};
+  $('#health').innerHTML = `jyotish-mcp <span class="pill ${m.ok?'ok':'bad'}">${m.ok?('DE440 · jhora '+(m.jhora_up?'up':'down')+' · vedastro '+(m.vedastro_up?'up':'down')):'down'}</span> &nbsp; kundali-webapp <span class="pill ${k.ok?'ok':'bad'}">${k.ok?'up :8000':'down'}</span>`;
+ }catch(e){ $('#health').textContent='console backend unreachable'; } }
+health();
+$('#f').addEventListener('submit', async e => {
+  e.preventDefault(); const fd=new FormData(e.target); const b={utc:fd.get('utc'),lat:+fd.get('lat'),lon:+fd.get('lon'),tz_offset_hours:+fd.get('tz')};
+  $('#run').disabled=true; $('#run').textContent='Running…';
+  try{ const r=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)}); const d=await r.json(); render(d); }
+  catch(err){ alert('run failed: '+err); } finally{ $('#run').disabled=false; $('#run').textContent='Run all engines'; }
+});
+function render(d){
+  $('#out').hidden=false;
+  const c=d.consensus, cs=c.ok?c.data.consensus_status:'n/a';
+  let ch=`<p><span class="pill ${cs==='PASS'?'ok':(cs==='FAIL'?'bad':'warn')}">${esc(cs)}</span> <span class="muted">${c.ok?'':esc(JSON.stringify(c.error||''))}</span></p>`;
+  if(c.ok&&c.data.categories){ ch+='<div class="kv">'+Object.entries(c.data.categories).map(([k,v])=>`<b>${esc(k)}</b><span>${typeof v==='object'?esc(JSON.stringify(v)):esc(v)}</span>`).join('')+'</div>'; }
+  if(c.ok&&c.data.time_scale){ ch+=`<p class="muted">time_scale: ${esc(JSON.stringify(c.data.time_scale))}</p>`; }
+  $('#cons').innerHTML=ch;
+  const ev=(d.chart.data||{}).evidence||{};
+  $('#summary').innerHTML=[['birth (UTC)',d.birth.utc],['local',`${d.local.year}-${String(d.local.month).padStart(2,'0')}-${String(d.local.day).padStart(2,'0')} ${String(d.local.hour).padStart(2,'0')}:${String(d.local.minute).padStart(2,'0')} (UTC${d.birth.tz_offset_hours>=0?'+':''}${d.birth.tz_offset_hours})`],
+    ['engine',ev.engine||'—'],['kernel sha',(ev.kernel_sha256||'').slice(0,16)+(ev.kernel_sha256?'…':'')],['ayanamsa',ev.ayanamsa||'—'],['nodes',ev.nodes||'—'],['ΔT σ (s)',ev.delta_t_sigma_sec??'—'],
+    ['chart.compute',d.chart.ok?d.chart.ms+' ms':'ERROR '+esc(JSON.stringify(d.chart.error))],['engine.consensus',c.ok?c.ms+' ms':'ERROR'],['panchang.day',d.panchang.ok?d.panchang.ms+' ms':'ERROR'],['dasha.timeline',d.dasha.ok?d.dasha.ms+' ms':'ERROR'],['kundali /api/chart',d.kundali.ok?d.kundali.ms+' ms':'ERROR '+esc(d.kundali.error||'')],['total',d.elapsed_ms+' ms']]
+    .map(([k,v])=>`<b>${esc(k)}</b><span>${v}</span>`).join('');
+  const rows=d.positions.map(p=>`<tr><td>${p.body}</td><td class="num">${fmt(p.xalen_de440)}</td><td class="num">${fmt(p.jhora_swiss)}</td><td class="num">${fmt(p.kundali_swiss)}</td><td class="num">${fmt(p.d_xalen_jhora_arcsec,3)}</td><td class="num">${fmt(p.d_kundali_jhora_arcsec,3)}</td><td>${esc(p.nakshatra||'—')} ${p.pada?'p'+p.pada:''}</td><td class="num">${p.pada_flip_sec==null?'—':Math.round(p.pada_flip_sec)}</td><td class="muted">${esc(p.source||'')}</td></tr>`).join('');
+  const a=d.ascendant;
+  $('#pos').innerHTML=`<thead><tr><th>Body</th><th class="num">XALEN-DE440 °</th><th class="num">PyJHora/Swiss °</th><th class="num">Kundali/Swiss °</th><th class="num">Δ X−J ″</th><th class="num">Δ K−J ″</th><th>Nakshatra</th><th class="num">pada flip (s)</th><th>source</th></tr></thead><tbody>${rows}<tr><td>Ascendant</td><td class="num">${fmt(a.xalen_de440)}</td><td class="num">${fmt(a.jhora_swiss)}</td><td class="num">${fmt(a.kundali_swiss)}</td><td class="num">${fmt(a.d_xalen_jhora_arcsec,3)}</td><td class="num">${fmt(a.d_kundali_jhora_arcsec,3)}</td><td colspan="3"></td></tr></tbody>`;
+  $('#notes').textContent=(d.notes||[]).join(' ');
+  const p=d.panchang.ok?d.panchang.data:null;
+  $('#pan').innerHTML=p?Object.entries(p).filter(([k,v])=>['tithi','nakshatra','yoga','karana','vara','weekday','sunrise','sunset','sunrise_utc','sunset_utc','sunrise_local','sunset_local'].includes(k)).map(([k,v])=>`<b>${esc(k)}</b><span>${esc(typeof v==='object'?JSON.stringify(v):v)}</span>`).join('')||'<span class="muted">see raw</span>':'<span class="pill bad">ERROR</span>';
+  const kp=d.kundali.panchanga; $('#kpan').innerHTML=kp?Object.entries(kp).slice(0,12).map(([k,v])=>`<b>${esc(k)}</b><span>${esc(typeof v==='object'?JSON.stringify(v):v)}</span>`).join(''):'<span class="muted">'+esc(d.kundali.error||'n/a')+'</span>';
+  const ds=d.dasha.ok?d.dasha.data:null;
+  $('#dasha').innerHTML=ds?`<p class="muted">balance at birth ${fmt(ds.balance_at_birth_years,4)} y · ${esc(ds.system)}</p><div class="wrap"><table><thead><tr><th>Maha</th><th>start</th><th>end</th><th class="num">years</th></tr></thead><tbody>${(ds.periods||[]).map(x=>`<tr><td>${esc(x.lord)}</td><td>${esc((x.start_utc||'').slice(0,10))}</td><td>${esc((x.end_utc||'').slice(0,10))}</td><td class="num">${fmt(x.duration_years,3)}</td></tr>`).join('')}</tbody></table></div>`:'<span class="pill bad">ERROR</span> <span class="muted">'+esc(JSON.stringify(d.dasha.error||''))+'</span>';
+  const kx=d.kundali; $('#kx').innerHTML=kx.ok?`<div class="kv"><b>ayanamsha</b><span>${fmt(kx.ayanamsha,6)}°</span><b>provenance</b><span>${esc(JSON.stringify(kx.provenance))}</span><b>yogas</b><span>${Array.isArray(kx.yogas)?kx.yogas.length+' found':esc(typeof kx.yogas)}</span><b>integrity</b><span>${esc(JSON.stringify(kx.birth_data_integrity||{})).slice(0,200)}</span><b>warnings</b><span>${esc(JSON.stringify(kx.warnings||[]))}</span></div><p class="muted">Full Gujarati UI of this product: <a href="http://127.0.0.1:8000" target="_blank" rel="noopener">http://127.0.0.1:8000</a></p>`:'<span class="pill bad">'+esc(kx.error||'down')+'</span>';
+  $('#raw').textContent=JSON.stringify(d,null,2);
+}
+</script>
+</body>
+</html>
