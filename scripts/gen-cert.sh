@@ -91,8 +91,10 @@ else
 fi
 
 # --- invariants the server will re-check at boot -------------------------------------------
-[[ "$(stat -f '%Lp' "$SRV_KEY" 2>/dev/null || stat -c '%a' "$SRV_KEY")" == "600" ]] || { echo "server key is not mode 600" >&2; exit 1; }
-[[ "$(stat -f '%Lp' "$CA_KEY" 2>/dev/null || stat -c '%a' "$CA_KEY")" == "600" ]] || { echo "CA key is not mode 600" >&2; exit 1; }
+# portable mode read: GNU stat (-c) first, BSD/macOS stat (-f) second — `stat -f` on GNU means *filesystem* status.
+mode_of() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1"; }
+[[ "$(mode_of "$SRV_KEY")" == "600" ]] || { echo "server key is not mode 600 (got $(mode_of "$SRV_KEY"))" >&2; exit 1; }
+[[ "$(mode_of "$CA_KEY")" == "600" ]] || { echo "CA key is not mode 600 (got $(mode_of "$CA_KEY"))" >&2; exit 1; }
 openssl verify -CAfile "$CA_CRT" "$SRV_CRT" >/dev/null
 openssl x509 -in "$SRV_CRT" -noout -ext subjectAltName | grep -q '127\.0\.0\.1'
 

@@ -11,7 +11,9 @@ command -v uv >/dev/null || { echo "uv not found (https://docs.astral.sh/uv/)" >
 [ -x .venv/bin/python ] || uv venv --python 3.12 .venv
 export VIRTUAL_ENV="$PWD/.venv"
 uv pip install -q -r "$ROOT/vendor/pyjhora/requirements.txt"
-uv pip install -q fastapi uvicorn "pydantic>=2" pytest httpx
+# python-dateutil: imported by vendor/pyjhora/src/jhora/utils.py:44 but absent from PyJHora's own
+# requirements.txt (upstream omission, surfaced by hosted CI 2026-09-20). Pinned to the lock's version.
+uv pip install -q fastapi uvicorn "pydantic>=2" pytest httpx "python-dateutil==2.9.0.post0"
 SP="$(.venv/bin/python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
 echo "$ROOT/vendor/pyjhora/src" > "$SP/pyjhora-vendor.pth"
 .venv/bin/python - <<'PY'
